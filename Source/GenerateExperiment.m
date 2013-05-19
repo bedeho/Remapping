@@ -36,6 +36,11 @@ function GenerateExperiment()
     %% Specify main paramters
     parameterCombinations = containers.Map;
     
+    % Simulations
+    dt = 0.001; % (s)
+    epochs = 1;
+    
+    
     % LIP
     parameterCombinations('R_eccentricity') = [45 50];
     parameterCombinations('R_tau')          = [0.100 0.2]; % (s)

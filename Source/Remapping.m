@@ -7,11 +7,12 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Remapping(sourcefolder, outputFolder, paramters,enablePlasticity)
+function Remapping(network, paramters, stimuli, outputfolder, enablePlasticity)
 
     % Dynamical quantities
     Duration = 2; % (s)
     dt = 0.010; % (s)
+    
     numTimeSteps = ceil(Duration/dt);
 
     % Random seed
@@ -41,97 +42,6 @@ function Remapping(sourcefolder, outputFolder, paramters,enablePlasticity)
     % Index i => Time (i-1)*dt
     eyePositionTrace = zeros(1, numTimeSteps);
     eyePositionTrace(1) = initialEyePosition;
-
-    % Generate eye position trace
-    numCompletedSaccades = 0;
-    for t=2:numTimeSteps,
-        
-        presentTime = stepToTime(t);
-        
-        % Have we completed all saccades beginning before time timestep t?
-        if numCompletedSaccades == numSaccades || presentTime <= saccadeTimes(numCompletedSaccades+1),
-
-            % yes, so lets just continue fixating
-            eyePositionTrace(t) = eyePositionTrace(t-1);
-
-        else
-            % no, there was a not completed saccade beginning before
-            % timestep t
-            
-            % was this the first step across this saccade onset time?
-            previousTimeSteptime = stepToTime(t-1);
-            timeOffset = abs(previousTimeSteptime - saccadeTimes(numCompletedSaccades+1));
-            
-            if(timeOffset < dt),
-                
-                % yes it was, so mini saccade starting
-                % point needs to correct for delay between prior time step
-                % and saccade onset event to find saccade start position
-                
-                reduceSaccadeTimeInPresentTimeStepWith = timeOffset;
-            else
-                
-                % no, we passed at some previous time, so mini saccade starting
-                % point is just last eye position
-                
-                reduceSaccadeTimeInPresentTimeStepWith = 0;
-            end
-            
-            % Will one more stime step saccading from
-            % miniSaccadeStartPosition take us past saccade target?
-            
-            saccadeOffset = eyePositionTrace(t-1) - saccadeTargets(numCompletedSaccades+1);
-            timeStepSaccadeMagnitude = (dt - reduceSaccadeTimeInPresentTimeStepWith)*saccadeSpeed;
-            
-            if (timeStepSaccadeMagnitude > saccadeOffset),
-                
-                % yes, so lets not do the whole thing
-                eyePositionTrace(t) = saccadeTargets(numCompletedSaccades+1);
-                
-                % and lets saccade as completed
-                numCompletedSaccades = numCompletedSaccades + 1;
-                
-            else
-                
-                % no, then lets do the full thing and keep going.
-                eyePositionTrace(t) = eyePositionTrace(t-1) + -1*sign(saccadeOffset)*saccadeSpeed*dt;
-                
-            end
-            
-        end
-        
-    end
-
-    % Generate retinal target location trace
-    retinalTargetTraces = zeros(maxNumberOfVisibleTargets, numTimeSteps);
-    for h=1:maxNumberOfVisibleTargets,
-        
-        % Make trace: r = h - e
-        retinalTargetTraces(h, :) = headCenteredTargetLocations(h) - eyePositionTrace;
-        
-        % Cancel out parts where target is not present
-        offIntervals = targetOffIntervals{h};
-        [numIntervals x] = size(offIntervals);
-        for i=1:numIntervals,
-            
-            % Get interval
-            interval = offIntervals(i,:);
-            
-            % Translate from time to timesteps
-            timeStepInterval = timeToTimeStep(interval);
-            
-            % Cancel out, i.e. not visible
-            retinalTargetTraces(h, timeStepInterval(1):timeStepInterval(2)) = nan;
-        end
-    end
-    
-    function r = stepToTime(i)
-        r = (i-1)*dt;
-    end
-    
-    function i = timeToTimeStep(t)
-        i = floor(t/dt) + 1;
-    end
 
     %% Dynamics
     
@@ -197,37 +107,6 @@ function Remapping(sourcefolder, outputFolder, paramters,enablePlasticity)
     C_history = zeros(C_N,numTimeSteps);
     C_history2 = zeros(C_N,numTimeSteps);
     
-    %% Setup Weights
-    
-    % Random
-    C_to_R_weights = rand(R_N,C_N);
-    R_to_C_weights = rand(C_N,R_N);
-    S_to_C_weights = rand(C_N,S_N);
-    
-    %{
-    % Hardwire
-    [X Y Z] = meshgrid(R_preferences, S_preferences, R_preferences);
-    
-    % C_to_R_weights
-    C_to_R_raw = exp(-(((Z - (X-Y))).^2)./(2*V_sigma^2));
-    C_to_R_reshaped = reshape(C_to_R_raw,C_N,R_N)';
-    C_to_R_norm = 1./sqrt(squeeze(sum(C_to_R_reshaped.^2))); 
-    C_to_R_weights = bsxfun(@times,C_to_R_reshaped,C_to_R_norm); % Normalize
-    
-    % R_to_C_weights
-    R_to_C_raw = exp(-((Z - X).^2)./(2*V_sigma^2));
-    R_to_C_reshaped = reshape(R_to_C_raw,C_N,R_N);
-    R_to_C_norm = 1./sqrt(squeeze(sum(R_to_C_reshaped.^2))); 
-    R_to_C_weights = bsxfun(@times,R_to_C_reshaped,R_to_C_norm); % Normalize
-    
-    % S_to_C_weights
-    [X Y Z] = meshgrid(R_preferences, S_preferences, S_preferences);
-    
-    S_to_C_raw = exp(-((Z - Y).^2))./(2*V_sigma^2);
-    S_to_C_reshaped = reshape(S_to_C_raw, C_N,S_N);
-    S_to_C_norm = 1./sqrt(squeeze(sum(S_to_C_reshaped.^2))); 
-    S_to_C_weights = bsxfun(@times,S_to_C_reshaped,S_to_C_norm); % Normalize
-    %}
     
     %% Integrate
     
