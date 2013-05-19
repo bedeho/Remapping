@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Remapping()
+function Remapping(sourcefolder, outputFolder, paramters,enablePlasticity)
 
     % Dynamical quantities
     Duration = 2; % (s)
@@ -283,21 +283,22 @@ function Remapping()
         S_activation = S_activation + (dt/S_tau)*(-S_activation + S_driver'); 
         
         %% Weight Update
-        %{
-        C_to_R_weights = C_to_R_weights + dt*C_to_R_alpha*(R_firingrate'*C_firingrate);
-        S_to_C_weights = S_to_C_weights + dt*S_to_C_alpha*(C_firingrate'*S_firingrate);
-        R_to_C_weights = R_to_C_weights + dt*R_to_C_alpha*(C_firingrate'*R_firingrate);
-        
-        % Normalize
-        C_to_R_norm = 1./sqrt(squeeze(sum(C_to_R_weights.^2))); 
-        C_to_R_weights = bsxfun(@times,C_to_R_weights,C_to_R_norm);
-    
-        S_to_C_norm = 1./sqrt(squeeze(sum(S_to_C_weights.^2))); 
-        S_to_C_weights = bsxfun(@times,S_to_C_weights,S_to_C_norm); 
-        
-        R_to_C_norm = 1./sqrt(squeeze(sum(R_to_C_weights.^2))); 
-        R_to_C_weights = bsxfun(@times,R_to_C_weights,R_to_C_norm);
-        %}
+        if enablePlasticity,
+            
+            C_to_R_weights = C_to_R_weights + dt*C_to_R_alpha*(R_firingrate'*C_firingrate);
+            S_to_C_weights = S_to_C_weights + dt*S_to_C_alpha*(C_firingrate'*S_firingrate);
+            R_to_C_weights = R_to_C_weights + dt*R_to_C_alpha*(C_firingrate'*R_firingrate);
+
+            % Normalize
+            C_to_R_norm = 1./sqrt(squeeze(sum(C_to_R_weights.^2))); 
+            C_to_R_weights = bsxfun(@times,C_to_R_weights,C_to_R_norm);
+
+            S_to_C_norm = 1./sqrt(squeeze(sum(S_to_C_weights.^2))); 
+            S_to_C_weights = bsxfun(@times,S_to_C_weights,S_to_C_norm); 
+
+            R_to_C_norm = 1./sqrt(squeeze(sum(R_to_C_weights.^2))); 
+            R_to_C_weights = bsxfun(@times,R_to_C_weights,R_to_C_norm);
+        end
         
         %% Firing rates & Save history
         R_firingrate = 1./(1 + exp(-2*R_slope*(R_activation - R_threshold)));

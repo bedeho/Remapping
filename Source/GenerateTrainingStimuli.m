@@ -28,8 +28,8 @@ function GenerateTrainingStimuli()
     headCenteredTargetLocations = [15]; % (deg)
     maxNumberOfVisibleTargets = length(headCenteredTargetLocations);
     
-    targetOffIntervals{1} = []; %[0.6 2];%[0.5 0.9;]; % (s) [start_OFF end_OFF; start_OFF end_OFF] <==== Make dt multiples
-    targetOffIntervals{2} = []; %[0.1 0.2;];
+    targetOffIntervals{1} = [];% [0.6 1.8]; %[0.5 0.9;]; % (s) [start_OFF end_OFF; start_OFF end_OFF] <==== Make dt multiples
+    %targetOffIntervals{2} = []; %[0.1 0.2;];
     
     assert(length(targetOffIntervals) >= maxNumberOfVisibleTargets, 'On off history not provided for all targets.');
     
@@ -138,7 +138,7 @@ function GenerateTrainingStimuli()
         i = floor(t/dt) + 1;
     end
 
-    subplot(4,2,7);
+    figure;
     plot(eyePositionTrace, 'r');
     hold on;
     plot(retinalTargetTraces' , 'b');
@@ -148,6 +148,7 @@ function GenerateTrainingStimuli()
     
     % Save params
     stimuliFolder = [base 'Stimuli' filesep Name];
+    mkdir(stimuliFolder);
     save([stimuliFolder filesep 'TrainingStimuli.mat'] , ...
                                     'headCenteredTargetLocations', ...
                                     'maxNumberOfVisibleTargets', ...

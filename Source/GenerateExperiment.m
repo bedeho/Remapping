@@ -131,8 +131,13 @@ function GenerateExperiment()
             % Create simulation blank network
             createBlankNetwork([simulationFolder filesep 'BlankNetwork.mat'], simulation);
             
-            % Run experiment
-            %Remapping()
+            % Training
+            %Remapping(sourcefolder, outputFolder, paramters,enablePlasticity)
+            
+            % Testing
+            %Remapping(sourcefolder, outputFolder, paramters,enablePlasticity)
+            
+            % Analysis
             
         end
     end
