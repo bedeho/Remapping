@@ -36,9 +36,12 @@ function GenerateExperiment()
     %% Specify main paramters
     parameterCombinations = containers.Map;
     
-    % Simulations
+    % Simulations Paramters
     dt = 0.001; % (s)
     epochs = 1;
+    outputSavingRate = 2; % Period of time step saving during testing.
+    saveDuringTraining = false;
+    saveNetworksAtEpochs = 333; % Save network at this resolution
     
     
     % LIP
