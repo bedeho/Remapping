@@ -1,5 +1,4 @@
 
-
 %
 %  StandAloneRemapping.m
 %  StandAloneRemapping
@@ -220,13 +219,11 @@ function StandAloneRemapping()
     C_to_R_norm = 1./sqrt(squeeze(sum(C_to_R_reshaped.^2))); 
     C_to_R_weights = bsxfun(@times,C_to_R_reshaped,C_to_R_norm); % Normalize
     
-    % R_to_C_weights
-    R_to_C_raw = exp(-((Z - X).^2)./(2*V_sigma^2));
-    R_to_C_reshaped = reshape(R_to_C_raw,C_N,R_N);
-    R_to_C_norm = 1./sqrt(squeeze(sum(R_to_C_reshaped.^2))); 
-    R_to_C_weights = bsxfun(@times,R_to_C_reshaped,R_to_C_norm); % Normalize
-    
-    V_to_C_weights = R_to_C_weights;
+    % V_to_C_weights (old R_to_C_weights)
+    V_to_C_raw = exp(-((Z - X).^2)./(2*V_sigma^2));
+    V_to_C_reshaped = reshape(V_to_C_raw,C_N,R_N);
+    V_to_C_norm = 1./sqrt(squeeze(sum(V_to_C_reshaped.^2))); 
+    V_to_C_weights = bsxfun(@times,V_to_C_reshaped,V_to_C_norm); % Normalize
     
     % S_to_C_weights
     [X Y Z] = meshgrid(R_preferences, S_preferences, S_preferences);
@@ -282,11 +279,10 @@ function StandAloneRemapping()
         
         % C
         C_inhibition = C_w_INHB*sum(C_firingrate);
-        R_to_C_excitation = R_to_C_psi*(R_to_C_weights*R_firingrate');
-        V_to_C_excitation = V_to_C_psi*(V_to_C_weights*V');
+        V_to_C_excitation = V_to_C_psi*(V_to_C_weights*V'); %R_to_C_excitation = R_to_C_psi*(R_to_C_weights*R_firingrate');
         
         S_to_C_excitation = S_to_C_psi*(S_to_C_weights*S_firingrate');
-        C_activation = C_activation + (dt/C_tau)*(-C_activation + V_to_C_excitation' + R_to_C_excitation' + S_to_C_excitation' - C_inhibition);
+        C_activation = C_activation + (dt/C_tau)*(-C_activation + V_to_C_excitation' + S_to_C_excitation' - C_inhibition); % removed R_to_C_excitation' in sum
         
         % S
         %F = (saccade_time_neg_offset <= time) & (time <= saccade_times); % check both conditions: y-z <= x <= y
@@ -310,8 +306,8 @@ function StandAloneRemapping()
             S_to_C_norm = 1./sqrt(squeeze(sum(S_to_C_weights.^2))); 
             S_to_C_weights = bsxfun(@times,S_to_C_weights,S_to_C_norm); 
 
-            R_to_C_norm = 1./sqrt(squeeze(sum(R_to_C_weights.^2))); 
-            R_to_C_weights = bsxfun(@times,R_to_C_weights,R_to_C_norm);
+            V_to_C_norm = 1./sqrt(squeeze(sum(V_to_C_weights.^2))); 
+            V_to_C_weights = bsxfun(@times,V_to_C_weights,V_to_C_norm);
         end
         
         %% Firing rates & Save history

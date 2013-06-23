@@ -13,155 +13,96 @@ function GenerateKusonokiTestingStimuli(Name)
     declareGlobalVars();
     global base;
 
-    Name = [Name - '-kusonoki'];
-
+    filename = [Name '-KusonokiTesting'];
+    stimulitype = 'KusonokiTesting';
+    
+    % Params
+    dt                              = 0.010; % (s)
+    seed                            = 77;
+    S_eccentricity                  = 30;
+    S_density                       = 1;
+    R_eccentricity                  = 45;
+    R_density                       = 1;
+    
     % Dynamical quantities
-    Duration = 2; % (s)
-    dt = 0.010; % (s)
-    numTimeSteps = ceil(Duration/dt);
-
-    % Random seed
-    seed = 77;
-    rng(seed);
-
-    % Visual
-    headCenteredTargetLocations = [15]; % (deg)
-    maxNumberOfVisibleTargets = length(headCenteredTargetLocations);
+    saccadeOnset                    = 0.4; % w.r.t start of task
+    earliestStimulusOnsetTime       = 0.100; % w.r.t start of task
+    lastStimulusOnsetTime           = saccadeOnset + 0.500; % w.r.t start of task
+    stimulusDuration                = 0.1;
+    fixationPeriod                  = lastStimulusOnsetTime + stimulusDuration + 100; % time from saccade onset
+    stimulusOnsetTimes              = earliestStimulusOnsetTime:100:lastStimulusOnsetTime;
     
-    targetOffIntervals{1} = [];% [0.6 1.8]; %[0.5 0.9;]; % (s) [start_OFF end_OFF; start_OFF end_OFF] <==== Make dt multiples
-    %targetOffIntervals{2} = []; %[0.1 0.2;];
-    
-    assert(length(targetOffIntervals) >= maxNumberOfVisibleTargets, 'On off history not provided for all targets.');
     
     % Saccadic
-    initialEyePosition = 0; % (deg), init = 13 deg
-    saccadeSpeed = 300; % (deg/s)
-    saccadeTimes = [1.2]; % (s) % <==== Make dt multiples, ALLOW FOR SUFFIEIENCT INTERSACCADE TIME TO COMPLETE SACCADES!
-    saccadeTargets = [20]; % (deg)
-    numSaccades = length(saccadeTimes);
+    saccadeSpeed                    = 300; % (deg/s)
+
+    % Generate visual target locations
+    rng(seed);
     
-    assert(length(saccadeTimes) >= length(saccadeTargets), 'Number of saccade times and targets must match.');
-
-    % Allocate space for traces
-    % Index i => Time (i-1)*dt
-    eyePositionTrace = zeros(1, numTimeSteps);
-    eyePositionTrace(1) = initialEyePosition;
-
-    % Generate eye position trace
-    numCompletedSaccades = 0;
-    for t=2:numTimeSteps,
+    
+    update add the fixation periode stuff
+    Duration                        = saccadeOnsetDelay + (saccadeSpeed/2*S_eccentricity) + fixationPeriod; % (s)
+    
+    
+    
+    
+    saccadeTargets                  = -S_eccentricity:S_density:S_eccentricity;
+    headCenteredTargetLocations     = -R_eccentricity:R_density:R_eccentricity;
+    
+    k = 1;
+    for i = 1:length(headCenteredTargetLocations);
         
-        presentTime = stepToTime(t);
+        % Location of target
+        h = headCenteredTargetLocations(i);
         
-        % Have we completed all saccades beginning before time timestep t?
-        if numCompletedSaccades == numSaccades || presentTime <= saccadeTimes(numCompletedSaccades+1),
+        % Deduce all valid saccades keeping this target on retina
+        saccadeTargets = saccadeTargets(-R_eccentricity + h <= saccadeTargets <= h + R_eccentricity);
+        
+        for j = 1:length(saccadeTargets),
+            
+            % Get saccade
+            s = saccadeTargets(j);
+            
+            for t = 1:length(stimulusOnsetTimes),
+                
+                    onsetTime = stimulusOnsetTimes(t);
+                    offsetTime = onsetTime + stimulusDuration;
+                    
+                    targetOffIntervals{1}           = [0 onsetTime;offsetTime ]% (s) [start_OFF end_OFF; start_OFF end_OFF]
+            
+                    stimuli{k}.initialEyePosition = 0;
+                    stimuli{k}.headCenteredTargetLocations = h;
+                    stimuli{k}.saccadeTimes = saccadeOnset;
+                    stimuli{k}.saccadeTargets = s;
+                    stimuli{k}.numSaccades = length(stimuli{k}.saccadeTargets);
 
-            % yes, so lets just continue fixating
-            eyePositionTrace(t) = eyePositionTrace(t-1);
+                    stimuli{k}.eyePositionTrace = GenerateEyeTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, targetOffIntervals, 0, saccadeSpeed, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
 
-        else
-            % no, there was a not completed saccade beginning before
-            % timestep t
-            
-            % was this the first step across this saccade onset time?
-            previousTimeSteptime = stepToTime(t-1);
-            timeOffset = abs(previousTimeSteptime - saccadeTimes(numCompletedSaccades+1));
-            
-            if(timeOffset < dt),
-                
-                % yes it was, so mini saccade starting
-                % point needs to correct for delay between prior time step
-                % and saccade onset event to find saccade start position
-                
-                reduceSaccadeTimeInPresentTimeStepWith = timeOffset;
-            else
-                
-                % no, we passed at some previous time, so mini saccade starting
-                % point is just last eye position
-                
-                reduceSaccadeTimeInPresentTimeStepWith = 0;
-            end
-            
-            % Will one more stime step saccading from
-            % miniSaccadeStartPosition take us past saccade target?
-            
-            saccadeOffset = eyePositionTrace(t-1) - saccadeTargets(numCompletedSaccades+1);
-            timeStepSaccadeMagnitude = (dt - reduceSaccadeTimeInPresentTimeStepWith)*saccadeSpeed;
-            
-            if (timeStepSaccadeMagnitude > saccadeOffset),
-                
-                % yes, so lets not do the whole thing
-                eyePositionTrace(t) = saccadeTargets(numCompletedSaccades+1);
-                
-                % and lets saccade as completed
-                numCompletedSaccades = numCompletedSaccades + 1;
-                
-            else
-                
-                % no, then lets do the full thing and keep going.
-                eyePositionTrace(t) = eyePositionTrace(t-1) + -1*sign(saccadeOffset)*saccadeSpeed*dt;
-                
+                    k = k + 1;
             end
             
         end
-        
     end
-
-    % Generate retinal target location trace
-    retinalTargetTraces = zeros(maxNumberOfVisibleTargets, numTimeSteps);
-    for h=1:maxNumberOfVisibleTargets,
-        
-        % Make trace: r = h - e
-        retinalTargetTraces(h, :) = headCenteredTargetLocations(h) - eyePositionTrace;
-        
-        % Cancel out parts where target is not present
-        offIntervals = targetOffIntervals{h};
-        [numIntervals x] = size(offIntervals);
-        for i=1:numIntervals,
-            
-            % Get interval
-            interval = offIntervals(i,:);
-            
-            % Translate from time to timesteps
-            timeStepInterval = timeToTimeStep(interval);
-            
-            % Cancel out, i.e. not visible
-            retinalTargetTraces(h, timeStepInterval(1):timeStepInterval(2)) = nan;
-        end
-    end
-    
-    function r = stepToTime(i)
-        r = (i-1)*dt;
-    end
-    
-    function i = timeToTimeStep(t)
-        i = floor(t/dt) + 1;
-    end
-
-    figure;
-    plot(eyePositionTrace, 'r');
-    hold on;
-    plot(retinalTargetTraces' , 'b');
-    xlabel('Time step');
-    legend({'Eye Position','Stimuli Retinal Locations'})
-    %ylim(min(min(eyePositionTrace),min(min(retinalTargetTraces)) max(max(eyePositionTrace),max(max(retinalTargetTraces)))]);
     
     % Save params
-    stimuliFolder = [base 'Stimuli' filesep Name];
+    stimuliFolder = [base 'Stimuli' filesep filename];
     mkdir(stimuliFolder);
-    save([stimuliFolder filesep 'TrainingStimuli.mat'] , ...
-                                    'headCenteredTargetLocations', ...
-                                    'maxNumberOfVisibleTargets', ...
-                                    'targetOffIntervals', ...
-                                    'initialEyePosition', ...
-                                    'saccadeSpeed', ...
-                                    'saccadeTimes', ...
+    save([stimuliFolder filesep 'stim.mat'] , ...
+                                    'S_eccentricity', ...
+                                    'S_density', ...
+                                    'R_eccentricity', ...
+                                    'R_density', ...
+                                    'saccadeOnset', ...
+                                    'earliestStimulusOnsetTime', ...
+                                    'lastStimulusOnsetTime', ...
+                                    'stimulusDuration', ...
+                                    'fixationPeriod', ...
+                                    'stimulusOnsetTimes', ...
                                     'saccadeTargets', ...
-                                    'numSaccades', ...
-                                    'eyePositionTrace', ...
-                                    'retinalTargetTraces', ...
+                                    'stimulitype', ...
+                                    'stimuli', ...
                                     'Duration', ...
+                                    'saccadeSpeed', ...
                                     'dt', ...
-                                    'numTimeSteps', ...
                                     'seed');
 end

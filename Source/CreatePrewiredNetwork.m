@@ -1,13 +1,13 @@
 
 %
-%  createBlankNetwork.m
+%  createPrewiredNetwork.m
 %  Remapping
 %
 %  Created by Bedeho Mender on 19/05/13.
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function createBlankNetwork(outputfile, simulation)
+function createPrewiredNetwork(outputfile, simulation)
 
     R_N = length(simulation('R_preferences'));
     S_N = length(simulation('S_preferences'));
@@ -22,11 +22,11 @@ function createBlankNetwork(outputfile, simulation)
     C_to_R_norm = 1./sqrt(squeeze(sum(C_to_R_reshaped.^2))); 
     C_to_R_weights = bsxfun(@times,C_to_R_reshaped,C_to_R_norm); % Normalize
     
-    % R_to_C_weights
-    R_to_C_raw = exp(-((Z - X).^2)./(2*V_sigma^2));
-    R_to_C_reshaped = reshape(R_to_C_raw,C_N,R_N);
-    R_to_C_norm = 1./sqrt(squeeze(sum(R_to_C_reshaped.^2))); 
-    R_to_C_weights = bsxfun(@times,R_to_C_reshaped,R_to_C_norm); % Normalize
+    % V_to_C_weights
+    V_to_C_raw = exp(-((Z - X).^2)./(2*V_sigma^2));
+    V_to_C_reshaped = reshape(V_to_C_raw,C_N,R_N);
+    V_to_C_norm = 1./sqrt(squeeze(sum(V_to_C_reshaped.^2))); 
+    V_to_C_weights = bsxfun(@times,V_to_C_reshaped,V_to_C_norm); % Normalize
     
     % S_to_C_weights
     [X Y Z] = meshgrid(R_preferences, S_preferences, S_preferences);
@@ -43,10 +43,10 @@ function createBlankNetwork(outputfile, simulation)
     S_to_C_norm = 1./sqrt(squeeze(sum(S_to_C_weights.^2))); 
     S_to_C_weights = bsxfun(@times,S_to_C_weights,S_to_C_norm); 
 
-    R_to_C_norm = 1./sqrt(squeeze(sum(R_to_C_weights.^2))); 
-    R_to_C_weights = bsxfun(@times,R_to_C_weights,R_to_C_norm);
+    V_to_C_norm = 1./sqrt(squeeze(sum(V_to_C_weights.^2))); 
+    V_to_C_weights = bsxfun(@times,V_to_C_weights,V_to_C_norm);
     
     % Save params
-    save(outputfile , 'C_to_R_weights', 'S_to_C_weights', 'R_to_C_weights');
+    save(outputfile , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights');
     
 end

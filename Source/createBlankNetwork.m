@@ -15,7 +15,7 @@ function createBlankNetwork(outputfile, simulation)
 
     % Random
     C_to_R_weights = rand(R_N,C_N);
-    R_to_C_weights = rand(C_N,R_N);
+    V_to_C_weights = rand(C_N,R_N);
     S_to_C_weights = rand(C_N,S_N);
     
     % Normalize
@@ -25,10 +25,10 @@ function createBlankNetwork(outputfile, simulation)
     S_to_C_norm = 1./sqrt(squeeze(sum(S_to_C_weights.^2))); 
     S_to_C_weights = bsxfun(@times,S_to_C_weights,S_to_C_norm); 
 
-    R_to_C_norm = 1./sqrt(squeeze(sum(R_to_C_weights.^2))); 
-    R_to_C_weights = bsxfun(@times,R_to_C_weights,R_to_C_norm);
+    V_to_C_norm = 1./sqrt(squeeze(sum(V_to_C_weights.^2))); 
+    V_to_C_weights = bsxfun(@times,V_to_C_weights,V_to_C_norm);
     
     % Save params
-    save(outputfile , 'C_to_R_weights', 'S_to_C_weights', 'R_to_C_weights');
+    save(outputfile , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights');
     
 end

@@ -43,7 +43,6 @@ function GenerateExperiment()
     saveDuringTraining = false;
     saveNetworksAtEpochs = 333; % Save network at this resolution
     
-    
     % LIP
     parameterCombinations('R_eccentricity') = [45 50];
     parameterCombinations('R_tau')          = [0.100 0.2]; % (s)
@@ -60,6 +59,7 @@ function GenerateExperiment()
     parameterCombinations('S_eccentricity') = [30];
     parameterCombinations('S_delay_sigma')  = [0.4]; % (s)
     parameterCombinations('S_tau')          = [0.300]; % (s)
+    
     parameterCombinations('S_psi')          = [1];
     parameterCombinations('S_sigma')        = parameterCombinations('V_sigma'); % (deg) receptive field size
     parameterCombinations('S_slope')        = [6];
