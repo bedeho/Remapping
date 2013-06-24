@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function eyePositionTrace = GenerateEyeTrace(Duration, dt, headCenteredTargetLocations, targetOffIntervals, initialEyePosition, saccadeSpeed, saccadeTimes, saccadeTargets)
+function eyePositionTrace = GenerateEyeTrace(Duration, dt, headCenteredTargetLocations, targetOffIntervals, initialEyePosition, saccadeTimes, saccadeTargets)
 
     numTimeSteps = ceil(Duration/dt);
     
@@ -16,12 +16,13 @@ function eyePositionTrace = GenerateEyeTrace(Duration, dt, headCenteredTargetLoc
     assert(length(targetOffIntervals) >= maxNumberOfVisibleTargets, 'On off history not provided for all targets.');
     
     % Saccadic
+    saccadeSpeed = 300; % (s), %if changed, then change in GenerateKusonokiTestingStimuli.m as well!
     numSaccades = length(saccadeTimes);
     
     if numSaccades > 0,
         
         assert(length(saccadeTimes) >= length(saccadeTargets), 'Number of saccade times and targets must match.');
-        assert(max(saccadeTimes) > Duration, 'Saccade time after total duration found.');
+        assert(Duration >= max(saccadeTimes), 'Saccade time after total duration found.');
     end
 
     % Allocate space for traces

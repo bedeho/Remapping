@@ -12,14 +12,22 @@ function GenerateExperiment()
     % Import global variables
     declareGlobalVars();
     global EXPERIMENTS_FOLDER;
-
+    global STIMULI_FOLDER;
+    
+    % Stimuli
+    trainingStimuli     = 'baseline';
+    testing_kusonoki    = 'test-KusonokiTesting';
+    testing_stim_ctrl   = 'test-StimuliControlTask';
+    testing_sac_ctrl    = 'test-SaccadeControlTask';
+    
+    trainingStimuliFile         = [STIMULI_FOLDER filesep trainingStimuli filesep 'stim.mat'];
+    testingKusonokiStimuliFile  = [STIMULI_FOLDER filesep testing_kusonoki filesep 'stim.mat'];
+    testingStimCTRLStimuliFile  = [STIMULI_FOLDER filesep testing_stim_ctrl filesep 'stim.mat'];
+    testingSacCTRLStimuliFile   = [STIMULI_FOLDER filesep testing_sac_ctrl filesep 'stim.mat'];
+    
     % Experiment parameters
     Name = 'test';
     experimentFolderPath = [EXPERIMENTS_FOLDER Name];
-    
-    % Stimuli
-    %trainingStimuli = 'dddd';
-    %testingStimuli = 'dddd';
     
     % Create experiment folders
     if exist(experimentFolderPath),
@@ -38,10 +46,11 @@ function GenerateExperiment()
     
     % Simulations Paramters
     dt = 0.001; % (s)
-    epochs = 1;
+    numTrainingEpochs = 1;
     outputSavingRate = 2; % Period of time step saving during testing.
     saveDuringTraining = false;
-    saveNetworksAtEpochs = 333; % Save network at this resolution
+    saveNetworksAtEpochMultiples = 333; % Save network at this resolution
+    seed = 13;
     
     % LIP
     parameterCombinations('R_eccentricity') = [45 50];
@@ -76,7 +85,7 @@ function GenerateExperiment()
     parameterCombinations('C_threshold')    = [1.0];
     
     % Save the experiment params
-    save([experimentFolderPath filesep 'GenerateExperiment.mat'] , 'parameterCombinations');
+    save([experimentFolderPath filesep 'GenerateExperiment.mat'] , 'parameterCombinations','dt', 'numTrainingEpochs', 'outputSavingRate', 'saveDuringTraining', 'saveNetworksAtEpochMultiples', 'seed');
     
     % Start paramters permutation
     simulation = containers.Map;
@@ -122,6 +131,8 @@ function GenerateExperiment()
                 simulationName = 'baseline';
             end
             
+            disp(['Making simulation: ' simulationName]);
+            
             % Create simulation folder
             simulationFolder = [experimentFolderPath filesep simulationName];
             mkdir(simulationFolder);
@@ -133,20 +144,46 @@ function GenerateExperiment()
             offset(offset < 0)                  = -offset(offset < 0);
             simulation('S_presaccadicOffset')   = offset;
             
-            % Save params
-            save([simulationFolder filesep 'SimulationExperiment.mat'] , 'simulation');
+            % Save params, add miscelanous paramters
+            save([simulationFolder filesep 'Paramters.mat'], 'simulation', 'dt');
             
             % Create simulation blank network
             createBlankNetwork([simulationFolder filesep 'BlankNetwork.mat'], simulation);
-            
+                        
             % Training
-            %Remapping(sourcefolder, outputFolder, paramters,enablePlasticity)
+            disp('Training...');
+            Remapping(simulationFolder, trainingStimuliFile, true);
             
-            % Testing
-            %Remapping(sourcefolder, outputFolder, paramters,enablePlasticity)
-            
-            % Analysis
-            
+            % Move each network to new folder & test
+            listing = dir(experimentFolder); 
+            for d = 1:length(listing),
+                
+                % We looking for networks files
+                subsim_name = listing(d).name;
+                
+                if ~listing(d).isdir && ~isempty(findstr(subsim_name,'Network')),
+                    
+                    % Make dir name and dir
+                    networkfile = [simulationFolder filesep subsim_name];
+                    [pathstr, name, ext] = fileparts(networkfile);
+                    subsim_dir = [simulationFolder filesep name];
+                    mkdir(subsim_dir);
+                    
+                    % Move file into dir
+                    movefile(networkfile, subsim_dir);
+                    
+                    % Testing network
+                    disp('Kusonoki Task...');
+                    Remapping(simulationFolder, testingKusonokiStimuliFile, false, 'kusonoki');
+                    
+                    disp('Saccade Control Task...');
+                    Remapping(simulationFolder, testingStimCTRLStimuliFile, false, 'saccade-control');
+                    
+                    disp('Stimulus Control Task...');
+                    Remapping(simulationFolder, testingSacCTRLStimuliFile, false, 'stimulus-control');
+
+                end
+            end
         end
     end
     

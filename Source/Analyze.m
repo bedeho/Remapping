@@ -7,5 +7,5 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Analyze()
+function Analyze(simulationFolder, testingStimuliFile)
 end

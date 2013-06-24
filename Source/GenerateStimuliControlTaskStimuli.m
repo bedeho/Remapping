@@ -17,36 +17,31 @@ function GenerateStimuliControlTaskStimuli(Name)
     stimulitype = 'StimuliControlTask';
     
     % Params
-    dt                          = 0.010; % (s)
+    dt                          = 0.010; %(s)
     seed                        = 77;
     R_eccentricity              = 45;
     R_density                   = 1;
     
     % Dynamical quantities
-    stimuliOnsetDelay           = 0.1; % (s)
+    stimuliOnsetDelay           = 0.1; %(s)
     stimuliDuration             = 0.1; %(s)
     stimuliOffsetPeriod         = 0.3; %(s)
-    
-    % Saccadic
-    saccadeSpeed                = 300; % (deg/s)
 
-    % Generate visual target locations
+    % Generate stimuli
     rng(seed);
     Duration                    = stimuliOnsetDelay+stimuliDuration+stimuliOffsetPeriod; % (s)
     headCenteredTargetLocations = -R_eccentricity:R_density:R_eccentricity;
+    targetOffIntervals{1}       = [0 stimuliOnsetDelay;(stimuliOnsetDelay+stimuliDuration) Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
     for i = 1:length(headCenteredTargetLocations);
         
-        stimuli{i}.initialEyePosition = 0;
-        stimuli{i}.headCenteredTargetLocations = headCenteredTargetLocations(i);
-        stimuli{i}.saccadeTimes = [];
-        stimuli{i}.saccadeTargets = [];
-        stimuli{i}.numSaccades = length(stimuli{i}.saccadeTargets);
-        
-        targetOffIntervals{1}           = [0 onsetTime;offsetTime ]% (s) [start_OFF end_OFF; start_OFF end_OFF]
-        
-        stimuli{i}.eyePositionTrace = GenerateEyeTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, {[]}, 0, saccadeSpeed, stimuli{i}.saccadeTimes, stimuli{i}.saccadeTargets);
-        
+        stimuli{i}.initialEyePosition           = 0;
+        stimuli{i}.headCenteredTargetLocations  = headCenteredTargetLocations(i);
+        stimuli{i}.saccadeTimes                 = [];
+        stimuli{i}.saccadeTargets               = [];
+        stimuli{i}.numSaccades                  = length(stimuli{i}.saccadeTargets);
+        stimuli{i}.targetOffIntervals           = targetOffIntervals;
+        stimuli{i}.eyePositionTrace             = GenerateEyeTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, targetOffIntervals, stimuli{i}.initialEyePosition, stimuli{i}.saccadeTimes, stimuli{i}.saccadeTargets);
     end
     
     % Save params
@@ -55,6 +50,7 @@ function GenerateStimuliControlTaskStimuli(Name)
     save([stimuliFolder filesep 'stim.mat'] , ...
                                     'stimulitype', ...
                                     'headCenteredTargetLocations', ...
+                                    'targetOffIntervals', ...
                                     'R_eccentricity', ...
                                     'R_density', ...
                                     'Duration', ...

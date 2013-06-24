@@ -7,7 +7,36 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Remapping(network, paramters, stimuli, outputfolder, enablePlasticity)
+function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix)
+
+    
+    if nargin < 4,
+        outputpostfix = '';
+    end
+
+    % Load input files
+    paramterFile = load([simulationFolder filesep 'Paramters.mat']);
+    networkFile  = load([simulationFolder filesep 'BlankNetwork.mat']);
+    outputFolder = load([simulationFolder filesep 'Paramters.mat']);
+    stimuliFile  = load([simulationFolder filesep 'stim.mat']);
+
+    % Load paramters
+
+
+    save([experimentFolderPath filesep 'GenerateExperiment.mat'] , 'parameterCombinations','dt', 'numTrainingEpochs', 'outputSavingRate', 'saveDuringTraining', 'saveNetworksAtEpochMultiples', 'seed');
+    
+    
+    
+    
+
+        stimuli{i}.initialEyePosition           = 0;
+        stimuli{i}.headCenteredTargetLocations  = headCenteredTargetLocations(i);
+        stimuli{i}.saccadeTimes                 = [];
+        stimuli{i}.saccadeTargets               = [];
+        stimuli{i}.numSaccades                  = length(stimuli{i}.saccadeTargets);
+        stimuli{k}.targetOffIntervals           = targetOffIntervals;
+        stimuli{i}.eyePositionTrace             = GenerateEyeTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, targetOffIntervals, stimuli{i}.initialEyePosition, stimuli{i}.saccadeTimes, stimuli{i}.saccadeTargets);
+        
 
     % Dynamical quantities
     Duration = 2; % (s)

@@ -14,6 +14,9 @@ function declareGlobalVars()
 	global EXPERIMENTS_FOLDER;
 	EXPERIMENTS_FOLDER = [base 'Experiments' filesep];
     
+    global STIMULI_FOLDER;
+	STIMULI_FOLDER = [base 'Stimuli' filesep];
+    
     global THESIS_FIGURE_PATH;
     THESIS_FIGURE_PATH = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Thesis/figures/';
     

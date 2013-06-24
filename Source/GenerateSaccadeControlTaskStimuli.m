@@ -17,35 +17,30 @@ function GenerateSaccadeControlTaskStimuli(Name)
     stimulitype = 'SaccadeControlTask';
     
     % Params
-    dt                          = 0.010; % (s)
+    dt                          = 0.010; %(s)
     seed                        = 77;
     S_eccentricity              = 30;
     S_density                   = 1;
     
     % Dynamical quantities
-    saccadeOnsetDelay           = 0.1; % (s)
+    saccadeOnsetDelay           = 0.1; %(s)
     fixationPeriod              = 0.4; %(s)
-    
-    % Saccadic
-    saccadeSpeed                = 300; % (deg/s)
 
-    % Generate visual target locations
+    % Generate stimuli
     rng(seed);
     Duration                    = saccadeOnsetDelay + (saccadeSpeed/2*S_eccentricity) + fixationPeriod; % (s)
     saccadeTargets              = -S_eccentricity:S_density:S_eccentricity;
+    targetOffIntervals{1}       = [0 Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
     for i = 1:length(headCenteredTargetLocations);
         
-        stimuli{i}.initialEyePosition = 0;
-        stimuli{i}.headCenteredTargetLocations = [];
-        stimuli{i}.saccadeTimes = saccadeOnsetDelay;
-        stimuli{i}.saccadeTargets = saccadeTargets(i);
-        stimuli{i}.numSaccades = length(stimuli{i}.saccadeTargets);
-        
-        targetOffIntervals{1}           = [0 onsetTime;offsetTime ]% (s) [start_OFF end_OFF; start_OFF end_OFF]
-        
-        stimuli{i}.eyePositionTrace = GenerateEyeTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, {[]}, 0, saccadeSpeed, stimuli{i}.saccadeTimes, stimuli{i}.saccadeTargets);
-        
+        stimuli{i}.initialEyePosition           = 0;
+        stimuli{i}.headCenteredTargetLocations  = [];
+        stimuli{i}.saccadeTimes                 = saccadeOnsetDelay;
+        stimuli{i}.saccadeTargets               = saccadeTargets(i);
+        stimuli{i}.numSaccades                  = length(stimuli{i}.saccadeTargets);
+        stimuli{i}.targetOffIntervals           = targetOffIntervals;
+        stimuli{i}.eyePositionTrace             = GenerateEyeTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, targetOffIntervals, stimuli{i}.initialEyePosition, stimuli{i}.saccadeTimes, stimuli{i}.saccadeTargets);
     end
     
     % Save params
@@ -55,6 +50,7 @@ function GenerateSaccadeControlTaskStimuli(Name)
                                     'S_eccentricity', ...
                                     'S_density', ...
                                     'saccadeTargets', ...
+                                    'targetOffIntervals', ...
                                     'stimulitype', ...
                                     'stimuli', ...
                                     'saccadeOnsetDelay', ...
