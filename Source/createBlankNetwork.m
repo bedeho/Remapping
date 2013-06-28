@@ -7,10 +7,10 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function createBlankNetwork(outputfile, simulation)
+function createBlankNetwork(outputfile, R_preferences, S_preferences)
 
-    R_N = length(simulation('R_preferences'));
-    S_N = length(simulation('S_preferences'));
+    R_N = length(R_preferences);
+    S_N = length(S_preferences);
     C_N = S_N*R_N;
 
     % Random
@@ -29,6 +29,6 @@ function createBlankNetwork(outputfile, simulation)
     V_to_C_weights = bsxfun(@times,V_to_C_weights,V_to_C_norm);
     
     % Save params
-    save(outputfile , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights');
+    save(outputfile, 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'R_N', 'S_N', 'C_N');
     
 end

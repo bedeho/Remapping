@@ -41,12 +41,22 @@ function GenerateStimuliControlTaskStimuli(Name)
         stimuli{i}.saccadeTargets               = [];
         stimuli{i}.numSaccades                  = length(stimuli{i}.saccadeTargets);
         stimuli{i}.targetOffIntervals           = targetOffIntervals;
-        stimuli{i}.eyePositionTrace             = GenerateEyeTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, targetOffIntervals, stimuli{i}.initialEyePosition, stimuli{i}.saccadeTimes, stimuli{i}.saccadeTargets);
+        
+        [eyePositionTrace, retinalTargetTraces] = GenerateEyeTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, targetOffIntervals, stimuli{i}.initialEyePosition, stimuli{i}.saccadeTimes, stimuli{i}.saccadeTargets);
+        stimuli{i}.eyePositionTrace             = eyePositionTrace;
+        stimuli{i}.retinalTargetTraces          = retinalTargetTraces;
+        
     end
     
     % Save params
     stimuliFolder = [base 'Stimuli' filesep filename];
+    
+    if exist(stimuliFolder),
+        system(['rm -R ' stimuliFolder]);
+    end 
+    
     mkdir(stimuliFolder);
+    
     save([stimuliFolder filesep 'stim.mat'] , ...
                                     'stimulitype', ...
                                     'headCenteredTargetLocations', ...
@@ -58,7 +68,6 @@ function GenerateStimuliControlTaskStimuli(Name)
                                     'stimuliOnsetDelay', ...
                                     'stimuliDuration', ...
                                     'stimuliOffsetPeriod', ...
-                                    'saccadeSpeed', ...
                                     'dt', ...
                                     'seed');
 end

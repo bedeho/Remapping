@@ -25,6 +25,7 @@ function GenerateSaccadeControlTaskStimuli(Name)
     % Dynamical quantities
     saccadeOnsetDelay           = 0.1; %(s)
     fixationPeriod              = 0.4; %(s)
+    saccadeSpeed                = 0.300; %(s)
 
     % Generate stimuli
     rng(seed);
@@ -32,7 +33,7 @@ function GenerateSaccadeControlTaskStimuli(Name)
     saccadeTargets              = -S_eccentricity:S_density:S_eccentricity;
     targetOffIntervals{1}       = [0 Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
-    for i = 1:length(headCenteredTargetLocations);
+    for i = 1:length(saccadeTargets);
         
         stimuli{i}.initialEyePosition           = 0;
         stimuli{i}.headCenteredTargetLocations  = [];
@@ -40,12 +41,21 @@ function GenerateSaccadeControlTaskStimuli(Name)
         stimuli{i}.saccadeTargets               = saccadeTargets(i);
         stimuli{i}.numSaccades                  = length(stimuli{i}.saccadeTargets);
         stimuli{i}.targetOffIntervals           = targetOffIntervals;
-        stimuli{i}.eyePositionTrace             = GenerateEyeTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, targetOffIntervals, stimuli{i}.initialEyePosition, stimuli{i}.saccadeTimes, stimuli{i}.saccadeTargets);
+        
+        [eyePositionTrace, retinalTargetTraces] = GenerateEyeTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, targetOffIntervals, stimuli{i}.initialEyePosition, stimuli{i}.saccadeTimes, stimuli{i}.saccadeTargets);
+        stimuli{i}.eyePositionTrace             = eyePositionTrace;
+        stimuli{i}.retinalTargetTraces          = retinalTargetTraces;
     end
     
     % Save params
     stimuliFolder = [base 'Stimuli' filesep filename];
+        
+    if exist(stimuliFolder),
+        system(['rm -R ' stimuliFolder]);
+    end 
+    
     mkdir(stimuliFolder);
+    
     save([stimuliFolder filesep 'stim.mat'] , ...
                                     'S_eccentricity', ...
                                     'S_density', ...
@@ -56,7 +66,6 @@ function GenerateSaccadeControlTaskStimuli(Name)
                                     'saccadeOnsetDelay', ...
                                     'Duration', ...
                                     'fixationPeriod', ...
-                                    'stimuliOffsetPeriod', ...
                                     'saccadeSpeed', ...
                                     'dt', ...
                                     'seed');

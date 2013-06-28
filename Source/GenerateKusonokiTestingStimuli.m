@@ -20,9 +20,9 @@ function GenerateKusonokiTestingStimuli(Name)
     dt                              = 0.010; % (s)
     seed                            = 77;
     S_eccentricity                  = 30;
-    S_density                       = 1;
+    S_density                       = 10;
     R_eccentricity                  = 45;
-    R_density                       = 1;
+    R_density                       = 10;
     
     % Dynamical quantities
     saccadeSpeed                    = 300; %if changed, then change in GenerateEyeTrace.m as well!
@@ -31,14 +31,14 @@ function GenerateKusonokiTestingStimuli(Name)
     lastStimulusOnsetTime           = saccadeOnset + 0.500; % w.r.t start of task
     stimulusDuration                = 0.1;
     fixationPeriod                  = lastStimulusOnsetTime + stimulusDuration + 0.100; % time from saccade onset
-    stimulusOnsetTimes              = earliestStimulusOnsetTime:100:lastStimulusOnsetTime;
+    stimulusOnsetTimes              = earliestStimulusOnsetTime; %classic = earliestStimulusOnsetTime:0.300:lastStimulusOnsetTime;
 
     % Generate stimuli
     rng(seed);
     Duration                        = saccadeOnset + (2*S_eccentricity/saccadeSpeed) + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
     saccadeTargets                  = -S_eccentricity:S_density:S_eccentricity;
     headCenteredTargetLocations     = -R_eccentricity:R_density:R_eccentricity;
-    
+
     k = 1;
     for i = 1:length(headCenteredTargetLocations);
         
@@ -65,7 +65,10 @@ function GenerateKusonokiTestingStimuli(Name)
                     stimuli{k}.saccadeTargets               = s;
                     stimuli{k}.numSaccades                  = length(stimuli{k}.saccadeTargets);
                     stimuli{k}.targetOffIntervals           = targetOffIntervals;
-                    stimuli{k}.eyePositionTrace             = GenerateEyeTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, stimuli{k}.targetOffIntervals, stimuli{k}.initialEyePosition, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
+                    
+                    [eyePositionTrace, retinalTargetTraces] = GenerateEyeTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, stimuli{k}.targetOffIntervals, stimuli{k}.initialEyePosition, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
+                    stimuli{k}.eyePositionTrace             = eyePositionTrace;
+                    stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
 
                     k = k + 1;
             end
@@ -75,7 +78,13 @@ function GenerateKusonokiTestingStimuli(Name)
     
     % Save params
     stimuliFolder = [base 'Stimuli' filesep filename];
+    
+    if exist(stimuliFolder),
+        system(['rm -R ' stimuliFolder]);
+    end 
+    
     mkdir(stimuliFolder);
+    
     save([stimuliFolder filesep 'stim.mat'] , ...
                                     'S_eccentricity', ...
                                     'S_density', ...

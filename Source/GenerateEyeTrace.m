@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function eyePositionTrace = GenerateEyeTrace(Duration, dt, headCenteredTargetLocations, targetOffIntervals, initialEyePosition, saccadeTimes, saccadeTargets)
+function [eyePositionTrace, retinalTargetTraces] = GenerateEyeTrace(Duration, dt, headCenteredTargetLocations, targetOffIntervals, initialEyePosition, saccadeTimes, saccadeTargets)
 
     numTimeSteps = ceil(Duration/dt);
     

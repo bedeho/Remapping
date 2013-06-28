@@ -7,257 +7,288 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix)
+function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, networkfilename)
 
-    
-    if nargin < 4,
-        outputpostfix = '';
+    % Parse input args
+    if nargin < 5,
+        networkfilename = 'BlankNetwork.mat';
+
+        if nargin < 4,
+            outputpostfix = '';
+        else
+            outputpostfix = ['-' outputpostfix];
+        end
     end
 
     % Load input files
-    paramterFile = load([simulationFolder filesep 'Paramters.mat']);
-    networkFile  = load([simulationFolder filesep 'BlankNetwork.mat']);
-    outputFolder = load([simulationFolder filesep 'Paramters.mat']);
-    stimuliFile  = load([simulationFolder filesep 'stim.mat']);
+    disp('Loading input files...');
+    parameters = load([simulationFolder filesep 'Parameters.mat']);
+    network  = load([simulationFolder filesep networkfilename]);
+    stimuli  = load(stimuliFile);
 
-    % Load paramters
+    % Validate input
+    %assert(paramter.simulation('R_eccentricity') ~=
+    %stimuli.R_eccentricity, 'R_eccentricity not identical in stimuli and
+    %parameters');
+    
+    assert(parameters.dt == stimuli.dt, 'dt not identical in stimuli and model.');
+    
+    %% Simulation parameters
+    dt = parameters.dt; % (s)
+    rng(parameters.seed);
+    
+    % Num epochs
+    if isTraining,
+        numEpochs = parameters.numTrainingEpochs;
+    else
+        numEpochs = 1;
+    end
+    
+    numPeriods = length(stimuli.stimuli);
+    timeStepsInPeriod = zeros(1,numPeriods);
+    
+    for period=1:numPeriods,
+        timeStepsInPeriod(period) = length(stimuli.stimuli{period}.eyePositionTrace);
+    end
+    
+    %numTimeStepsPerEpoch = sum(timeStepsInPeriod);
+    maxTimeStepsPerEpoch = max(timeStepsInPeriod); % will likely never even vary...
+    outputSavingRate = parameters.outputSavingRate;
+    
+    % Allocate buffers for activity
+    if (~isTraining || isTraining && parameters.saveActivityInTraining)
+        numSavedTimeSteps = ceil(maxTimeStepsPerEpoch/outputSavingRate);
+    else
+        numSavedTimeSteps = 0;
+    end
+                                     
+    %% Load network
+    C_to_R_weights = network.C_to_R_weights;
+    S_to_C_weights = network.S_to_C_weights;
+    V_to_C_weights = network.V_to_C_weights;
 
-
-    save([experimentFolderPath filesep 'GenerateExperiment.mat'] , 'parameterCombinations','dt', 'numTrainingEpochs', 'outputSavingRate', 'saveDuringTraining', 'saveNetworksAtEpochMultiples', 'seed');
-    
-    
-    
-    
-
-        stimuli{i}.initialEyePosition           = 0;
-        stimuli{i}.headCenteredTargetLocations  = headCenteredTargetLocations(i);
-        stimuli{i}.saccadeTimes                 = [];
-        stimuli{i}.saccadeTargets               = [];
-        stimuli{i}.numSaccades                  = length(stimuli{i}.saccadeTargets);
-        stimuli{k}.targetOffIntervals           = targetOffIntervals;
-        stimuli{i}.eyePositionTrace             = GenerateEyeTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, targetOffIntervals, stimuli{i}.initialEyePosition, stimuli{i}.saccadeTimes, stimuli{i}.saccadeTargets);
-        
-
-    % Dynamical quantities
-    Duration = 2; % (s)
-    dt = 0.010; % (s)
-    
-    numTimeSteps = ceil(Duration/dt);
-
-    % Random seed
-    rng(77);
-
-    %% Stimuli
-    
-    % Visual
-    headCenteredTargetLocations = [15]; % (deg)
-    maxNumberOfVisibleTargets = length(headCenteredTargetLocations);
-    
-    targetOffIntervals{1} = []%[0.6 2];%[0.5 0.9;]; % (s) [start_OFF end_OFF; start_OFF end_OFF] <==== Make dt multiples
-    targetOffIntervals{2} = [];%[0.1 0.2;];
-    
-    assert(length(targetOffIntervals) >= maxNumberOfVisibleTargets, 'On off history not provided for all targets.');
-    
-    % Saccadic
-    initialEyePosition = 0; % (deg), init = 13 deg
-    saccadeSpeed = 300; % (deg/s)
-    saccadeTimes = [1.2]; % (s) % <==== Make dt multiples, ALLOW FOR SUFFIEIENCT INTERSACCADE TIME TO COMPLETE SACCADES!
-    saccadeTargets = [20]; % (deg)
-    numSaccades = length(saccadeTimes);
-    
-    assert(length(saccadeTimes) >= length(saccadeTargets), 'Number of saccade times and targets must match.');
-
-    % Allocate space for traces
-    % Index i => Time (i-1)*dt
-    eyePositionTrace = zeros(1, numTimeSteps);
-    eyePositionTrace(1) = initialEyePosition;
-
-    %% Dynamics
+    %% Load dynamical parameters
     
     % LIP: Retina
-    R_eccentricity = 45;
-    R_preferences = -R_eccentricity:1:R_eccentricity;
+    R_eccentricity = parameters.simulation('R_eccentricity');
+    R_preferences = parameters.simulation('R_preferences');
     R_N = length(R_preferences);
     
-    R_tau = 0.100; % (s)
-    C_to_R_psi = 0.08; % 0.15
-    R_w_INHB = 0; %0.7
+    R_tau = parameters.simulation('R_tau');
+    C_to_R_psi = parameters.simulation('C_to_R_psi');
+    R_w_INHB = parameters.simulation('R_w_INHB');
     
-    V_tau = 0.400; % (s)
-    V_psi = 4;
-    V_sigma = 5; % (deg) receptive field size
+    V_tau = parameters.simulation('V_tau');
+    V_psi = parameters.simulation('V_psi');
+    V_sigma = parameters.simulation('V_sigma');
     V = zeros(1,R_N);
     
-    C_to_R_alpha = 0.1; % learning rate
+    C_to_R_alpha = parameters.simulation('C_to_R_alpha');
     
-    R_slope = 1;
-    R_threshold = 2.0;
+    R_slope = parameters.simulation('R_slope');
+    R_threshold = parameters.simulation('R_threshold');
     
     R_activation = zeros(1,R_N);
     R_firingrate = zeros(1,R_N);
-    R_history = zeros(R_N,numTimeSteps);
-    R_history2 = zeros(R_N,numTimeSteps);
-    
+
     % FEF: Saccade Plan
-    S_eccentricity = 30;
-    S_preferences = -S_eccentricity:1:S_eccentricity;
+    S_eccentricity = parameters.simulation('S_eccentricity');
+    S_preferences = parameters.simulation('S_preferences');
     S_N = length(S_preferences);
-    S_delay_sigma = 0.4; % (s)
-    S_presaccadicOffset = S_delay_sigma*randn(1,S_N);
-    S_presaccadicOffset(S_presaccadicOffset < 0) = -S_presaccadicOffset(S_presaccadicOffset < 0);
-    
-    S_tau = 0.300; % (s)
-    S_psi = 1;
+    S_delay_sigma = parameters.simulation('S_delay_sigma');
+    S_presaccadicOffset = parameters.simulation('S_presaccadicOffset');
+    S_tau = parameters.simulation('S_tau'); % (s)
+    S_psi = parameters.simulation('S_psi');
     S_sigma = V_sigma; % (deg) receptive field size
     
-    S_slope = 6;
-    S_threshold = 0.2;
+    S_slope = parameters.simulation('S_slope');
+    S_threshold = parameters.simulation('S_threshold');
     
     S_activation = zeros(1,S_N);
     S_firingrate = zeros(1,S_N);
-    S_history = zeros(S_N,numTimeSteps);
-    S_history2 = zeros(S_N,numTimeSteps);
     
     % SC?: Comb
     C_N = S_N*R_N;
-    C_tau = 0.100; % (s)
-    R_to_C_psi = 1.0; % 4
-    S_to_C_psi = 6.2;
+    C_tau = parameters.simulation('C_tau'); % (s)
+    %R_to_C_psi = parameters.simulation('R_to_C_psi'); % 4
+    S_to_C_psi = parameters.simulation('S_to_C_psi');
+    V_to_C_psi = parameters.simulation('V_to_C_psi');
     C_w_INHB = 0/C_N;
     
-    R_to_C_alpha = 0.1; % learning rate
-    S_to_C_alpha = 0.1; % learning rate
+    R_to_C_alpha = parameters.simulation('R_to_C_alpha'); % learning rate
+    S_to_C_alpha = parameters.simulation('S_to_C_alpha'); % learning rate
     
-    C_slope = 50;
-    C_threshold = 1.0;
+    C_slope = parameters.simulation('C_slope');
+    C_threshold = parameters.simulation('C_threshold');
     
     C_activation = zeros(1,C_N);
     C_firingrate = zeros(1,C_N);
-    C_history = zeros(C_N,numTimeSteps);
-    C_history2 = zeros(C_N,numTimeSteps);
     
-    
-    %% Integrate
-    
-    % Forward euler: dY = Y + (dt/tau)*(f(Y,t))
-    %
-    % Computation order respecting dependancy
-    % 1. Activation = old (activations, firing rates, weights
-    % 2. Weight = old firing rates
-    % 3. Firing rate = old activations
-    
-    % static working variables
-    R_preference_comparison_matrix = repmat(R_preferences, maxNumberOfVisibleTargets, 1); % used to compute driving term in V
-    
-    % meshgrid alternative: even tighter
-    %[saccade_times saccade_presaccadicoffset] = meshgrid(saccadeTimes, S_presaccadicOffset);
-    %saccade_time_offset = saccade_times - saccade_presaccadicoffset;
-    
-    saccade_times = repmat(saccadeTimes,S_N,1); % Used to get F
-    saccade_time_offset = saccade_times - repmat(S_presaccadicOffset',1,numSaccades); % Used to get F
-    saccade_target_offset = exp(-((repmat(S_preferences', 1, numSaccades) - repmat(saccadeTargets, S_N, 1)).^2)./(2*S_sigma^2)); % term multiplied by F
-    
-    tic
-    for t=1:numTimeSteps,
-        
-        % Turn time step into real time
-        time = stepToTime(t);
-        
-        %% Activation
-        
-        % R
-        R_inhibition = R_w_INHB*sum(R_firingrate);
-        C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate'); 
-        R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + V);
-        
-        % V
-        retinalTargets = retinalTargetTraces(:,t);
-        diff = R_preference_comparison_matrix - repmat(retinalTargets,1,R_N);
-        diff(isnan(diff)) = inf; % for nan values, make inf, so that exponantiation gives no contribution
-        gauss = exp((-(diff).^2)./(2*V_sigma^2));
-        
-        V_driver = V_psi*sum(gauss,1); % add upp all targets for each neuron to get one driving V value
-        V = V + (dt/V_tau)*(-V + V_driver);
-        
-        % C
-        C_inhibition = C_w_INHB*sum(C_firingrate);
-        R_to_C_excitation = R_to_C_psi*(R_to_C_weights*R_firingrate');
-        S_to_C_excitation = S_to_C_psi*(S_to_C_weights*S_firingrate');
-        C_activation = C_activation + (dt/C_tau)*(-C_activation + R_to_C_excitation' + S_to_C_excitation' - C_inhibition);
-        
-        % S
-        F = (saccade_time_offset <= time) & (time <= saccade_times); % check both conditions: y-z <= x <= y
-        S_driver = S_psi*sum(bsxfun(@times, F, saccade_target_offset),2); % cannot be done with matrix mult since exponential depends on i
-        S_activation = S_activation + (dt/S_tau)*(-S_activation + S_driver'); 
-        
-        %% Weight Update
-        if enablePlasticity,
-            
-            C_to_R_weights = C_to_R_weights + dt*C_to_R_alpha*(R_firingrate'*C_firingrate);
-            S_to_C_weights = S_to_C_weights + dt*S_to_C_alpha*(C_firingrate'*S_firingrate);
-            R_to_C_weights = R_to_C_weights + dt*R_to_C_alpha*(C_firingrate'*R_firingrate);
+    % Allocate buffer space
+    V_firing_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
+    R_firing_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
+    S_firing_history = zeros(S_N, numSavedTimeSteps, numPeriods, numEpochs);
+    C_firing_history = zeros(C_N, numSavedTimeSteps, numPeriods, numEpochs);
 
-            % Normalize
-            C_to_R_norm = 1./sqrt(squeeze(sum(C_to_R_weights.^2))); 
-            C_to_R_weights = bsxfun(@times,C_to_R_weights,C_to_R_norm);
-
-            S_to_C_norm = 1./sqrt(squeeze(sum(S_to_C_weights.^2))); 
-            S_to_C_weights = bsxfun(@times,S_to_C_weights,S_to_C_norm); 
-
-            R_to_C_norm = 1./sqrt(squeeze(sum(R_to_C_weights.^2))); 
-            R_to_C_weights = bsxfun(@times,R_to_C_weights,R_to_C_norm);
+    V_activation_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
+    R_activation_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
+    S_activation_history = zeros(S_N, numSavedTimeSteps, numPeriods, numEpochs);
+    C_activation_history = zeros(C_N, numSavedTimeSteps, numPeriods, numEpochs);
+    
+    %% Simulate
+    for epoch=1:numEpochs,
+        
+        if isTraining,
+            disp(['Starting epoch #' num2str(epoch)]);
         end
         
-        %% Firing rates & Save history
-        R_firingrate = 1./(1 + exp(-2*R_slope*(R_activation - R_threshold)));
-        S_firingrate = 1./(1 + exp(-2*S_slope*(S_activation - S_threshold)));
-        C_firingrate = 1./(1 + exp(-2*C_slope*(C_activation - C_threshold)));
+        for period=1:numPeriods
+            
+            tic
+            
+            % Get number of time steps in this period
+            numTimeSteps = timeStepsInPeriod(period);
+            
+            maxNumberOfVisibleTargets = length(stimuli.stimuli{period}.headCenteredTargetLocations);
+    
+            % Load Stimuli for period
+            retinalTargetTraces = stimuli.stimuli{period}.retinalTargetTraces;
+            saccadeTimes        = stimuli.stimuli{period}.saccadeTimes;
+            saccadeTargets      = stimuli.stimuli{period}.saccadeTargets;
+            numSaccades         = stimuli.stimuli{period}.numSaccades;
+
+            % Setup static working variables
+            R_preference_comparison_matrix = repmat(R_preferences, maxNumberOfVisibleTargets, 1); % used to compute driving term in V
+            
+            if(numSaccades > 0),
+                saccade_times = repmat(saccadeTimes,S_N,1); % Used to get F
+                saccade_time_offset = saccade_times - repmat(S_presaccadicOffset',1,numSaccades); % Used to get F
+                saccade_target_offset = exp(-((repmat(S_preferences', 1, numSaccades) - repmat(saccadeTargets, S_N, 1)).^2)./(2*S_sigma^2)); % term multiplied by F
+            end
+            
+            % Reset network variables
+            periodSaveCounter = 1;
+            
+            % do later?
+    
+            % Run period
+            for t=1:numTimeSteps,
+
+                % Turn time step into real time
+                time = stepToTime(t);
+
+                % Activation
+
+                % R
+                R_inhibition = R_w_INHB*sum(R_firingrate);
+                C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate'); 
+                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + V);
+
+                % V
+                retinalTargets = retinalTargetTraces(:,t);
+                diff = R_preference_comparison_matrix - repmat(retinalTargets,1,R_N);
+                diff(isnan(diff)) = inf; % for nan values, make inf, so that exponantiation gives no contribution
+                gauss = exp((-(diff).^2)./(2*V_sigma^2));
+
+                V_driver = V_psi*sum(gauss,1); % add upp all targets for each neuron to get one driving V value
+                V = V + (dt/V_tau)*(-V + V_driver);
+
+                % C
+                C_inhibition = C_w_INHB*sum(C_firingrate);
+                %R_to_C_excitation = R_to_C_psi*(R_to_C_weights*R_firingrate');
+                V_to_C_excitation = V_to_C_psi*(V_to_C_weights*R_firingrate');
+                S_to_C_excitation = S_to_C_psi*(S_to_C_weights*S_firingrate');
+                C_activation = C_activation + (dt/C_tau)*(-C_activation + V_to_C_excitation' + S_to_C_excitation' - C_inhibition); % _to_C_excitation
+
+                % S
+                if(numSaccades > 0),
+                    F = (saccade_time_offset <= time) & (time <= saccade_times); % check both conditions: y-z <= x <= y
+                    S_driver = S_psi*sum(bsxfun(@times, F, saccade_target_offset),2); % cannot be done with matrix mult since exponential depends on i
+                    S_activation = S_activation + (dt/S_tau)*(-S_activation + S_driver');
+                else
+                    S_activation = S_activation + (dt/S_tau)*(-S_activation); 
+                end
+                
+
+                % Weight Update
+                if isTraining,
+
+                    C_to_R_weights = C_to_R_weights + dt*C_to_R_alpha*(R_firingrate'*C_firingrate);
+                    S_to_C_weights = S_to_C_weights + dt*S_to_C_alpha*(C_firingrate'*S_firingrate);
+                    R_to_C_weights = R_to_C_weights + dt*R_to_C_alpha*(C_firingrate'*R_firingrate);
+
+                    % Normalize
+                    C_to_R_norm = 1./sqrt(squeeze(sum(C_to_R_weights.^2))); 
+                    C_to_R_weights = bsxfun(@times,C_to_R_weights,C_to_R_norm);
+
+                    S_to_C_norm = 1./sqrt(squeeze(sum(S_to_C_weights.^2))); 
+                    S_to_C_weights = bsxfun(@times,S_to_C_weights,S_to_C_norm); 
+
+                    R_to_C_norm = 1./sqrt(squeeze(sum(R_to_C_weights.^2))); 
+                    R_to_C_weights = bsxfun(@times,R_to_C_weights,R_to_C_norm);
+                end
+
+                % Compute firing rates
+                R_firingrate = 1./(1 + exp(-2*R_slope*(R_activation - R_threshold)));
+                S_firingrate = 1./(1 + exp(-2*S_slope*(S_activation - S_threshold)));
+                C_firingrate = 1./(1 + exp(-2*C_slope*(C_activation - C_threshold)));
+
+                % Save activity                
+                if (~isTraining || isTraining && parameters.saveActivityInTraining) && mod(t, outputSavingRate) == 0,
+                    
+                    V_firing_history(:, periodSaveCounter, period, epoch) = V;
+                    R_firing_history(:, periodSaveCounter, period, epoch) = R_firingrate;
+                    S_firing_history(:, periodSaveCounter, period, epoch) = S_firingrate;
+                    C_firing_history(:, periodSaveCounter, period, epoch) = C_firingrate;
+
+                    V_activation_history(:, periodSaveCounter, period, epoch) = V;
+                    R_activation_history(:, periodSaveCounter, period, epoch) = R_activation;
+                    S_activation_history(:, periodSaveCounter, period, epoch) = S_activation;
+                    C_activation_history(:, periodSaveCounter, period, epoch) = C_activation;
+                    
+                    
+                    % Count one more dt
+                    periodSaveCounter = periodSaveCounter + 1;
+                end 
+            end
+            
+            finishTime = toc;
+            disp(['Finished period #' num2str(period) ' of ' num2str(numPeriods) ' in ' num2str(finishTime) 's.']);
+            
+        end
         
-        % Save in history
-        R_history(:,t) = R_firingrate; % R_firingrate, R_activation
-        S_history(:,t) = S_firingrate;
-        C_history(:,t) = C_firingrate; %C_firingrate; C_activation
-        
-        R_history2(:,t) = R_activation; % R_firingrate, R_activation
-        S_history2(:,t) = S_activation;
-        C_history2(:,t) = C_activation;
-        
+        % Output intermediate network
+        if mod(epoch, parameters.saveNetworksAtEpochMultiples) == 0,
+            
+            disp('Saving trained network to disk...');
+            save([simulationFolder filesep 'TrainedNetwork_e' num2str(epoch) '.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights');
+        end
     end
     
-    toc
     
-    % Plot
-    figure('Position', [100, 100, 1049, 895]);
-
-    subplot(4,2,1);
-    imagesc(flipud(R_history));
-    colorbar
+    disp(['Completed ' num2str(numEpochs) ' epochs in ' num2str(finishTime) ' seconds.']);
     
-    subplot(4,2,2);
-    imagesc(flipud(R_history2));
-    colorbar
+    % Output final network
+    disp('Saving trained network to disk...');
+    save([simulationFolder filesep 'TrainedNetwork.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'R_N', 'S_N', 'C_N');
     
-    subplot(4,2,3);
-    imagesc(flipud(S_history));
-    colorbar
+    % Output activity
+    disp('Saving activity...');
+    save([simulationFolder filesep 'activity' outputpostfix '.mat'] , 'V_firing_history' ...
+                                                                    , 'R_firing_history' ...
+                                                                    , 'S_firing_history' ...
+                                                                    , 'C_firing_history' ...
+                                                                    , 'V_activation_history' ...
+                                                                    , 'R_activation_history' ...
+                                                                    , 'S_activation_history' ...
+                                                                    , 'C_activation_history' ...
+                                                                    , 'numEpochs' ...
+                                                                    , 'numPeriods' ...
+                                                                    , 'R_N', 'S_N', 'C_N');
     
-    subplot(4,2,4);
-    imagesc(flipud(S_history2));
-    colorbar
+    disp('Done...');
     
-    subplot(4,2,5);
-    imagesc(flipud(C_history));
-    colorbar
-    
-    subplot(4,2,6);
-    imagesc(flipud(C_history2));
-    colorbar
-    
-    subplot(4,2,7);
-    plot(eyePositionTrace, 'r');
-    hold on;
-    plot(retinalTargetTraces' , 'b');
-    xlabel('Time step');
-    legend({'Eye Position','Stimuli Retinal Locations'})
-    %ylim(min(min(eyePositionTrace),min(min(retinalTargetTraces)) max(max(eyePositionTrace),max(max(retinalTargetTraces)))]);
+    function r = stepToTime(i)
+        r = (i-1)*dt;
+    end
 end

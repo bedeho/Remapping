@@ -15,18 +15,18 @@ function GenerateExperiment()
     global STIMULI_FOLDER;
     
     % Stimuli
-    trainingStimuli     = 'baseline';
-    testing_kusonoki    = 'test-KusonokiTesting';
-    testing_stim_ctrl   = 'test-StimuliControlTask';
-    testing_sac_ctrl    = 'test-SaccadeControlTask';
+    trainingStimuli     = 'basic';
+    testing_kusonoki    = 'basic-KusonokiTesting';
+    testing_stim_ctrl   = 'basic-StimuliControlTask';
+    testing_sac_ctrl    = 'basic-SaccadeControlTask';
     
-    trainingStimuliFile         = [STIMULI_FOLDER filesep trainingStimuli filesep 'stim.mat'];
-    testingKusonokiStimuliFile  = [STIMULI_FOLDER filesep testing_kusonoki filesep 'stim.mat'];
-    testingStimCTRLStimuliFile  = [STIMULI_FOLDER filesep testing_stim_ctrl filesep 'stim.mat'];
-    testingSacCTRLStimuliFile   = [STIMULI_FOLDER filesep testing_sac_ctrl filesep 'stim.mat'];
+    trainingStimuliFile         = [STIMULI_FOLDER trainingStimuli filesep 'stim.mat'];
+    testingKusonokiStimuliFile  = [STIMULI_FOLDER testing_kusonoki filesep 'stim.mat'];
+    testingStimCTRLStimuliFile  = [STIMULI_FOLDER testing_stim_ctrl filesep 'stim.mat'];
+    testingSacCTRLStimuliFile   = [STIMULI_FOLDER testing_sac_ctrl filesep 'stim.mat'];
     
     % Experiment parameters
-    Name = 'test';
+    Name = 'prewired';
     experimentFolderPath = [EXPERIMENTS_FOLDER Name];
     
     % Create experiment folders
@@ -45,17 +45,17 @@ function GenerateExperiment()
     parameterCombinations = containers.Map;
     
     % Simulations Paramters
-    dt = 0.001; % (s)
+    dt = 0.010; % (s)
     numTrainingEpochs = 1;
     outputSavingRate = 2; % Period of time step saving during testing.
-    saveDuringTraining = false;
+    saveActivityInTraining = false;
     saveNetworksAtEpochMultiples = 333; % Save network at this resolution
     seed = 13;
     
     % LIP
-    parameterCombinations('R_eccentricity') = [45 50];
+    parameterCombinations('R_eccentricity') = [45];
     parameterCombinations('R_tau')          = [0.100 0.2]; % (s)
-    parameterCombinations('C_to_R_psi')     = [0.08]; % 0.15
+    parameterCombinations('C_to_R_psi')     = [0.08 2]; % 0.15
     parameterCombinations('R_w_INHB')       = [0]; %0.7
     parameterCombinations('V_tau')          = [0.400]; % (s)
     parameterCombinations('V_psi')          = [4];
@@ -76,7 +76,7 @@ function GenerateExperiment()
     
     % SC?: Comb
     parameterCombinations('C_tau')          = [0.100]; % (s)
-    parameterCombinations('R_to_C_psi')     = [1.0];
+    parameterCombinations('V_to_C_psi')     = [1.0]; % R_to_C_psi
     parameterCombinations('S_to_C_psi')     = [6.2];
     parameterCombinations('C_w_INHB')       = [0]; %/C_N
     parameterCombinations('R_to_C_alpha')   = [0.1]; % learning rate
@@ -85,7 +85,7 @@ function GenerateExperiment()
     parameterCombinations('C_threshold')    = [1.0];
     
     % Save the experiment params
-    save([experimentFolderPath filesep 'GenerateExperiment.mat'] , 'parameterCombinations','dt', 'numTrainingEpochs', 'outputSavingRate', 'saveDuringTraining', 'saveNetworksAtEpochMultiples', 'seed');
+    save([experimentFolderPath filesep 'GenerateExperiment.mat'], 'parameterCombinations');
     
     % Start paramters permutation
     simulation = containers.Map;
@@ -140,22 +140,30 @@ function GenerateExperiment()
             % Derive new paramters
             simulation('R_preferences')         = -simulation('R_eccentricity'):1:simulation('R_eccentricity');
             simulation('S_preferences')         = -simulation('S_eccentricity'):1:simulation('S_eccentricity');
-            offset                              = 0.4*randn(1, length(simulation('S_preferences'))); % (s)
+            offset                              = simulation('S_delay_sigma')*randn(1, length(simulation('S_preferences'))); % (s)
             offset(offset < 0)                  = -offset(offset < 0);
             simulation('S_presaccadicOffset')   = offset;
+
+            % Save parameters, add miscelanous paramters
+            parameterfile = [simulationFolder filesep 'Parameters.mat'];
+            save(parameterfile, 'simulation', 'dt', 'numTrainingEpochs', 'outputSavingRate', 'saveActivityInTraining', 'saveNetworksAtEpochMultiples', 'seed');
             
-            % Save params, add miscelanous paramters
-            save([simulationFolder filesep 'Paramters.mat'], 'simulation', 'dt');
-            
+            %{
             % Create simulation blank network
+            disp('Creating blank network...');
             createBlankNetwork([simulationFolder filesep 'BlankNetwork.mat'], simulation);
                         
             % Training
             disp('Training...');
             Remapping(simulationFolder, trainingStimuliFile, true);
+            %}
+            
+            % Create prewired network
+            disp('Create prewired network...');
+            CreatePrewiredNetwork([simulationFolder filesep 'PrewiredNetwork.mat'], simulation('R_preferences'), simulation('S_preferences'), simulation('V_sigma'));
             
             % Move each network to new folder & test
-            listing = dir(experimentFolder); 
+            listing = dir(simulationFolder); 
             for d = 1:length(listing),
                 
                 % We looking for networks files
@@ -169,18 +177,19 @@ function GenerateExperiment()
                     subsim_dir = [simulationFolder filesep name];
                     mkdir(subsim_dir);
                     
-                    % Move file into dir
+                    % Move files into dir
                     movefile(networkfile, subsim_dir);
+                    copyfile(parameterfile, subsim_dir)
                     
                     % Testing network
                     disp('Kusonoki Task...');
-                    Remapping(simulationFolder, testingKusonokiStimuliFile, false, 'kusonoki');
+                    Remapping(subsim_dir, testingKusonokiStimuliFile, false, 'kusonoki', [name ext]);
                     
                     disp('Saccade Control Task...');
-                    Remapping(simulationFolder, testingStimCTRLStimuliFile, false, 'saccade-control');
+                    Remapping(subsim_dir, testingStimCTRLStimuliFile, false, 'saccade-control', [name ext]);
                     
                     disp('Stimulus Control Task...');
-                    Remapping(simulationFolder, testingSacCTRLStimuliFile, false, 'stimulus-control');
+                    Remapping(subsim_dir, testingSacCTRLStimuliFile, false, 'stimulus-control', [name ext]);
 
                 end
             end
