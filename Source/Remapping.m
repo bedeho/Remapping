@@ -111,6 +111,7 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
     C_N = S_N*R_N;
     C_tau = parameters.simulation('C_tau'); % (s)
     %R_to_C_psi = parameters.simulation('R_to_C_psi'); % 4
+    V_to_R_psi = parameters.simulation('V_to_R_psi');
     S_to_C_psi = parameters.simulation('S_to_C_psi');
     V_to_C_psi = parameters.simulation('V_to_C_psi');
     C_w_INHB = 0/C_N;
@@ -181,8 +182,9 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
 
                 % R
                 R_inhibition = R_w_INHB*sum(R_firingrate);
-                C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate'); 
-                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + V);
+                C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate');
+                V_to_R_excitation = V_to_R_psi*V;
+                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + V_to_R_excitation);
 
                 % V
                 retinalTargets = retinalTargetTraces(:,t);

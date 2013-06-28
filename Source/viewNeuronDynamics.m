@@ -9,17 +9,29 @@
 
 function viewNeuronDynamics(activityFile, stimuliFile)
 
+    activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/-C_to_R_psi=2/PrewiredNetwork/activitykusonoki.mat';
+    stimuliFile     = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-KusonokiTesting/stim.mat';
+
     % Load input files
     disp('Loading input files...');
     activity = load(activityFile);
     stimuli  = load(stimuliFile);
     
+    V_firing_history = activity.V_firing_history;
+    R_firing_history = activity.R_firing_history;
+    S_firing_history = activity.S_firing_history;
+    C_firing_history = activity.C_firing_history;
+
+    V_activation_history = activity.V_activation_history;
+    R_activation_history = activity.R_activation_history;
+    S_activation_history = activity.S_activation_history;
+    C_activation_history = activity.C_activation_history;
+    
     % Set parameters
     R_N = activity.R_N;
     S_N = activity.S_N;
     C_N = activity.C_N;
-    eyePositionTrace = stimuli.eyePositionTrace;
-    retinalTargetTraces = stimuli.retinalTargetTraces;
+    dt = stimuli.dt;
     
     % Visualization loop
     figure('Position', [100, 100, 1049, 895]);
@@ -28,32 +40,34 @@ function viewNeuronDynamics(activityFile, stimuliFile)
         
         % Get desired epoch or quit
         if activity.numEpochs > 1,
-            str = input(['Epoch # (1, ' num2str(activity.numEpochs) '), or 0 to quit'],'s');
-            epoch = num2str(str);
+            str = input(['Epoch # (1, ' num2str(activity.numEpochs) '), or 0 to quit: '],'s');
+            epoch = str2num(str);
             
             % Quit if we are done
             if epoch == 0,
                 return;
             end
+        else
+            epoch = 1;
         end
         
         % Get desired period
-        str = input(['Period # (1, ' num2str(activity.numPeriods) ')'],'s');
-        period = num2str(str);
+        str = input(['Period # (1, ' num2str(activity.numPeriods) '): '],'s');
+        period = str2num(str);
         
         % Load
-        V_firingrate = activity(epoch, period, 1).V_firingrate;
-        R_firingrate = activity(epoch, period, 1).R_firingrate;
-        S_firingrate = activity(epoch, period, 1).S_firingrate;
-        C_firingrate = activity(epoch, period, 1).C_firingrate;
+        V_firingrate = V_firing_history(:, :, period, epoch);
+        R_firingrate = R_firing_history(:, :, period, epoch);
+        S_firingrate = S_firing_history(:, :, period, epoch);
+        C_firingrate = C_firing_history(:, :, period, epoch);
 
-        V_activation = activity(epoch, period, 2).V_activation;
-        R_activation = activity(epoch, period, 2).R_activation;
-        S_activation = activity(epoch, period, 2).S_activation;
-        C_activation = activity(epoch, period, 2).C_activation;
+        V_activation = V_activation_history(:, :, period, epoch);
+        R_activation = R_activation_history(:, :, period, epoch);
+        S_activation = S_activation_history(:, :, period, epoch);
+        C_activation = C_activation_history(:, :, period, epoch);
         
         % Plot
-        s = timeToTimeStep(stimuli{period}.saccadeTimes);
+        s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes);
 
         subplot(5,2,1);
         imagesc(flipud(V_firingrate));
@@ -104,19 +118,26 @@ function viewNeuronDynamics(activityFile, stimuliFile)
         title('C Actiation');
 
         subplot(5,2,9);
-        plot(eyePositionTrace, 'r');
+        cla
+        plot(stimuli.stimuli{period}.eyePositionTrace, 'r');
         hold on;
-        plot(retinalTargetTraces' , 'b');
+        plot(stimuli.stimuli{period}.retinalTargetTraces', 'b');
         xlabel('Time step');
         legend({'Eye Position','Stimuli Retinal Locations'})
 
         subplot(5,2,10);
-        plot(eyePositionTrace, 'r');
+        cla
+        plot(stimuli.stimuli{period}.eyePositionTrace, 'r');
         hold on;
-        plot(retinalTargetTraces' , 'b');
+        plot(stimuli.stimuli{period}.retinalTargetTraces', 'b');
         xlabel('Time step');
         legend({'Eye Position','Stimuli Retinal Locations'})    
 
         % ylim(min(min(eyePositionTrace),min(min(retinalTargetTraces)) max(max(eyePositionTrace),max(max(retinalTargetTraces)))]);
     end
+    
+    function i = timeToTimeStep(t)
+        i = floor(t/dt) + 1;
+    end
 end
+

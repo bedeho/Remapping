@@ -52,37 +52,39 @@ function GenerateExperiment()
     saveNetworksAtEpochMultiples = 333; % Save network at this resolution
     seed = 13;
     
-    % LIP
+    % R
     parameterCombinations('R_eccentricity') = [45];
-    parameterCombinations('R_tau')          = [0.100 0.2]; % (s)
-    parameterCombinations('C_to_R_psi')     = [0.08 2]; % 0.15
+    parameterCombinations('R_tau')          = [0.100]; % (s)
     parameterCombinations('R_w_INHB')       = [0]; %0.7
-    parameterCombinations('V_tau')          = [0.400]; % (s)
-    parameterCombinations('V_psi')          = [4];
-    parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
-    parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
     parameterCombinations('R_slope')        = [10];
     parameterCombinations('R_threshold')    = [2.0];
+    parameterCombinations('R_to_C_alpha')   = [0.1]; % learning rate
     
-    % FEF: Saccade Plan
+    % V
+    parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
+    parameterCombinations('V_tau')          = [0.400]; % (s)
+    parameterCombinations('V_psi')          = [4];
+    parameterCombinations('V_to_R_psi')     = [2];
+    parameterCombinations('V_to_C_psi')     = [1.0]; % R_to_C_psi
+    
+    % S
     parameterCombinations('S_eccentricity') = [30];
     parameterCombinations('S_delay_sigma')  = [0.4]; % (s)
     parameterCombinations('S_tau')          = [0.300]; % (s)
-    
     parameterCombinations('S_psi')          = [1];
     parameterCombinations('S_sigma')        = parameterCombinations('V_sigma'); % (deg) receptive field size
     parameterCombinations('S_slope')        = [6];
     parameterCombinations('S_threshold')    = [0.2];
-    
-    % SC?: Comb
-    parameterCombinations('C_tau')          = [0.100]; % (s)
-    parameterCombinations('V_to_C_psi')     = [1.0]; % R_to_C_psi
     parameterCombinations('S_to_C_psi')     = [6.2];
-    parameterCombinations('C_w_INHB')       = [0]; %/C_N
-    parameterCombinations('R_to_C_alpha')   = [0.1]; % learning rate
     parameterCombinations('S_to_C_alpha')   = [0.1]; % learning rate
+    
+    % C
+    parameterCombinations('C_tau')          = [0.100]; % (s)
+    parameterCombinations('C_w_INHB')       = [0]; %/C_N
     parameterCombinations('C_slope')        = [50];
     parameterCombinations('C_threshold')    = [1.0];
+    parameterCombinations('C_to_R_psi')     = [2]; % 0.15
+    parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
     
     % Save the experiment params
     save([experimentFolderPath filesep 'GenerateExperiment.mat'], 'parameterCombinations');
