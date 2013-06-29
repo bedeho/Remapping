@@ -56,7 +56,7 @@ function GenerateExperiment()
     parameterCombinations('R_eccentricity') = [45];
     parameterCombinations('R_tau')          = [0.100]; % (s)
     parameterCombinations('R_w_INHB')       = [0]; %0.7
-    parameterCombinations('R_slope')        = [3];
+    parameterCombinations('R_slope')        = [1];
     parameterCombinations('R_threshold')    = [2.0];
     parameterCombinations('R_to_C_alpha')   = [0.1]; % learning rate
     
@@ -83,7 +83,7 @@ function GenerateExperiment()
     parameterCombinations('C_w_INHB')       = [0]; %/C_N
     parameterCombinations('C_slope')        = [50];
     parameterCombinations('C_threshold')    = [1.0];
-    parameterCombinations('C_to_R_psi')     = [0.5]; % 0.15
+    parameterCombinations('C_to_R_psi')     = [0.15]; % 0.15
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
     
     % Save the experiment params
