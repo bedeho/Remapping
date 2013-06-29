@@ -15,7 +15,7 @@ function GenerateExperiment()
     global STIMULI_FOLDER;
     
     % Stimuli
-    trainingStimuli     = 'basic';
+    trainingStimuli     = 'basic-Training';
     testing_kusonoki    = 'basic-KusonokiTesting';
     testing_stim_ctrl   = 'basic-StimuliControlTask';
     testing_sac_ctrl    = 'basic-SaccadeControlTask';
@@ -47,7 +47,7 @@ function GenerateExperiment()
     % Simulations Paramters
     dt = 0.010; % (s)
     numTrainingEpochs = 1;
-    outputSavingRate = 4; % Period of time step saving during testing.
+    outputSavingRate = 1; % Period of time step saving during testing.
     saveActivityInTraining = false;
     saveNetworksAtEpochMultiples = 333; % Save network at this resolution
     seed = 13;
@@ -64,7 +64,7 @@ function GenerateExperiment()
     parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
     parameterCombinations('V_tau')          = [0.400]; % (s)
     parameterCombinations('V_psi')          = [4];
-    parameterCombinations('V_to_R_psi')     = [10];
+    parameterCombinations('V_to_R_psi')     = [4];
     parameterCombinations('V_to_C_psi')     = [1.0]; % R_to_C_psi
     
     % S
@@ -188,10 +188,10 @@ function GenerateExperiment()
                     Remapping(subsim_dir, testingKusonokiStimuliFile, false, 'kusonoki', [name ext]);
                     
                     disp('Saccade Control Task...');
-                    Remapping(subsim_dir, testingStimCTRLStimuliFile, false, 'saccade-control', [name ext]);
+                    Remapping(subsim_dir, testingSacCTRLStimuliFile, false, 'saccade-control', [name ext]);
                     
                     disp('Stimulus Control Task...');
-                    Remapping(subsim_dir, testingSacCTRLStimuliFile, false, 'stimulus-control', [name ext]);
+                    Remapping(subsim_dir, testingStimCTRLStimuliFile, false, 'stimulus-control', [name ext]);
 
                 end
             end

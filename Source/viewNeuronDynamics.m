@@ -10,8 +10,8 @@
 function viewNeuronDynamics(activityFile, stimuliFile)
 
     if nargin == 0,
-        activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activitykusonoki.mat';
-        stimuliFile     = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-KusonokiTesting/stim.mat';
+        activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activitysaccade-control.mat';
+        stimuliFile     = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-SaccadeControlTask/stim.mat';
     end
     
     % Load input files
@@ -64,7 +64,7 @@ function viewNeuronDynamics(activityFile, stimuliFile)
     %}
     
     % Setup global vars
-    period = 30
+    period = 56
     epoch = 1
     
     % Do first plot
@@ -107,49 +107,56 @@ function viewNeuronDynamics(activityFile, stimuliFile)
 
         subplot(5,2,1);
         imagesc(flipud(V_firingrate));
-        hold on;plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r');
-        colorbar
+        hold on;colorbar
+        if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('V Firing');
 
         subplot(5,2,2);
         imagesc(flipud(V_activation));
-        hold on;plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r');
+        hold on;colorbar
+        if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('V Firing');
 
         subplot(5,2,3);
         imagesc(flipud(R_firingrate));
-        hold on;plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r');
+        hold on;colorbar
+        if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('R Firing');
 
         subplot(5,2,4);
         imagesc(flipud(R_activation));
-        hold on;plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r');
+        hold on;colorbar
+        if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('R Activation');
 
         subplot(5,2,5);
         imagesc(flipud(S_firingrate));
         colorbar
-        hold on;plot([s s],[ones(S_N,1) S_N*ones(S_N,1)],'r');
+        hold on;colorbar
+        if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('S Firing');
 
         subplot(5,2,6);
         imagesc(flipud(S_activation));
-        hold on;plot([s s],[ones(S_N,1) S_N*ones(S_N,1)],'r');
+        hold on;colorbar
+        if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('S Activation');
 
         subplot(5,2,7);
         imagesc(flipud(C_firingrate));
-        hold on;plot([s s],[ones(C_N,1) C_N*ones(C_N,1)],'r');
+        hold on;colorbar
+        if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('C Firing');
 
         subplot(5,2,8);
         imagesc(flipud(C_activation));
-        hold on;plot([s s],[ones(C_N,1) C_N*ones(C_N,1)],'r');
+        hold on;colorbar
+        if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('C Actiation');
 

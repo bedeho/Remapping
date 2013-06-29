@@ -1,13 +1,13 @@
 
 %
-%  GenerateEyeTrace.m
+%  GenerateTrace.m
 %  Remapping
 %
 %  Created by Bedeho Mender on 23/06/13.
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [eyePositionTrace, retinalTargetTraces] = GenerateEyeTrace(Duration, dt, headCenteredTargetLocations, targetOffIntervals, initialEyePosition, saccadeTimes, saccadeTargets)
+function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, headCenteredTargetLocations, targetOffIntervals, initialEyePosition, saccadeTimes, saccadeTargets)
 
     numTimeSteps = ceil(Duration/dt);
     

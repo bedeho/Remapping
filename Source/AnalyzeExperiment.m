@@ -7,9 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function AnalyzeExperiment(experiment)
-
-%{
+function AnalyzeExperiment(experiment, stimulinames)
 
     % Import global variables
     declareGlobalVars();
