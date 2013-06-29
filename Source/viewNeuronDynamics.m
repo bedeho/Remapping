@@ -9,9 +9,11 @@
 
 function viewNeuronDynamics(activityFile, stimuliFile)
 
-    activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/-C_to_R_psi=2/PrewiredNetwork/activitykusonoki.mat';
-    stimuliFile     = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-KusonokiTesting/stim.mat';
-
+    if nargin == 0,
+        activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activitykusonoki.mat';
+        stimuliFile     = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-KusonokiTesting/stim.mat';
+    end
+    
     % Load input files
     disp('Loading input files...');
     activity = load(activityFile);
@@ -33,11 +35,44 @@ function viewNeuronDynamics(activityFile, stimuliFile)
     C_N = activity.C_N;
     dt = stimuli.dt;
     
-    % Visualization loop
+    % Make figure
     figure('Position', [100, 100, 1049, 895]);
     
-    while(true),
+    %{
+    
+    % Adding controls
+    if activity.numEpochs > 1
+        uicontrol('Style', 'slider', 'Min', 1, 'Max', activity.numEpochs, 'Value', 1, 'Position', [20 850 120 20], 'Callback', {@epoch_callback});
+    end
+    
+    if activity.numPeriods > 1
+        uicontrol('Style', 'slider', 'Min', 1, 'Max', activity.numPeriods, 'Value', 1, 'Position', [200 850 120 20], 'Callback', {@period_callback});
+    end
+    
+    function epoch_callback(hObj,event,ax)
         
+        val = 51 - get(hObj,'Value');
+        epoch = val
+    end 
+    
+    function period_callback(hObj,event,ax)
+        
+        val = 51 - get(hObj,'Value');
+        period = val
+    end
+
+    %}
+    
+    % Setup global vars
+    period = 30
+    epoch = 1
+    
+    % Do first plot
+    display();
+
+    function display()
+        
+        %{
         % Get desired epoch or quit
         if activity.numEpochs > 1,
             str = input(['Epoch # (1, ' num2str(activity.numEpochs) '), or 0 to quit: '],'s');
@@ -54,6 +89,7 @@ function viewNeuronDynamics(activityFile, stimuliFile)
         % Get desired period
         str = input(['Period # (1, ' num2str(activity.numPeriods) '): '],'s');
         period = str2num(str);
+        %}
         
         % Load
         V_firingrate = V_firing_history(:, :, period, epoch);
@@ -123,7 +159,8 @@ function viewNeuronDynamics(activityFile, stimuliFile)
         hold on;
         plot(stimuli.stimuli{period}.retinalTargetTraces', 'b');
         xlabel('Time step');
-        legend({'Eye Position','Stimuli Retinal Locations'})
+        legend({'Eye Position','Stimuli Retinal Locations'});
+        ylim([-stimuli.R_eccentricity stimuli.R_eccentricity]);
 
         subplot(5,2,10);
         cla
@@ -131,13 +168,15 @@ function viewNeuronDynamics(activityFile, stimuliFile)
         hold on;
         plot(stimuli.stimuli{period}.retinalTargetTraces', 'b');
         xlabel('Time step');
-        legend({'Eye Position','Stimuli Retinal Locations'})    
-
-        % ylim(min(min(eyePositionTrace),min(min(retinalTargetTraces)) max(max(eyePositionTrace),max(max(retinalTargetTraces)))]);
-    end
+        legend({'Eye Position','Stimuli Retinal Locations'});
+        ylim([-stimuli.R_eccentricity stimuli.R_eccentricity]);
+        
+        function i = timeToTimeStep(t)
+            i = floor(t/dt) + 1;
+        end
+        
+        stimuli.stimuli{period}
     
-    function i = timeToTimeStep(t)
-        i = floor(t/dt) + 1;
     end
 end
 

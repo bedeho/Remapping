@@ -70,60 +70,57 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
     %% Load dynamical parameters
     
     % LIP: Retina
-    R_eccentricity = parameters.simulation('R_eccentricity');
-    R_preferences = parameters.simulation('R_preferences');
-    R_N = length(R_preferences);
+    R_eccentricity  = parameters.simulation('R_eccentricity');
+    R_preferences   = parameters.simulation('R_preferences');
+    R_N             = length(R_preferences);
+    R_activation    = zeros(1,R_N);
+    R_firingrate    = zeros(1,R_N);
     
-    R_tau = parameters.simulation('R_tau');
-    C_to_R_psi = parameters.simulation('C_to_R_psi');
-    R_w_INHB = parameters.simulation('R_w_INHB');
+    R_tau           = parameters.simulation('R_tau');
+    R_w_INHB        = parameters.simulation('R_w_INHB');
+    R_slope         = parameters.simulation('R_slope');
+    R_threshold     = parameters.simulation('R_threshold');
+    R_to_C_alpha    = parameters.simulation('R_to_C_alpha'); % learning rate
+    %R_to_C_psi     = parameters.simulation('R_to_C_psi'); % 4
     
-    V_tau = parameters.simulation('V_tau');
-    V_psi = parameters.simulation('V_psi');
-    V_sigma = parameters.simulation('V_sigma');
-    V = zeros(1,R_N);
+    % V
+    V_tau           = parameters.simulation('V_tau');
+    V_psi           = parameters.simulation('V_psi');
+    V_sigma         = parameters.simulation('V_sigma');
+    V               = zeros(1,R_N);
     
-    C_to_R_alpha = parameters.simulation('C_to_R_alpha');
-    
-    R_slope = parameters.simulation('R_slope');
-    R_threshold = parameters.simulation('R_threshold');
-    
-    R_activation = zeros(1,R_N);
-    R_firingrate = zeros(1,R_N);
+    V_to_R_psi      = parameters.simulation('V_to_R_psi');
+    V_to_C_psi      = parameters.simulation('V_to_C_psi');
 
-    % FEF: Saccade Plan
-    S_eccentricity = parameters.simulation('S_eccentricity');
-    S_preferences = parameters.simulation('S_preferences');
-    S_N = length(S_preferences);
-    S_delay_sigma = parameters.simulation('S_delay_sigma');
+    % S
+    S_eccentricity  = parameters.simulation('S_eccentricity');
+    S_preferences   = parameters.simulation('S_preferences');
+    S_N             = length(S_preferences);
+    
+    S_activation    = zeros(1,S_N);
+    S_firingrate    = zeros(1,S_N);
+    
+    S_delay_sigma   = parameters.simulation('S_delay_sigma');
     S_presaccadicOffset = parameters.simulation('S_presaccadicOffset');
-    S_tau = parameters.simulation('S_tau'); % (s)
-    S_psi = parameters.simulation('S_psi');
-    S_sigma = V_sigma; % (deg) receptive field size
+    S_tau           = parameters.simulation('S_tau'); % (s)
+    S_psi           = parameters.simulation('S_psi');
+    S_to_C_psi      = parameters.simulation('S_to_C_psi');
+    S_slope         = parameters.simulation('S_slope');
+    S_threshold     = parameters.simulation('S_threshold');
+    S_to_C_alpha    = parameters.simulation('S_to_C_alpha'); % learning rate
+    S_sigma         = V_sigma; % (deg) receptive field size
+
+    % C
+    C_N             = S_N*R_N;
+    C_activation    = zeros(1,C_N);
+    C_firingrate    = zeros(1,C_N);
     
-    S_slope = parameters.simulation('S_slope');
-    S_threshold = parameters.simulation('S_threshold');
-    
-    S_activation = zeros(1,S_N);
-    S_firingrate = zeros(1,S_N);
-    
-    % SC?: Comb
-    C_N = S_N*R_N;
-    C_tau = parameters.simulation('C_tau'); % (s)
-    %R_to_C_psi = parameters.simulation('R_to_C_psi'); % 4
-    V_to_R_psi = parameters.simulation('V_to_R_psi');
-    S_to_C_psi = parameters.simulation('S_to_C_psi');
-    V_to_C_psi = parameters.simulation('V_to_C_psi');
-    C_w_INHB = 0/C_N;
-    
-    R_to_C_alpha = parameters.simulation('R_to_C_alpha'); % learning rate
-    S_to_C_alpha = parameters.simulation('S_to_C_alpha'); % learning rate
-    
-    C_slope = parameters.simulation('C_slope');
-    C_threshold = parameters.simulation('C_threshold');
-    
-    C_activation = zeros(1,C_N);
-    C_firingrate = zeros(1,C_N);
+    C_tau           = parameters.simulation('C_tau'); % (s)
+    C_to_R_alpha    = parameters.simulation('C_to_R_alpha');
+    C_to_R_psi      = parameters.simulation('C_to_R_psi');
+    C_w_INHB        = 0/C_N;
+    C_slope         = parameters.simulation('C_slope');
+    C_threshold     = parameters.simulation('C_threshold');
     
     % Allocate buffer space
     V_firing_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
@@ -137,6 +134,7 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
     C_activation_history = zeros(C_N, numSavedTimeSteps, numPeriods, numEpochs);
     
     %% Simulate
+    totalTicID = tic;
     for epoch=1:numEpochs,
         
         if isTraining,
@@ -145,7 +143,7 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
         
         for period=1:numPeriods
             
-            tic
+            periodTicID = tic;
             
             % Get number of time steps in this period
             numTimeSteps = timeStepsInPeriod(period);
@@ -198,7 +196,7 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
                 % C
                 C_inhibition = C_w_INHB*sum(C_firingrate);
                 %R_to_C_excitation = R_to_C_psi*(R_to_C_weights*R_firingrate');
-                V_to_C_excitation = V_to_C_psi*(V_to_C_weights*R_firingrate');
+                V_to_C_excitation = V_to_C_psi*(V_to_C_weights*V');
                 S_to_C_excitation = S_to_C_psi*(S_to_C_weights*S_firingrate');
                 C_activation = C_activation + (dt/C_tau)*(-C_activation + V_to_C_excitation' + S_to_C_excitation' - C_inhibition); % _to_C_excitation
 
@@ -254,8 +252,8 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
                 end 
             end
             
-            finishTime = toc;
-            disp(['Finished period #' num2str(period) ' of ' num2str(numPeriods) ' in ' num2str(finishTime) 's.']);
+            periodFinishTime = toc(periodTicID);
+            disp(['Finished period #' num2str(period) ' of ' num2str(numPeriods) ' in ' num2str(periodFinishTime) 's.']);
             
         end
         
@@ -267,12 +265,14 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
         end
     end
     
-    
-    disp(['Completed ' num2str(numEpochs) ' epochs in ' num2str(finishTime) ' seconds.']);
+    totalFinishTime = toc(totalTicID);
+    disp(['Completed ' num2str(numEpochs) ' epochs in ' num2str(totalFinishTime) 's.']);
     
     % Output final network
-    disp('Saving trained network to disk...');
-    save([simulationFolder filesep 'TrainedNetwork.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'R_N', 'S_N', 'C_N');
+    if isTraining,
+        disp('Saving trained network to disk...');
+        save([simulationFolder filesep 'TrainedNetwork.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'R_N', 'S_N', 'C_N');
+    end
     
     % Output activity
     disp('Saving activity...');
@@ -293,4 +293,5 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
     function r = stepToTime(i)
         r = (i-1)*dt;
     end
+
 end
