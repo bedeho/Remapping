@@ -25,7 +25,7 @@ function GenerateKusonokiTestingStimuli(Name)
     R_density                       = 10;
     
     % Dynamical quantities
-    saccadeSpeed                    = 300; %if changed, then change in GenerateEyeTrace.m as well!
+    saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!
     saccadeOnset                    = 0.4; % w.r.t start of task
     earliestStimulusOnsetTime       = 0.100; % w.r.t start of task
     lastStimulusOnsetTime           = saccadeOnset + 0.500; % w.r.t start of task

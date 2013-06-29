@@ -101,7 +101,7 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
     S_firingrate    = zeros(1,S_N);
     
     S_delay_sigma   = parameters.simulation('S_delay_sigma');
-    S_presaccadicOffset = parameters.simulation('S_presaccadicOffset');
+    S_presaccadicOffset = ones(1,S_N);%parameters.simulation('S_presaccadicOffset');
     S_tau           = parameters.simulation('S_tau'); % (s)
     S_psi           = parameters.simulation('S_psi');
     S_to_C_psi      = parameters.simulation('S_to_C_psi');
