@@ -166,9 +166,14 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
             end
             
             % Reset network variables
-            periodSaveCounter = 1;
-            
-            % do later?
+            periodSaveCounter   = 1;
+            V                   = V*0;
+            R_firingrate        = R_firingrate*0;
+            S_firingrate        = S_firingrate*0;
+            C_firingrate        = C_firingrate*0;
+            R_activation        = R_activation*0;
+            S_activation        = S_activation*0;
+            C_activation        = C_activation*0;
     
             % Run period
             for t=1:numTimeSteps,
@@ -245,7 +250,6 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
                     R_activation_history(:, periodSaveCounter, period, epoch) = R_activation;
                     S_activation_history(:, periodSaveCounter, period, epoch) = S_activation;
                     C_activation_history(:, periodSaveCounter, period, epoch) = C_activation;
-                    
                     
                     % Count one more dt
                     periodSaveCounter = periodSaveCounter + 1;
