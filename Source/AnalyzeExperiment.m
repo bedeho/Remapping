@@ -19,36 +19,7 @@ function AnalyzeExperiment(experiment, stimulinames)
     
     % Iterate simulations in this experiment folder
     listing = dir(experimentFolder); 
-    
-    % Load stimuli
-    startDir = pwd;
-    cd([base 'Stimuli/' stimuliName]);
-    
-    C = load('info.mat');
-    info = C.info;
-    nrOfEyePositionsInTesting = length(info.eyePositions);
-    
-    %C = load('dotproduct.mat'); 
-    %dotproduct = C.dotproduct;
-    dotproduct = 0;
-    
-    cd(startDir);
-    
-    % Load training <=== complete and utter hackjob , but no time!;
-    stimuliName_training = strrep(stimuliName, 'stdTest', 'training');
-    training_dir = [base 'Stimuli/' stimuliName_training];
-    
-    if exist(training_dir),
         
-        % Load stimuli
-        cd(training_dir);
-        trainingInfo = load('dimensions.mat');
-        cd(startDir);
-    
-    else
-        trainingInfo = 0;
-    end
-    
     % Find an example of simulation directory to extract column names- HORRIBLY CODED
     for d = 1:length(listing),
 
@@ -88,16 +59,15 @@ function AnalyzeExperiment(experiment, stimulinames)
     fprintf(fileID, '<table id="example" class="display" cellpadding="10" style="border: solid 1px">\n');
     fprintf(fileID, '<thead><tr>');
     fprintf(fileID, '<th>Name</th>');
-    fprintf(fileID, '<th>Network</th>');
-    fprintf(fileID, '<th>L/h</th>');
-    for p = 1:nrOfParams,
-        fprintf(fileID, ['<th>' parameters{p,1} '</th>']);
-    end
-
-    fprintf(fileID, '<th>Action</th>');
-    fprintf(fileID, '</tr></thead>');
     
-    %h = waitbar(0, 'Plotting&Infoanalysis...');
+    for i = 1:nrOfParams,
+        fprintf(fileID, ['<th>' parameters{i,1} '</th>']);
+    end
+    
+    for i = 1:length(stimulinames),
+        fprintf(fileID, ['<th>' stimulinames(i) '</th>']);
+    end
+    
     counter = 1;
     
     format('short');
@@ -116,7 +86,7 @@ function AnalyzeExperiment(experiment, stimulinames)
             disp(['******** Doing ' num2str(counter) ' out of ' num2str((nnz([listing(:).isdir]) - 2)) '********']); 
             counter = counter + 1;
             
-            summary = plotSimulation(experiment, simulation, info, trainingInfo);
+            %summary = plotSimulation(experiment, simulation, info, trainingInfo);
 
             for s=1:length(summary),
                 
@@ -139,8 +109,8 @@ function AnalyzeExperiment(experiment, stimulinames)
                 % Parameters
                 parameters = getParameters(simulation);
 
-                for p = 1:nrOfParams,
-                    fprintf(fileID, ['<td> ' parameters{p,2} ' </td>\n']);
+                for i = 1:nrOfParams,
+                    fprintf(fileID, ['<td> ' parameters{i,2} ' </td>\n']);
                 end
 
                 % Action

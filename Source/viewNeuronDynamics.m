@@ -10,8 +10,8 @@
 function viewNeuronDynamics(activityFile, stimuliFile)
 
     if nargin == 0,
-        activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activitystimulus-control.mat';
-        stimuliFile     = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-StimuliControlTask/stim.mat';
+        activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/-C_w_INHB=0.0092593/PrewiredNetwork/activitykusonoki.mat';
+        stimuliFile     = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-KusonokiTesting/stim.mat';
     end
     
     % Load input files
@@ -64,7 +64,7 @@ function viewNeuronDynamics(activityFile, stimuliFile)
     %}
     
     % Setup global vars
-    period = 10
+    period = 30
     epoch = 1
     
     % Do first plot

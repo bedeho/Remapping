@@ -73,16 +73,16 @@ function GenerateExperiment()
     parameterCombinations('S_tau')          = [0.300]; % (s)
     parameterCombinations('S_psi')          = [1];
     parameterCombinations('S_sigma')        = parameterCombinations('V_sigma'); % (deg) receptive field size
-    parameterCombinations('S_slope')        = [6];
+    parameterCombinations('S_slope')        = [2];
     parameterCombinations('S_threshold')    = [0.2];
     parameterCombinations('S_to_C_psi')     = [6.2];
     parameterCombinations('S_to_C_alpha')   = [0.1]; % learning rate
     
     % C
     parameterCombinations('C_tau')          = [0.100]; % (s)
-    parameterCombinations('C_w_INHB')       = [0]; %/C_N
+    parameterCombinations('C_w_INHB')       = [100/5400 500/5400 1000/5400]; % C_N = 5400
     parameterCombinations('C_slope')        = [50];
-    parameterCombinations('C_threshold')    = [1.0];
+    parameterCombinations('C_threshold')    = [0.6];
     parameterCombinations('C_to_R_psi')     = [0.15]; % 0.15
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
     
