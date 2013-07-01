@@ -7,17 +7,21 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function viewNeuronDynamics(activityFile, stimuliFile)
+function viewNeuronDynamics(activityFile, stimuliName)
 
+    % Import global variables
+    declareGlobalVars();
+    global STIMULI_FOLDER;
+    
     if nargin == 0,
-        activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/-C_w_INHB=0.0092593/PrewiredNetwork/activitykusonoki.mat';
-        stimuliFile     = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-KusonokiTesting/stim.mat';
+        activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/R_w_INHB=0.10989/PrewiredNetwork/activity-basic-KusonokiTesting.mat';
+        stimuliName     = 'basic-KusonokiTesting';
     end
     
     % Load input files
     disp('Loading input files...');
     activity = load(activityFile);
-    stimuli  = load(stimuliFile);
+    stimuli  = load([STIMULI_FOLDER stimuliName filesep 'stim.mat']);
     
     V_firing_history = activity.V_firing_history;
     R_firing_history = activity.R_firing_history;
@@ -105,7 +109,7 @@ function viewNeuronDynamics(activityFile, stimuliFile)
         C_activation = C_activation_history(:, :, period, epoch);
         
         % Plot
-        s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes);
+        s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes, dt);
 
         subplot(5,2,1);
         imagesc(flipud(V_firingrate));
@@ -179,10 +183,6 @@ function viewNeuronDynamics(activityFile, stimuliFile)
         xlabel('Time step');
         legend({'Eye Position','Stimuli Retinal Locations'});
         ylim([-45 45]); % we hard code limit since not all stimuli has stimuli.R_eccentricity
-
-        function i = timeToTimeStep(t)
-            i = floor(t/dt) + 1;
-        end
         
     end
 end

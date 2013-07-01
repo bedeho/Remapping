@@ -12,18 +12,12 @@ function GenerateExperiment()
     % Import global variables
     declareGlobalVars();
     global EXPERIMENTS_FOLDER;
-    global STIMULI_FOLDER;
     
     % Stimuli
-    trainingStimuli     = 'basic-Training';
+    %trainingStimuli     = 'basic-Training';
     testing_kusonoki    = 'basic-KusonokiTesting';
-    testing_stim_ctrl   = 'basic-StimuliControlTask';
     testing_sac_ctrl    = 'basic-SaccadeControlTask';
-    
-    trainingStimuliFile         = [STIMULI_FOLDER trainingStimuli filesep 'stim.mat'];
-    testingKusonokiStimuliFile  = [STIMULI_FOLDER testing_kusonoki filesep 'stim.mat'];
-    testingStimCTRLStimuliFile  = [STIMULI_FOLDER testing_stim_ctrl filesep 'stim.mat'];
-    testingSacCTRLStimuliFile   = [STIMULI_FOLDER testing_sac_ctrl filesep 'stim.mat'];
+    testing_stim_ctrl   = 'basic-StimuliControlTask';
     
     % Experiment parameters
     Name = 'prewired';
@@ -55,21 +49,21 @@ function GenerateExperiment()
     % R
     parameterCombinations('R_eccentricity') = [45];
     parameterCombinations('R_tau')          = [0.100]; % (s)
-    parameterCombinations('R_w_INHB')       = [0]; %0.7
+    parameterCombinations('R_w_INHB')       = [1/(45*2+1) 10/(45*2+1) 100/(45*2+1)]; %0.7
     parameterCombinations('R_slope')        = [1];
     parameterCombinations('R_threshold')    = [2.0];
     parameterCombinations('R_to_C_alpha')   = [0.1]; % learning rate
     
     % V
     parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
-    parameterCombinations('V_tau')          = [0.400]; % (s)
+    parameterCombinations('V_tau')          = [0.200]; % (s)
     parameterCombinations('V_psi')          = [4];
     parameterCombinations('V_to_R_psi')     = [4];
     parameterCombinations('V_to_C_psi')     = [1.0]; % R_to_C_psi
     
     % S
     parameterCombinations('S_eccentricity') = [30];
-    parameterCombinations('S_delay_sigma')  = [0.4]; % (s)
+    parameterCombinations('S_delay_sigma')  = [0.100]; % (s)
     parameterCombinations('S_tau')          = [0.300]; % (s)
     parameterCombinations('S_psi')          = [1];
     parameterCombinations('S_sigma')        = parameterCombinations('V_sigma'); % (deg) receptive field size
@@ -80,7 +74,7 @@ function GenerateExperiment()
     
     % C
     parameterCombinations('C_tau')          = [0.100]; % (s)
-    parameterCombinations('C_w_INHB')       = [100/5400 500/5400 1000/5400]; % C_N = 5400
+    parameterCombinations('C_w_INHB')       = [100/5400]; % C_N = 5400, 2000/5400 3000/5400 4000/5400
     parameterCombinations('C_slope')        = [50];
     parameterCombinations('C_threshold')    = [0.6];
     parameterCombinations('C_to_R_psi')     = [0.15]; % 0.15
@@ -123,7 +117,12 @@ function GenerateExperiment()
             for p=1:length(nameComponents),
                 
                 if ~isempty(nameComponents{p}),
-                    simulationName = [simulationName '-' nameComponents{p} '=' num2str(valueComponents{p})];
+                    
+                    if strcmp(simulationName,''),
+                        simulationName = [nameComponents{p} '=' num2str(valueComponents{p})];
+                    else
+                        simulationName = [simulationName '-' nameComponents{p} '=' num2str(valueComponents{p})];
+                    end
                 end
             end
             
@@ -181,17 +180,17 @@ function GenerateExperiment()
                     
                     % Move files into dir
                     movefile(networkfile, subsim_dir);
-                    copyfile(parameterfile, subsim_dir)
+                    copyfile(parameterfile, subsim_dir);
                     
                     % Testing network
                     disp('Kusonoki Task...');
-                    Remapping(subsim_dir, testingKusonokiStimuliFile, false, 'kusonoki', [name ext]);
+                    Remapping(subsim_dir, testing_kusonoki, false, [name ext]); % 'kusonoki'
                     
                     disp('Saccade Control Task...');
-                    Remapping(subsim_dir, testingSacCTRLStimuliFile, false, 'saccade-control', [name ext]);
+                    Remapping(subsim_dir, testing_sac_ctrl, false, [name ext]); % 'saccade-control'
                     
                     disp('Stimulus Control Task...');
-                    Remapping(subsim_dir, testingStimCTRLStimuliFile, false, 'stimulus-control', [name ext]);
+                    Remapping(subsim_dir, testing_stim_ctrl, false, [name ext]); % 'stimulus-control'
 
                 end
             end

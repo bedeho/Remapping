@@ -7,15 +7,19 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function AnalyzeExperiment(experiment, stimulinames)
+function AnalyzeExperiment()
 
+    % experiment, stimulinames)
+    experiment = 'prewired';
+    stimulinames = {'basic-KusonokiTesting','basic-SaccadeControlTask','basic-StimuliControlTask'};
+    
     % Import global variables
     declareGlobalVars();
     
     global EXPERIMENTS_FOLDER;
     global base;
 
-    experimentFolder = [EXPERIMENTS_FOLDER experiment '/'];
+    experimentFolder = [EXPERIMENTS_FOLDER experiment filesep];
     
     % Iterate simulations in this experiment folder
     listing = dir(experimentFolder); 
@@ -31,9 +35,7 @@ function AnalyzeExperiment(experiment, stimulinames)
         end
     end
 
-    
     % Save results for summary
-    % num2str(length(listing))
     filename = [experimentFolder 'Summary.html']; % Make name that is always original so we dont overwrite old summary which is from previous xGridCleanup run of partial results from this same parameter search
     fileID = fopen(filename, 'w'); % did note use datestr(now) since it has string
     
@@ -41,11 +43,11 @@ function AnalyzeExperiment(experiment, stimulinames)
     fprintf(fileID, '<html><head>\n');
     fprintf(fileID, '<style type="text/css" title="currentStyle">\n');
                              
-    fprintf(fileID, ['@import "' base 'Scripts/DataTables-1.8.2/media/css/demo_page.css";\n']);
-	fprintf(fileID, ['@import "' base 'Scripts/DataTables-1.8.2/media/css/demo_table.css";\n']);
+    fprintf(fileID, ['@import "' base 'Source/DataTables-1.8.2/media/css/demo_page.css";\n']);
+	fprintf(fileID, ['@import "' base 'Source/DataTables-1.8.2/media/css/demo_table.css";\n']);
 	fprintf(fileID, '</style>\n');
-	fprintf(fileID, ['<script type="text/javascript" language="javascript" src="' base 'Scripts/DataTables-1.8.2/media/js/jquery.js"></script>\n']);
-	fprintf(fileID, ['<script type="text/javascript" language="javascript" src="' base 'Scripts/DataTables-1.8.2/media/js/jquery.dataTables.js"></script>\n']);
+	fprintf(fileID, ['<script type="text/javascript" language="javascript" src="' base 'Source/DataTables-1.8.2/media/js/jquery.js"></script>\n']);
+	fprintf(fileID, ['<script type="text/javascript" language="javascript" src="' base 'Source/DataTables-1.8.2/media/js/jquery.dataTables.js"></script>\n']);
 	fprintf(fileID, '<script type="text/javascript" charset="utf-8">\n');
 	fprintf(fileID, '$(document).ready(function() { $("#example").dataTable();});\n');
 	fprintf(fileID, '</script>\n');
@@ -58,14 +60,18 @@ function AnalyzeExperiment(experiment, stimulinames)
     % HTML table
     fprintf(fileID, '<table id="example" class="display" cellpadding="10" style="border: solid 1px">\n');
     fprintf(fileID, '<thead><tr>');
-    fprintf(fileID, '<th>Name</th>');
+    fprintf(fileID, '<th>Simulation</th>');
+    fprintf(fileID, '<th>Network</th>');
     
     for i = 1:nrOfParams,
         fprintf(fileID, ['<th>' parameters{i,1} '</th>']);
     end
     
+    %fprintf(fileID, '<th>Summary</th>');
+    
+    stimuli_files = cell(1,length(stimulinames));
     for i = 1:length(stimulinames),
-        fprintf(fileID, ['<th>' stimulinames(i) '</th>']);
+        fprintf(fileID, ['<th>' stimulinames{i} '</th>']);
     end
     
     counter = 1;
@@ -81,51 +87,63 @@ function AnalyzeExperiment(experiment, stimulinames)
 
         if listing(d).isdir && ~any(strcmp(simulation, {'Filtered', 'Images', '.', '..'})),
             
-            % Waitbar messes up -nodisplay option
-            %waitbar(counter/(nnz([listing(:).isdir]) - 2), h);
-            disp(['******** Doing ' num2str(counter) ' out of ' num2str((nnz([listing(:).isdir]) - 2)) '********']); 
+            disp(['******** Simulation ' num2str(counter) ' out of ' num2str((nnz([listing(:).isdir]) - 2)) '********']); 
             counter = counter + 1;
             
-            %summary = plotSimulation(experiment, simulation, info, trainingInfo);
+            % Iterate simulations in this experiment folder
+            simulationFolder = [EXPERIMENTS_FOLDER experiment filesep simulation];
+            simulationListing = dir(simulationFolder); 
 
-            for s=1:length(summary),
+            for s=1:length(simulationListing),
                 
-                netDir = [experimentFolder  simulation '/' summary(s).directory];
-                netDirRelative = [simulation '/' summary(s).directory];
-                trDir = [experimentFolder simulation '/Training'];
+                network = simulationListing(s).name; 
                 
-                % Start row
-                fprintf(fileID, '<tr>');
+                if simulationListing(s).isdir && ~any(strcmp(network, {'Training', '.', '..'})),
+                    
+                    % color all these rows in same color
+                    netDir = [experimentFolder simulation filesep network];
+                    netDirRelative = [simulation filesep network];
+                    trDir = [experimentFolder simulation filesep 'Training'];
+                    
+                    % Do analysis
+                    analysisSummary = Analyze(netDir, stimulinames);
+
+                    % Start row
+                    fprintf(fileID, '<tr>');
+
+                    % Name
+                    fprintf(fileID, '<td> %s </td>\n', simulation);
+
+                    % Network
+                    fprintf(fileID, '<td> %s </td>\n', network);
+
+                    % Parameters
+                    parameters = getParameters(simulation);
+
+                    for i = 1:nrOfParams,
+                        fprintf(fileID, ['<td> ' parameters{i,2} ' </td>\n']);
+                    end
+                    
+                    % Summary
+                    %fprintf(fileID, '<td><img src="%s" width="250px" height="250px"/></td>\n', [netDir filesep 'summary.png']);
+
+                    % Stimuli
+                    for i = 1:length(stimulinames),
+                        
+                        fprintf(fileID, '<td>');
+                        
+                        % Image
+                        fprintf(fileID, '<img src="%s" width="250px" height="250px"/></br>\n', [netDir filesep stimulinames{i} '.png']);
+                        
+                        % Button
+                        outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'',\\''' stimulinames{i} '\\'')']);
+                        
+                        fprintf(fileID, '</td>');
+                    end
+
+                    fprintf(fileID, '\n\n');
                 
-                % Name
-                fprintf(fileID, '<td> %s </td>\n', simulation);
-
-                % Network
-                fprintf(fileID, '<td> %s </td>\n', summary(s).directory);
-
-                % hvalue
-                fprintf(fileID, '<td><img src="%s" width="250px" height="250px"/></td>\n', [netDir '/referenceFramePlot.png']);
-
-                % Parameters
-                parameters = getParameters(simulation);
-
-                for i = 1:nrOfParams,
-                    fprintf(fileID, ['<td> ' parameters{i,2} ' </td>\n']);
                 end
-
-                % Action
-                fprintf(fileID, '<td>\n');
-                
-                %{
-                outputButton('Correlation', ['matlab:open(\\''' netDir '/result_1.fig\\'')']);
-                outputButton('Output Orthogonalization', ['matlab:open(\\''' netDir '/outputOrthogonality.fig\\'')']);
-                outputButton('Response', ['matlab:inspectResponse(\\''' netDir '/firingRate.dat\\'',\\''' netDir '/' summary(s).directory '.txt\\'',' num2str(nrOfEyePositionsInTesting) ',\\''' stimuliName '\\'')']);
-                outputButton('Weights', ['matlab:inspectWeights(\\''' netDir '/' summary(s).directory '.txt\\'',\\''' netDir '/firingRate.dat\\'',' num2str(nrOfEyePositionsInTesting) ',\\''' stimuliName '\\'')']);
-                outputButton('t-F', ['matlab:plotNetworkHistoryDANIEL(\\''' trDir '/firingRate.dat\\'')']); 
-                %}
-
-                fprintf(fileID, '</td>');
-                fprintf(fileID, '</tr>\n\n');
             end
             
         end
@@ -144,21 +162,28 @@ function AnalyzeExperiment(experiment, stimulinames)
         fprintf(fileID, ['<input type="button" value="' title '" onclick="document.location=''' action '''"/></br>\n']);
     end
 
-    function [parameters, nrOfParams] = getParameters(experiment)
+    function [parameters, nrOfParams] = getParameters(sim)
 
-        % Get a sample simulation name
-        columns = strsplit(experiment, '_');
-        nrOfParams = length(columns) - 1;
+        % is there more than one paramter, handle it in special case if so.
+        if ~isempty(strfind(sim, '-')),
+            columns = strsplit(sim, '-');
+            nrOfParams = length(columns) - 1;
+            
+            parameters = cell(nrOfParams,2);
 
-        parameters = cell(nrOfParams,2);
-
-        for p = 1:nrOfParams,
-            pair = strsplit(char(columns(p)),'='); % columns(p) is a 1x1 cell
-            parameters{p,1} = char(pair(1));
-            parameters{p,2} = char(pair(2));
+            for p = 1:nrOfParams,
+                pair = strsplit(char(columns(p)),'='); % columns(p) is a 1x1 cell
+                parameters{p,1} = char(pair(1));
+                parameters{p,2} = char(pair(2));
+            end
+        
+        else
+            
+            nrOfParams = 1;
+            pair = strsplit(sim,'=');
+            parameters = cell(nrOfParams,2);
+            parameters{1,1} = char(pair(1));
+            parameters{1,2} = char(pair(2));
         end
     end
-
-%}
-
 end

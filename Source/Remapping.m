@@ -7,24 +7,22 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, networkfilename)
+function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
+
+    % Import global variables
+    declareGlobalVars();
+    global STIMULI_FOLDER;
 
     % Parse input args
-    if nargin < 5,
+    if nargin < 4,
         networkfilename = 'BlankNetwork.mat';
-
-        if nargin < 4,
-            outputpostfix = '';
-        else
-            outputpostfix = ['-' outputpostfix];
-        end
     end
 
     % Load input files
     disp('Loading input files...');
     parameters = load([simulationFolder filesep 'Parameters.mat']);
     network  = load([simulationFolder filesep networkfilename]);
-    stimuli  = load(stimuliFile);
+    stimuli  = load([STIMULI_FOLDER stimuliName filesep 'stim.mat']);
 
     % Validate input
     %assert(paramter.simulation('R_eccentricity') ~=
@@ -118,7 +116,7 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
     C_tau           = parameters.simulation('C_tau'); % (s)
     C_to_R_alpha    = parameters.simulation('C_to_R_alpha');
     C_to_R_psi      = parameters.simulation('C_to_R_psi');
-    C_w_INHB        = 0/C_N;
+    C_w_INHB        = parameters.simulation('C_w_INHB');
     C_slope         = parameters.simulation('C_slope');
     C_threshold     = parameters.simulation('C_threshold');
     
@@ -179,7 +177,7 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
             for t=1:numTimeSteps,
 
                 % Turn time step into real time
-                time = stepToTime(t);
+                time = stepToTime(t, dt);
 
                 % Activation
 
@@ -280,7 +278,7 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
     
     % Output activity
     disp('Saving activity...');
-    save([simulationFolder filesep 'activity' outputpostfix '.mat'] , 'V_firing_history' ...
+    save([simulationFolder filesep 'activity-' stimuliName '.mat'] , 'V_firing_history' ...
                                                                     , 'R_firing_history' ...
                                                                     , 'S_firing_history' ...
                                                                     , 'C_firing_history' ...
@@ -290,12 +288,9 @@ function Remapping(simulationFolder, stimuliFile, isTraining, outputpostfix, net
                                                                     , 'C_activation_history' ...
                                                                     , 'numEpochs' ...
                                                                     , 'numPeriods' ...
-                                                                    , 'R_N', 'S_N', 'C_N');
+                                                                    , 'R_N', 'S_N', 'C_N');% ...
+                                                                    %, '-v7.3');
     
     disp('Done...');
-    
-    function r = stepToTime(i)
-        r = (i-1)*dt;
-    end
 
 end
