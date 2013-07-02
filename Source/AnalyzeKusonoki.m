@@ -10,7 +10,7 @@
 function receptivefield = AnalyzeKusonki(activityFile, stimuliFile)
 
     if nargin == 0,
-        activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/-R_w_INHB=0.10989/PrewiredNetwork/activitykusonoki.mat';
+        activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/-R_w_INHB=0.10989/PrewiredNetwork/activity-basic-KusonokiTesting.mat';
         stimuliFile     = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-KusonokiTesting/stim.mat';
     end
     
