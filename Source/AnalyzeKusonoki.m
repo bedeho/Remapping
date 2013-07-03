@@ -1,20 +1,18 @@
 
 %
-%  AnalyzeKusonki.m
+%  AnalyzeKusonoki.m
 %  Remapping
 %
 %  Created by Bedeho Mender on 01/07/13.
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function receptivefield = AnalyzeKusonki(activityFile, stimuliFile)
+function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKusonoki(activityFile, stimuliFile)
 
     if nargin == 0,
-        activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/-R_w_INHB=0.10989/PrewiredNetwork/activity-basic-KusonokiTesting.mat';
+        activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-KusonokiTesting.mat';
         stimuliFile     = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-KusonokiTesting/stim.mat';
     end
-    
-    %{
     
     % Load input files
     disp('Loading input files...');
@@ -25,40 +23,59 @@ function receptivefield = AnalyzeKusonki(activityFile, stimuliFile)
     R_firing_history = activity.R_firing_history;
     
     % Set parameters
-    dt                  = activity.dt;
-    R_N                 = activity.R_N;
-    S_N                 = activity.S_N;
-    C_N                 = activity.C_N;
-    numPeriods          = activity.numPeriods;
-    numEpochs           = activity.numEpochs;
-    stimuliOnsetDelay   = stimuli.saccadeOnset;
-    onsetTimeStep       = timeToTimeStep(stimuliOnsetDelay, dt);
+    dt                          = activity.dt;
+    R_N                         = activity.R_N;
+    numEpochs                   = activity.numEpochs;
+    numPeriods                  = activity.numPeriods;
     
+    saccadeOnset                = stimuli.saccadeOnset;
+    stimulusOnsetTimes          = stimuli.stimulusOnsetTimes;
+    saccadeTargets              = stimuli.saccadeTargets;
+    headCenteredTargetLocations = stimuli.headCenteredTargetLocations;
+    
+    numStimuliOnsetTimes        = length(stimulusOnsetTimes);
+    numSaccadeTargets           = length(saccadeTargets);
+    numTargetsLocations         = length(headCenteredTargetLocations);
+                  
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
     
-    %% PERIODS, you forgot about that!!!!
+    % Analysis params
+    responseWindowSize  = 0.300; % (s) from kusonoki paper, it is used in both saccade aligned and stimulus aligned analysis
     
-    % Baseline response
-    baseline_activity = R_firing_history(:, 0:onsetTimeStep, :, 1); % [0,saccadeOnset]
-    baseline_response = trapz(baseline_activity')';
-    
-    % Stimulus response
-    stim_activity = R_firing_history(:, onsetTimeStep + dt*(50:250), :, 1); % [onsetTimeStep+50:250]
-    stim_response = trapz(baseline_activity')';
-    
-    % Latency
-    
-    % Duration
-    
-    % Location
-    
-    % Make summary figure
-    
+    %% Analysis for each period
+    for p=1:numPeriods,
         
-    % save analysis.mat to directory
-    
-    %}
-    
-    receptivefield = 0;
-    
+        % Params of this period
+        targetNr    = stimuli.stimuli{p}.targetNr;
+        saccadeNr   = stimuli.stimuli{p}.saccadeNr;
+        stimOnsetNr = stimuli.stimuli{p}.stimOnsetNr;
+        
+        stimOnsetTime        = stimulusOnsetTimes(stimOnsetNr);
+        saccOnsetTimeSteps   = timeToTimeStep(saccadeOnset + 0:dt:responseWindowSize, dt);
+        stimOnsetTimeSteps   = timeToTimeStep(stimOnsetTime + 0:dt:responseWindowSize, dt);
+        
+        % Extract the given time steps from all neurons in all periods
+        saccade_activity    = R_firing_history(:, saccOnsetTimeSteps, :, 1);
+        stimulus_activity   = R_firing_history(:, stimOnsetTimeSteps, :, 1);
+        
+        % Integrate to find response
+        saccade_response    = squeeze(trapz(saccade_activity,2));
+        stimulus_response   = squeeze(trapz(stimulus_activity,2));
+
+        % Normaliztion step, gives normalized (sp/s) units to response
+        saccade_response    = saccade_response/(length(saccOnsetTimeSteps) - 1);
+        stimulus_response   = stimulus_response/(length(stimOnsetTimeSteps) - 1);            
+        
+        % Save results
+        kusonokiSACCAlignedAnalysis(p).targetNr     = targetNr;
+        kusonokiSACCAlignedAnalysis(p).saccadeNr    = saccadeNr;
+        kusonokiSACCAlignedAnalysis(p).stimOnsetNr  = stimOnsetNr;
+        kusonokiSACCAlignedAnalysis(p).response     = saccade_response;
+        
+        kusonokiSTIMAlignedAnalysis(p).targetNr     = targetNr;
+        kusonokiSTIMAlignedAnalysis(p).saccadeNr    = saccadeNr;
+        kusonokiSTIMAlignedAnalysis(p).stimOnsetNr  = stimOnsetNr;
+        kusonokiSTIMAlignedAnalysis(p).response     = stimulus_response;
+        
+    end
 end

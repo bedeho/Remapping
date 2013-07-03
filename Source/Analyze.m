@@ -15,23 +15,52 @@ function analysisSummary = Analyze(netDir, stimulinames)
 
     for i = 1:length(stimulinames),
         
-        stimuli  = load([STIMULI_FOLDER stimulinames{i} filesep 'stim.mat']);
+        stimuliFile = [STIMULI_FOLDER stimulinames{i} filesep 'stim.mat'];
+        stimuli  = load(stimuliFile);
         type = stimuli.stimulitype;
+        dt = stimuli.dt;
         
         activityFile = [netDir filesep 'activity-' stimulinames{i} '.mat'];
         
         if strcmp(type,'StimuliControlTask'),
-            receptivefield = AnalyzeStimuliControlTask(activityFile, stimulinames{i});
+            
+            [baselineResponse, stim_response, location, foundOnset, foundOffset, latencyTimeStep, durationTimeStep, neuronResponse] = AnalyzeStimuliControlTask(activityFile, stimuliFile);
+            
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , ...
+                    'baselineResponse', ...
+                    'stim_response', ...
+                    'location', ...
+                    'foundOnset', ...
+                    'foundOffset', ...
+                    'latencyTimeStep', ...
+                    'durationTimeStep');
+                            
+            R_N = size(latencyTimeStep,2);                
+            f = figure;
+            imagesc(neuronResponse);
+            ylabel('Neuron');
+            xlabel('Time');
+            hold on;
+            plot(latencyTimeStep,1:R_N,'wo');
+            saveas(f,[netDir filesep stimulinames{i} '.png']);
+            
         elseif strcmp(type,'SaccadeControlTask'),
-            receptivefield = AnalyzeSaccadeControlTask(activityFile, stimulinames{i});
+            
+            saccade_response = AnalyzeSaccadeControlTask(activityFile, stimuliFile);
+            
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'saccade_response');
+            
         elseif strcmp(type,'KusonokiTesting'),
-            receptivefield = AnalyzeStimuliControlTask(activityFile, stimulinames{i});
+            
+            [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKusonoki(activityFile, stimulinames{i});
+            
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'kusonokiSTIMAlignedAnalysis', 'kusonokiSACCAlignedAnalysis');
+            
         else
-            disp(['Unkonwn stimuli, skipping analysis...']);
+            disp(['Unkonwn stimuli: ' num2str(stimulinames{i})]);
         end
             
     end
     
     analysisSummary = 0;
-
 end

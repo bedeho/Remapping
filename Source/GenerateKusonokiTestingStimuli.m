@@ -66,9 +66,15 @@ function GenerateKusonokiTestingStimuli(Name)
                     stimuli{k}.numSaccades                  = length(stimuli{k}.saccadeTargets);
                     stimuli{k}.targetOffIntervals           = targetOffIntervals;
                     
+                    
                     [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, stimuli{k}.targetOffIntervals, stimuli{k}.initialEyePosition, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
                     stimuli{k}.eyePositionTrace             = eyePositionTrace;
                     stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
+                    
+                    % meta data
+                    stimuli{k}.targetNr                     = i;
+                    stimuli{k}.saccadeNr                    = j;
+                    stimuli{k}.stimOnsetNr                  = t;
 
                     k = k + 1;
             end
@@ -97,6 +103,7 @@ function GenerateKusonokiTestingStimuli(Name)
                                     'fixationPeriod', ...
                                     'stimulusOnsetTimes', ...
                                     'saccadeTargets', ...
+                                    'headCenteredTargetLocations', ...
                                     'stimulitype', ...
                                     'stimuli', ...
                                     'Duration', ...
