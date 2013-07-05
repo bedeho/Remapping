@@ -31,7 +31,7 @@ function GenerateKusonokiTestingStimuli(Name)
     lastStimulusOnsetTime           = saccadeOnset + 0.500; % w.r.t start of task
     stimulusDuration                = 0.1;
     fixationPeriod                  = lastStimulusOnsetTime + stimulusDuration + 0.100; % time from saccade onset
-    stimulusOnsetTimes              = earliestStimulusOnsetTime; %classic = earliestStimulusOnsetTime:0.300:lastStimulusOnsetTime;
+    stimulusOnsetTimes              = earliestStimulusOnsetTime:0.200:lastStimulusOnsetTime;% earliestStimulusOnsetTime
 
     % Generate stimuli
     rng(seed);

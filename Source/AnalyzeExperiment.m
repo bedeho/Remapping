@@ -7,10 +7,14 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function AnalyzeExperiment()
+function AnalyzeExperiment(experiment)
 
-    % experiment, stimulinames)
-    experiment = 'prewired';
+    % Experiment name 
+    if nargin < 1,
+        experiment = 'kusonokireal-prewired-tuning';
+    end
+    
+    % Stimuli names
     stimulinames = {'basic-KusonokiTesting','basic-SaccadeControlTask','basic-StimuliControlTask'};
     
     % Import global variables
@@ -27,7 +31,7 @@ function AnalyzeExperiment()
     % Find an example of simulation directory to extract column names- HORRIBLY CODED
     for d = 1:length(listing),
 
-        simulation = listing(d).name
+        simulation = listing(d).name;
 
         if listing(d).isdir && ~any(strcmp(simulation, {'Filtered', 'Images', '.', '..'})),
             [parameters, nrOfParams] = getParameters(simulation);
@@ -67,7 +71,7 @@ function AnalyzeExperiment()
         fprintf(fileID, ['<th>' parameters{i,1} '</th>']);
     end
     
-    %fprintf(fileID, '<th>Summary</th>');
+    fprintf(fileID, '<th>Summary</th>');
     
     stimuli_files = cell(1,length(stimulinames));
     for i = 1:length(stimulinames),
@@ -125,15 +129,18 @@ function AnalyzeExperiment()
                     end
                     
                     % Summary
-                    %fprintf(fileID, '<td><img src="%s" width="250px" height="250px"/></td>\n', [netDir filesep 'summary.png']);
-
+                    fprintf(fileID, '<td>');
+                    fprintf(fileID, '<img src="%s" width="350px" height="350px"/>\n', [netDir filesep 'summary.png']);
+                    outputButton('INSPECTOR', ['matlab:Inspector(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'')']);
+                    fprintf(fileID, '</td>');
+                    
                     % Stimuli
                     for i = 1:length(stimulinames),
                         
                         fprintf(fileID, '<td>');
                         
                         % Image
-                        fprintf(fileID, '<img src="%s" width="250px" height="250px"/></br>\n', [netDir filesep stimulinames{i} '.png']);
+                        %fprintf(fileID, '<img src="%s" width="250px" height="250px"/></br>\n', [netDir filesep stimulinames{i} '.png']);
                         
                         % Button
                         outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'',\\''' stimulinames{i} '\\'')']);
@@ -179,11 +186,19 @@ function AnalyzeExperiment()
         
         else
             
-            nrOfParams = 1;
-            pair = strsplit(sim,'=');
-            parameters = cell(nrOfParams,2);
-            parameters{1,1} = char(pair(1));
-            parameters{1,2} = char(pair(2));
+            if ~isempty(strfind(sim, '=')),
+                
+                nrOfParams = 1;
+                
+                pair = strsplit(sim,'=');
+                parameters = cell(nrOfParams,2);
+                parameters{1,1} = char(pair(1));
+                parameters{1,2} = char(pair(2));
+            else
+                parameters = [];
+                nrOfParams = 0;
+            end
+            
         end
     end
 end

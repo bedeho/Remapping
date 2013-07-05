@@ -7,19 +7,17 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKusonoki(activityFile, stimuliFile)
+function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKusonoki(activity, stimuli)
 
+    % Check if this is manual run
     if nargin == 0,
-        activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-KusonokiTesting.mat';
-        stimuliFile     = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-KusonokiTesting/stim.mat';
+        
+        disp('Loading input files...');
+        activity = LoadActivity('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-KusonokiTesting.mat');
+        stimuli  = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-KusonokiTesting/stim.mat');
     end
     
-    % Load input files
-    disp('Loading input files...');
-    activity = load(activityFile);
-    stimuli  = load(stimuliFile);
-    
-    % Load data
+    % Get data
     R_firing_history = activity.R_firing_history;
     
     % Set parameters

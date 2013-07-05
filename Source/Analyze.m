@@ -15,16 +15,22 @@ function analysisSummary = Analyze(netDir, stimulinames)
 
     for i = 1:length(stimulinames),
         
+        % Load stimuli
+        disp(['Loading stimuli: ' stimulinames{i}]);
         stimuliFile = [STIMULI_FOLDER stimulinames{i} filesep 'stim.mat'];
         stimuli  = load(stimuliFile);
         type = stimuli.stimulitype;
-        dt = stimuli.dt;
         
+        % Load activity
+        disp(['Loading activity: ' stimulinames{i}]);
         activityFile = [netDir filesep 'activity-' stimulinames{i} '.mat'];
+        %activity = load(activityFile);
+        activity = LoadActivity(activityFile);
         
         if strcmp(type,'StimuliControlTask'),
             
-            [baselineResponse, stim_response, location, foundOnset, foundOffset, latencyTimeStep, durationTimeStep, neuronResponse] = AnalyzeStimuliControlTask(activityFile, stimuliFile);
+            disp('Doing stimuli control task analysis...');
+            [baselineResponse, stim_response, location, foundOnset, foundOffset, latencyTimeStep, durationTimeStep, neuronResponse] = AnalyzeStimuliControlTask(activity, stimuli);
             
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , ...
                     'baselineResponse', ...
@@ -46,15 +52,51 @@ function analysisSummary = Analyze(netDir, stimulinames)
             
         elseif strcmp(type,'SaccadeControlTask'),
             
-            saccade_response = AnalyzeSaccadeControlTask(activityFile, stimuliFile);
+            disp('Doing saccade control task analysis...');
+            saccade_response = AnalyzeSaccadeControlTask(activity, stimuli);
             
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'saccade_response');
             
         elseif strcmp(type,'KusonokiTesting'),
             
-            [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKusonoki(activityFile, stimulinames{i});
+            disp('Doing Kusonoki analysis...');
+            [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKusonoki(activity, stimuli);
             
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'kusonokiSTIMAlignedAnalysis', 'kusonokiSACCAlignedAnalysis');
+            
+            %% MANUAL HOME BREW ANALYTICS
+            
+            %activity = load(activityFile);
+            activity = LoadActivity(activityFile);
+            stimuli  = load(stimuliFile);
+            
+            period = 20;
+            R_N = activity.R_N;
+            dt = activity.dt;
+            
+            f=figure;
+            x = activity.R_firing_history(:, :, period, 1);
+            
+            s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes, dt);
+            
+            nr = stimuli.stimuli{period}.stimOnsetNr;
+            stim = timeToTimeStep(stimuli.stimulusOnsetTimes(nr), dt);
+            stim_off = timeToTimeStep(stimuli.stimulusOnsetTimes(nr) + stimuli.stimulusDuration, dt);
+            
+            imagesc(x);
+            
+            hold on;
+            
+            plot([stim stim],[ones(R_N,1) R_N*ones(R_N,1)],'--w','LineWidth', 4); % STIM ON
+            
+            plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'w','LineWidth', 4); % saccade
+            
+            plot([stim_off stim_off],[ones(R_N,1) R_N*ones(R_N,1)],'--w','LineWidth', 4); % STIM OFF
+            
+            title(num2str(period));
+            
+            saveas(f,[netDir filesep 'summary.png']);
+            close(f);
             
         else
             disp(['Unkonwn stimuli: ' num2str(stimulinames{i})]);

@@ -14,16 +14,21 @@ function GenerateExperiment()
     global EXPERIMENTS_FOLDER;
     
     % Stimuli
-    %trainingStimuli     = 'basic-Training';
+    trainingStimuli     = 'basic-Training';
     testing_kusonoki    = 'basic-KusonokiTesting';
     testing_sac_ctrl    = 'basic-SaccadeControlTask';
     testing_stim_ctrl   = 'basic-StimuliControlTask';
     
     % Experiment parameters
-    Name = 'prewired';
+    Name = 'kusonokireal-prewired-tuning'; 
+    
+    % first-training
+    % kusonokireal-prewired-tuning
+    
+
+    % Create experiment folders
     experimentFolderPath = [EXPERIMENTS_FOLDER Name];
     
-    % Create experiment folders
     if exist(experimentFolderPath),
         
         if strcmp(questdlg('DELETE OLD EXPERIMENT?', 'Delete', 'NO','YES','NO'), 'NO'),
@@ -42,6 +47,8 @@ function GenerateExperiment()
     dt = 0.010; % (s)
     numTrainingEpochs = 1;
     outputSavingRate = 1; % Period of time step saving during testing.
+    assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
+    
     saveActivityInTraining = false;
     saveNetworksAtEpochMultiples = 333; % Save network at this resolution
     seed = 13;
@@ -52,14 +59,19 @@ function GenerateExperiment()
     parameterCombinations('R_w_INHB')       = [10/(45*2+1)]; %0.7
     parameterCombinations('R_slope')        = [1];
     parameterCombinations('R_threshold')    = [2.0];
-    parameterCombinations('R_to_C_alpha')   = [0.1]; % learning rate
+    %parameterCombinations('R_to_C_alpha')   = [0.1]; % learning rate
+    %parameterCombinations('R_to_C_psi')   = [1];
     
     % V
     parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
     parameterCombinations('V_tau')          = [0.200]; % (s)
     parameterCombinations('V_psi')          = [4];
+    
     parameterCombinations('V_to_R_psi')     = [4];
-    parameterCombinations('V_to_C_psi')     = [1.0]; % R_to_C_psi
+    parameterCombinations('V_to_R_alpha')   = [0.1];
+    
+    parameterCombinations('V_to_C_psi')     = [4];
+    parameterCombinations('V_to_C_alpha')   = [0.1];
     
     % S
     parameterCombinations('S_eccentricity') = [30];
@@ -77,7 +89,7 @@ function GenerateExperiment()
     parameterCombinations('C_w_INHB')       = [100/5400]; % C_N = 5400, 2000/5400 3000/5400 4000/5400
     parameterCombinations('C_slope')        = [50];
     parameterCombinations('C_threshold')    = [0.6];
-    parameterCombinations('C_to_R_psi')     = [0.15]; % 0.15
+    parameterCombinations('C_to_R_psi')     = [0.5]; % 0.15
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
     
     % Save the experiment params
@@ -131,7 +143,7 @@ function GenerateExperiment()
             if isempty(simulationName),
                 simulationName = 'baseline';
             end
-            
+            =
             disp(['Making simulation: ' simulationName]);
             
             % Create simulation folder
@@ -152,11 +164,11 @@ function GenerateExperiment()
             %{
             % Create simulation blank network
             disp('Creating blank network...');
-            createBlankNetwork([simulationFolder filesep 'BlankNetwork.mat'], simulation);
+            CreateBlankNetwork([simulationFolder filesep 'BlankNetwork.mat'], length(simulation('R_preferences')), length(simulation('S_preferences')));
                         
             % Training
             disp('Training...');
-            Remapping(simulationFolder, trainingStimuliFile, true);
+            Remapping(simulationFolder, trainingStimuli, true);
             %}
             
             % Create prewired network

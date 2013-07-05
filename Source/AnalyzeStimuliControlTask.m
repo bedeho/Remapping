@@ -7,19 +7,17 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [baselineResponse, stim_response, location, foundOnset, foundOffset, latencyTimeStep, durationTimeStep, neuronResponse] = AnalyzeStimuliControlTask(activityFile, stimuliFile)
+function [baselineResponse, stim_response, location, foundOnset, foundOffset, latencyTimeStep, durationTimeStep, neuronResponse] = AnalyzeStimuliControlTask(activity, stimuli)
 
+    % Check if this is manual run 
     if nargin == 0,
-        activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-StimuliControlTask.mat';
-        stimuliFile     = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-StimuliControlTask/stim.mat';
+        
+        disp('Loading input files...');
+        activity = LoadActivity('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-StimuliControlTask.mat');
+        stimuli  = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-StimuliControlTask/stim.mat');
     end
     
-    % Load input files
-    disp('Loading input files...');
-    activity = load(activityFile);
-    stimuli  = load(stimuliFile);
-    
-    % Load data
+    % Get data
     R_firing_history = activity.R_firing_history;
     
     % Set parameters

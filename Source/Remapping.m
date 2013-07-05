@@ -64,6 +64,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     C_to_R_weights = network.C_to_R_weights;
     S_to_C_weights = network.S_to_C_weights;
     V_to_C_weights = network.V_to_C_weights;
+    %V_to_R_weights = network.V_to_R_weights;
 
     %% Load dynamical parameters
     
@@ -78,18 +79,19 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     R_w_INHB        = parameters.simulation('R_w_INHB');
     R_slope         = parameters.simulation('R_slope');
     R_threshold     = parameters.simulation('R_threshold');
-    R_to_C_alpha    = parameters.simulation('R_to_C_alpha'); % learning rate
+    %R_to_C_alpha    = parameters.simulation('R_to_C_alpha'); % learning rate
     %R_to_C_psi     = parameters.simulation('R_to_C_psi'); % 4
     
     % V
     V_tau           = parameters.simulation('V_tau');
     V_psi           = parameters.simulation('V_psi');
     V_sigma         = parameters.simulation('V_sigma');
+    V_to_R_psi      = parameters.simulation('V_to_R_psi');
+    V_to_R_alpha    = parameters.simulation('V_to_R_alpha'); % learning rate
+    V_to_C_psi      = parameters.simulation('V_to_C_psi');
+    V_to_C_alpha    = parameters.simulation('V_to_C_alpha'); % learning rate
     V               = zeros(1,R_N);
     
-    V_to_R_psi      = parameters.simulation('V_to_R_psi');
-    V_to_C_psi      = parameters.simulation('V_to_C_psi');
-
     % S
     S_eccentricity  = parameters.simulation('S_eccentricity');
     S_preferences   = parameters.simulation('S_preferences');
@@ -184,8 +186,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 % R
                 R_inhibition = R_w_INHB*sum(R_firingrate);
                 C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate');
-                V_to_R_excitation = V_to_R_psi*V;
-                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + V_to_R_excitation);
+                %V_to_R_excitation = V_to_R_psi*V;
+                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + V); % V_to_R_excitation
 
                 % V
                 retinalTargets = retinalTargetTraces(:,t);
@@ -218,17 +220,26 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
 
                     C_to_R_weights = C_to_R_weights + dt*C_to_R_alpha*(R_firingrate'*C_firingrate);
                     S_to_C_weights = S_to_C_weights + dt*S_to_C_alpha*(C_firingrate'*S_firingrate);
-                    R_to_C_weights = R_to_C_weights + dt*R_to_C_alpha*(C_firingrate'*R_firingrate);
+                    %R_to_C_weights = R_to_C_weights + dt*R_to_C_alpha*(C_firingrate'*R_firingrate);
+                    V_to_C_weights = V_to_C_weights + dt*V_to_C_alpha*(C_firingrate'*V);
+                    V_to_R_weights = V_to_R_weights + dt*V_to_R_alpha*(R_firingrate'*V);
 
                     % Normalize
                     C_to_R_norm = 1./sqrt(squeeze(sum(C_to_R_weights.^2))); 
-                    C_to_R_weights = bsxfun(@times,C_to_R_weights,C_to_R_norm);
+                    C_to_R_weights = bsxfun(@times,C_to_R_weights, C_to_R_norm);
 
                     S_to_C_norm = 1./sqrt(squeeze(sum(S_to_C_weights.^2))); 
-                    S_to_C_weights = bsxfun(@times,S_to_C_weights,S_to_C_norm); 
+                    S_to_C_weights = bsxfun(@times,S_to_C_weights, S_to_C_norm); 
 
-                    R_to_C_norm = 1./sqrt(squeeze(sum(R_to_C_weights.^2))); 
-                    R_to_C_weights = bsxfun(@times,R_to_C_weights,R_to_C_norm);
+                    %R_to_C_norm = 1./sqrt(squeeze(sum(R_to_C_weights.^2))); 
+                    %R_to_C_weights = bsxfun(@times,R_to_C_weights,R_to_C_norm);
+                    
+                    V_to_C_norm = 1./sqrt(squeeze(sum(V_to_C_weights.^2))); 
+                    V_to_C_weights = bsxfun(@times,V_to_C_weights, V_to_C_norm);
+                    
+                    %V_to_R_norm = 1./sqrt(squeeze(sum(V_to_R_weights.^2))); 
+                    %V_to_R_weights = bsxfun(@times,V_to_R_weights, V_to_R_norm);
+                    
                 end
 
                 % Compute firing rates
@@ -237,7 +248,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 C_firingrate = 1./(1 + exp(-2*C_slope*(C_activation - C_threshold)));
 
                 % Save activity                
-                if (~isTraining || isTraining && parameters.saveActivityInTraining) && mod(t, outputSavingRate) == 0,
+                if (~isTraining || isTraining && parameters.saveActivityInTraining) % && mod(t, outputSavingRate) == 0,
                     
                     V_firing_history(:, periodSaveCounter, period, epoch) = V;
                     R_firing_history(:, periodSaveCounter, period, epoch) = R_firingrate;
@@ -263,7 +274,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
         if mod(epoch, parameters.saveNetworksAtEpochMultiples) == 0,
             
             disp('Saving trained network to disk...');
-            save([simulationFolder filesep 'TrainedNetwork_e' num2str(epoch) '.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights');
+            save([simulationFolder filesep 'TrainedNetwork_e' num2str(epoch) '.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'V_to_R_weights');
         end
     end
     
@@ -273,24 +284,34 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     % Output final network
     if isTraining,
         disp('Saving trained network to disk...');
-        save([simulationFolder filesep 'TrainedNetwork.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'R_N', 'S_N', 'C_N');
+        save([simulationFolder filesep 'TrainedNetwork.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'V_to_R_weights', 'R_N', 'S_N', 'C_N');
     end
+    
+    %{
+    if prod(size(C_firing_history)) > 1000000/4, % dont save if bigger than 100MB
+        disp('Could not save C_firing_history, TO BIG !!!!!!!!!!!!!');
+        C_firing_history = [];
+        C_activation_history = [];
+    end
+    %}
     
     % Output activity
     disp('Saving activity...');
-    save([simulationFolder filesep 'activity-' stimuliName '.mat'] , 'V_firing_history' ...
-                                                                    , 'R_firing_history' ...
-                                                                    , 'S_firing_history' ...
-                                                                    , 'C_firing_history' ...
-                                                                    , 'V_activation_history' ...
-                                                                    , 'R_activation_history' ...
-                                                                    , 'S_activation_history' ...
-                                                                    , 'C_activation_history' ...
-                                                                    , 'numEpochs' ...
-                                                                    , 'numPeriods' ...
-                                                                    , 'dt' ...
-                                                                    , 'R_N', 'S_N', 'C_N');% ...
-                                                                    %, '-v7.3');
+    SaveActivity([simulationFolder filesep 'activity-' stimuliName '.dat'] , R_N ...
+                                                                            , S_N ...
+                                                                            , C_N ...
+                                                                            , numEpochs ...
+                                                                            , numPeriods ...
+                                                                            , dt ...
+                                                                            , V_firing_history ...
+                                                                            , R_firing_history ...
+                                                                            , S_firing_history ...
+                                                                            , C_firing_history ...
+                                                                            , V_activation_history ...
+                                                                            , R_activation_history ...
+                                                                            , S_activation_history ...
+                                                                            , C_activation_history)
+                                                                    
     
     disp('Done...');
 
