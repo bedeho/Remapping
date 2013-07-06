@@ -13,8 +13,8 @@ function Training_Basic(Name)
     declareGlobalVars();
     global base;
 
-    filename = [Name '-Training_Basic'];
-    stimulitype = 'Training_Basic';
+    filename = [Name '-Training'];
+    stimulitype = 'Training';
     
     % Params
     dt                              = 0.010; % (s)

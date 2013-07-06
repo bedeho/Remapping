@@ -35,7 +35,7 @@ function Testing_DuhamelRemappingTrace(Name)
     Duration                        = saccadeOnset + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
     headCenteredTargetLocations     = -R_eccentricity:1:R_eccentricity;
     saccades                        = -S_eccentricity:1:S_eccentricity;
-    targetOffIntervals              = [stimuliOffset Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
+    targetOffIntervals{1}           = [stimuliOffset Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
     for i = 1:length(headCenteredTargetLocations);
         
@@ -50,8 +50,11 @@ function Testing_DuhamelRemappingTrace(Name)
         end
         
         stimuli{i}.headCenteredTargetLocations  = r + saccades(s);
-        stimuli{i}.saccadeTarget                = saccades(s);
-        [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, targetOffIntervals, 0, saccadeOnset, stimuli{k}.saccadeTargets);
+        stimuli{i}.saccadeTargets               = saccades(s);
+        stimuli{i}.saccadeTimes                 = saccadeOnset;
+        stimuli{i}.numSaccades                  = length(saccadeOnset);
+        
+        [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, targetOffIntervals, 0, saccadeOnset, stimuli{i}.saccadeTargets);
         stimuli{i}.eyePositionTrace             = eyePositionTrace;
         stimuli{i}.retinalTargetTraces          = retinalTargetTraces;
 

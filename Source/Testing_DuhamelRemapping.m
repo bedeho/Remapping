@@ -48,8 +48,11 @@ function Testing_DuhamelRemapping(Name)
         end
         
         stimuli{i}.headCenteredTargetLocations  = r + saccades(s);
-        stimuli{i}.saccadeTarget                = saccades(s);
-        [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, [], 0, saccadeOnset, stimuli{k}.saccadeTargets);
+        stimuli{i}.saccadeTargets               = saccades(s);
+        stimuli{i}.saccadeTimes                 = saccadeOnset;
+        stimuli{i}.numSaccades                  = length(saccadeOnset);
+        
+        [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, {[]}, 0, saccadeOnset, stimuli{i}.saccadeTargets);
         stimuli{i}.eyePositionTrace             = eyePositionTrace;
         stimuli{i}.retinalTargetTraces          = retinalTargetTraces;
 

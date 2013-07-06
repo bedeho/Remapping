@@ -13,18 +13,11 @@ function GenerateExperiment()
     declareGlobalVars();
     global EXPERIMENTS_FOLDER;
     
-    % Stimuli
-    trainingStimuli     = 'basic-Training';
-    testing_kusonoki    = 'basic-KusonokiTesting';
-    testing_sac_ctrl    = 'basic-SaccadeControlTask';
-    testing_stim_ctrl   = 'basic-StimuliControlTask';
-    
     % Experiment parameters
-    Name = 'kusonokireal-prewired-tuning'; 
+    Name = 'prewired'; 
     
     % first-training
     % kusonokireal-prewired-tuning
-    
 
     % Create experiment folders
     experimentFolderPath = [EXPERIMENTS_FOLDER Name];
@@ -143,7 +136,7 @@ function GenerateExperiment()
             if isempty(simulationName),
                 simulationName = 'baseline';
             end
-            =
+            
             disp(['Making simulation: ' simulationName]);
             
             % Create simulation folder
@@ -168,7 +161,7 @@ function GenerateExperiment()
                         
             % Training
             disp('Training...');
-            Remapping(simulationFolder, trainingStimuli, true);
+            Remapping(simulationFolder, 'basic-Training', true);
             %}
             
             % Create prewired network
@@ -195,14 +188,23 @@ function GenerateExperiment()
                     copyfile(parameterfile, subsim_dir);
                     
                     % Testing network
-                    disp('Kusonoki Task...');
-                    Remapping(subsim_dir, testing_kusonoki, false, [name ext]); % 'kusonoki'
+                    %disp('Kusonoki ...');
+                    %Remapping(subsim_dir, 'basic-Kusonoki', false, [name ext]);
                     
-                    disp('Saccade Control Task...');
-                    Remapping(subsim_dir, testing_sac_ctrl, false, [name ext]); % 'saccade-control'
+                    disp('Duhamel Remapping ...');
+                    Remapping(subsim_dir, 'basic-DuhamelRemapping', false, [name ext]);
                     
-                    disp('Stimulus Control Task...');
-                    Remapping(subsim_dir, testing_stim_ctrl, false, [name ext]); % 'stimulus-control'
+                    disp('Duhamel Remapping Trace ...');
+                    Remapping(subsim_dir, 'basic-DuhamelRemappingTrace', false, [name ext]);
+                                  
+                    disp('Duhamel Truncation ...');
+                    Remapping(subsim_dir, 'basic-DuhamelTrunction', false, [name ext]);
+                    
+                    disp('Saccade Control ...');
+                    Remapping(subsim_dir, 'basic-SaccadeControl', false, [name ext]);
+                    
+                    disp('Stimulus Control ...');
+                    Remapping(subsim_dir, 'basic-StimuliControl', false, [name ext]);
 
                 end
             end

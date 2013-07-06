@@ -11,11 +11,15 @@ function AnalyzeExperiment(experiment)
 
     % Experiment name 
     if nargin < 1,
-        experiment = 'kusonokireal-prewired-tuning';
+        experiment = 'prewired';
     end
     
     % Stimuli names
-    stimulinames = {'basic-KusonokiTesting','basic-SaccadeControlTask','basic-StimuliControlTask'};
+    stimulinames = {'basic-DuhamelRemapping', ...
+                    'basic-DuhamelRemappingTrace', ...
+                    'basic-DuhamelTrunction', ...
+                    'basic-SaccadeControl', ...
+                    'basic-StimuliControl'}; %'basic-Kusonoki', ...
     
     % Import global variables
     declareGlobalVars();
@@ -131,7 +135,7 @@ function AnalyzeExperiment(experiment)
                     % Summary
                     fprintf(fileID, '<td>');
                     fprintf(fileID, '<img src="%s" width="350px" height="350px"/>\n', [netDir filesep 'summary.png']);
-                    outputButton('INSPECTOR', ['matlab:Inspector(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'')']);
+                    outputButton('INSPECTOR', ['matlab:Inspector(\\''' netDir filesep 'activity-' stimulinames{i} '.dat\\'')']);
                     fprintf(fileID, '</td>');
                     
                     % Stimuli
@@ -143,7 +147,7 @@ function AnalyzeExperiment(experiment)
                         %fprintf(fileID, '<img src="%s" width="250px" height="250px"/></br>\n', [netDir filesep stimulinames{i} '.png']);
                         
                         % Button
-                        outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'',\\''' stimulinames{i} '\\'')']);
+                        outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.dat\\'',\\''' stimulinames{i} '\\'')']);
                         
                         fprintf(fileID, '</td>');
                     end
