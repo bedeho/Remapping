@@ -1,20 +1,20 @@
 
 %
-%  GenerateKusonokiTestingStimuli.m
+%  Testing_Kusonoki.m
 %  Remapping
 %
 %  Created by Bedeho Mender on 23/05/13.
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function GenerateKusonokiTestingStimuli(Name)
+function Testing_Kusonoki(Name)
 
     % Import global variables
     declareGlobalVars();
     global base;
 
-    filename = [Name '-KusonokiTesting'];
-    stimulitype = 'KusonokiTesting';
+    filename = [Name '-Kusonoki'];
+    stimulitype = 'Kusonoki';
     
     % Params
     dt                              = 0.010; % (s)
@@ -35,7 +35,7 @@ function GenerateKusonokiTestingStimuli(Name)
 
     % Generate stimuli
     rng(seed);
-    Duration                        = saccadeOnset + (2*S_eccentricity/saccadeSpeed) + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
+    Duration                        = saccadeOnset + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
     saccadeTargets                  = -S_eccentricity:S_density:S_eccentricity;
     headCenteredTargetLocations     = -R_eccentricity:R_density:R_eccentricity;
 

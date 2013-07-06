@@ -1,20 +1,20 @@
 
 %
-%  GenerateTrainingStimuli.m
+%  Training_Basic.m
 %  Remapping
 %
 %  Created by Bedeho Mender on 23/05/13.
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function GenerateTrainingStimuli(Name)
+function Training_Basic(Name)
 
     % Import global variables
     declareGlobalVars();
     global base;
 
-    filename = [Name '-Training'];
-    stimulitype = 'Training';
+    filename = [Name '-Training_Basic'];
+    stimulitype = 'Training_Basic';
     
     % Params
     dt                              = 0.010; % (s)
