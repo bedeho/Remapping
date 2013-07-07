@@ -13,7 +13,8 @@ function [baselineResponse, stim_response, location, foundOnset, foundOffset, la
     if nargin == 0,
         
         disp('Loading input files...');
-        activity = LoadActivity('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-StimuliControlTask.mat');
+        %LoadActivity
+        activity = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-StimuliControlTask.mat');
         stimuli  = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-StimuliControlTask/stim.mat');
     end
     

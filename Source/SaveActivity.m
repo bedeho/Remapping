@@ -47,7 +47,6 @@ function SaveActivity( fileName , R_N ...
     fwrite(fileID, S_activation_history, 'float32');
     fwrite(fileID, C_activation_history, 'float32');
     
-
     % Close file
     fclose(fileID);
     

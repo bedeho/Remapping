@@ -13,7 +13,8 @@ function saccade_response = AnalyzeSaccadeControlTask(activity, stimuli)
     if nargin == 0,
         
         disp('Loading input files...');
-        activity = LoadActivity('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-SaccadeControlTask.mat');
+        % LoadActivity
+        activity = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-SaccadeControlTask.mat');
         stimuli  = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-SaccadeControlTask/stim.mat');
     end
     

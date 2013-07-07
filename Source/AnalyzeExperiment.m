@@ -134,8 +134,8 @@ function AnalyzeExperiment(experiment)
                     
                     % Summary
                     fprintf(fileID, '<td>');
-                    fprintf(fileID, '<img src="%s" width="350px" height="350px"/>\n', [netDir filesep 'summary.png']);
-                    outputButton('INSPECTOR', ['matlab:Inspector(\\''' netDir filesep 'activity-' stimulinames{i} '.dat\\'')']);
+                    fprintf(fileID, '<img src="%s" width="350px" height="350px"/>\n', [netDir filesep 'basic-StimuliControl.png']);
+                    outputButton('INSPECTOR', ['matlab:Inspector(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'')']);
                     fprintf(fileID, '</td>');
                     
                     % Stimuli
@@ -147,7 +147,7 @@ function AnalyzeExperiment(experiment)
                         %fprintf(fileID, '<img src="%s" width="250px" height="250px"/></br>\n', [netDir filesep stimulinames{i} '.png']);
                         
                         % Button
-                        outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.dat\\'',\\''' stimulinames{i} '\\'')']);
+                        outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'',\\''' stimulinames{i} '\\'')']);
                         
                         fprintf(fileID, '</td>');
                     end
@@ -169,6 +169,8 @@ function AnalyzeExperiment(experiment)
     disp('Analysis completed...');
     system('stty echo');
     
+    web(filename);
+    
     function outputButton(title, action)
         fprintf(fileID, ['<input type="button" value="' title '" onclick="document.location=''' action '''"/></br>\n']);
     end
@@ -178,7 +180,7 @@ function AnalyzeExperiment(experiment)
         % is there more than one paramter, handle it in special case if so.
         if ~isempty(strfind(sim, '-')),
             columns = strsplit(sim, '-');
-            nrOfParams = length(columns) - 1;
+            nrOfParams = length(columns);
             
             parameters = cell(nrOfParams,2);
 

@@ -23,16 +23,16 @@ function analysisSummary = Analyze(netDir, stimulinames)
         
         % Load activity
         disp(['Loading activity: ' stimulinames{i}]);
-        activityFile = [netDir filesep 'activity-' stimulinames{i} '.dat'];
-        %activity = load(activityFile);
-        activity = LoadActivity(activityFile);
+        activityFile = [netDir filesep 'activity-' stimulinames{i} '.mat'];
+        activity = load(activityFile);
+        %activity = LoadActivity(activityFile);
         
         if strcmp(type,'StimuliControl'),
             
             disp('Doing stimuli control task analysis...');
             [baselineResponse, stim_response, location, foundOnset, foundOffset, latencyTimeStep, durationTimeStep, neuronResponse] = AnalyzeStimuliControlTask(activity, stimuli);
             
-            save([netDir filesep 'analysis-' stimulinames{i} '.dat'] , ...
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , ...
                     'baselineResponse', ...
                     'stim_response', ...
                     'location', ...
@@ -49,20 +49,21 @@ function analysisSummary = Analyze(netDir, stimulinames)
             hold on;
             plot(latencyTimeStep,1:R_N,'wo');
             saveas(f,[netDir filesep stimulinames{i} '.png']);
+            close(f);
             
         elseif strcmp(type,'SaccadeControl'),
             
             disp('Doing saccade control task analysis...');
             saccade_response = AnalyzeSaccadeControlTask(activity, stimuli);
             
-            save([netDir filesep 'analysis-' stimulinames{i} '.dat'] , 'saccade_response');
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'saccade_response');
             
         elseif strcmp(type,'Kusonoki'),
             
             disp('Doing Kusonoki analysis...');
             [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKusonoki(activity, stimuli);
             
-            save([netDir filesep 'analysis-' stimulinames{i} '.dat'] , 'kusonokiSTIMAlignedAnalysis', 'kusonokiSACCAlignedAnalysis');
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'kusonokiSTIMAlignedAnalysis', 'kusonokiSACCAlignedAnalysis');
             
             %% MANUAL HOME BREW ANALYTICS
             

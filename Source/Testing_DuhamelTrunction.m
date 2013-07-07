@@ -22,7 +22,7 @@ function Testing_DuhamelTrunction(Name)
     S_eccentricity                  = 30;
     R_eccentricity                  = 45;
     
-    saccade_threshold               = S_eccentricity/4;
+    saccade_threshold               = S_eccentricity/2;
     
     % Dynamical quantities
     saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!

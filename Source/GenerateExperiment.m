@@ -27,7 +27,7 @@ function GenerateExperiment()
         if strcmp(questdlg('DELETE OLD EXPERIMENT?', 'Delete', 'NO','YES','NO'), 'NO'),
             return;
         else
-            system(['rm -R ' experimentFolderPath]);
+            rmdir(experimentFolderPath,'s')
         end   
     end
     
@@ -58,9 +58,9 @@ function GenerateExperiment()
     % V
     parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
     parameterCombinations('V_tau')          = [0.200]; % (s)
-    parameterCombinations('V_psi')          = [4];
+    parameterCombinations('V_psi')          = [1 2 5];
     
-    parameterCombinations('V_to_R_psi')     = [4];
+    parameterCombinations('V_to_R_psi')     = [0]; % 5 works
     parameterCombinations('V_to_R_alpha')   = [0.1];
     
     parameterCombinations('V_to_C_psi')     = [4];
@@ -210,5 +210,7 @@ function GenerateExperiment()
             end
         end
     end
+
+    AnalyzeExperiment(Name)
     
 end
