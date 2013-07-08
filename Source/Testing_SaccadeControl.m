@@ -30,7 +30,7 @@ function Testing_SaccadeControl(Name)
     % Generate stimuli
     rng(seed);
     Duration                    = saccadeOnsetDelay + fixationPeriod; % (s)
-    saccadeTargets              = -S_eccentricity:S_density:S_eccentricity;
+    saccadeTargets              = 20;%-S_eccentricity:S_density:S_eccentricity;
     targetOffIntervals{1}       = [0 Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
     for i = 1:length(saccadeTargets);

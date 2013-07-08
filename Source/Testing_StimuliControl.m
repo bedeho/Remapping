@@ -20,7 +20,7 @@ function Testing_StimuliControl(Name)
     dt                          = 0.010; %(s)
     seed                        = 77;
     R_eccentricity              = 45;
-    R_density                   = 1;
+    R_density                   = 10;
     
     % Dynamical quantities
     stimuliOnsetDelay           = 0.1; %(s)
@@ -30,7 +30,7 @@ function Testing_StimuliControl(Name)
     % Generate stimuli
     rng(seed);
     Duration                    = stimuliOnsetDelay+stimuliDuration+stimuliOffsetPeriod; % (s)
-    headCenteredTargetLocations = -R_eccentricity:R_density:R_eccentricity;
+    headCenteredTargetLocations = [0];%-R_eccentricity:R_density:R_eccentricity;
     targetOffIntervals{1}       = [0 stimuliOnsetDelay;(stimuliOnsetDelay+stimuliDuration) Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
     for i = 1:length(headCenteredTargetLocations);

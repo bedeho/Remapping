@@ -26,13 +26,14 @@ function Testing_DuhamelRemapping(Name)
     
     % Dynamical quantities
     saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!
-    saccadeOnset                    = 0.100; % (s) w.r.t start of task
+    saccadeOnset                    = 0.300; % (s) w.r.t start of task
     fixationPeriod                  = 0.300; % (s) time from saccade onset
     
     % Generate stimuli
     rng(seed);
-    Duration                        = saccadeOnset + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
-    headCenteredTargetLocations     = -R_eccentricity:1:R_eccentricity;
+    saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1) % round to nearest hundred above
+    Duration                        = saccadeOnset + saccadeDelayTime + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
+    headCenteredTargetLocations     = 0; %-R_eccentricity:1:R_eccentricity;
     saccades                        = -S_eccentricity:1:S_eccentricity;
     
     for i = 1:length(headCenteredTargetLocations);
@@ -43,7 +44,8 @@ function Testing_DuhamelRemapping(Name)
         % Pick saccade
         s = randi(length(saccades));
         
-        while((abs(saccades(s)) > saccade_threshold)) %(-R_eccentricity + r <= saccades(s)) && (saccades(s) <= r + R_eccentricity)
+        % Make sure it is big enough and keeps target on retina
+        while((abs(saccades(s)) < saccade_threshold) && ((-R_eccentricity + r) <= saccades(s) && saccades(s) <= (r + R_eccentricity)))
             s = randi(length(saccades));
         end
         

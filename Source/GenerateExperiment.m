@@ -57,13 +57,13 @@ function GenerateExperiment()
     
     % V
     parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
-    parameterCombinations('V_tau')          = [0.200]; % (s)
-    parameterCombinations('V_psi')          = [1 2 5];
+    parameterCombinations('V_tau')          = [0.100]; % (s)
+    parameterCombinations('V_psi')          = [1];
     
-    parameterCombinations('V_to_R_psi')     = [0]; % 5 works
+    parameterCombinations('V_to_R_psi')     = [6]; % 5 works
     parameterCombinations('V_to_R_alpha')   = [0.1];
     
-    parameterCombinations('V_to_C_psi')     = [4];
+    parameterCombinations('V_to_C_psi')     = [1];
     parameterCombinations('V_to_C_alpha')   = [0.1];
     
     % S
@@ -72,17 +72,17 @@ function GenerateExperiment()
     parameterCombinations('S_tau')          = [0.300]; % (s)
     parameterCombinations('S_psi')          = [1];
     parameterCombinations('S_sigma')        = parameterCombinations('V_sigma'); % (deg) receptive field size
-    parameterCombinations('S_slope')        = [2];
-    parameterCombinations('S_threshold')    = [0.2];
-    parameterCombinations('S_to_C_psi')     = [6.2];
+    parameterCombinations('S_slope')        = [8];
+    parameterCombinations('S_threshold')    = [0.3];
+    parameterCombinations('S_to_C_psi')     = [40];
     parameterCombinations('S_to_C_alpha')   = [0.1]; % learning rate
     
     % C
-    parameterCombinations('C_tau')          = [0.100]; % (s)
-    parameterCombinations('C_w_INHB')       = [100/5400]; % C_N = 5400, 2000/5400 3000/5400 4000/5400
-    parameterCombinations('C_slope')        = [50];
-    parameterCombinations('C_threshold')    = [0.6];
-    parameterCombinations('C_to_R_psi')     = [0.5]; % 0.15
+    parameterCombinations('C_tau')          = [0.010]; % (s)
+    parameterCombinations('C_w_INHB')       = [1/5000]; %10/5000 50/5000 100/5000  C_N = 5400
+    parameterCombinations('C_slope')        = [500];
+    parameterCombinations('C_threshold')    = [1.5]; % old 0.45
+    parameterCombinations('C_to_R_psi')     = [0.1]; % 0.12 0.15 0.17 0.2 0.22
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
     
     % Save the experiment params
@@ -191,17 +191,21 @@ function GenerateExperiment()
                     %disp('Kusonoki ...');
                     %Remapping(subsim_dir, 'basic-Kusonoki', false, [name ext]);
                     
+                    
                     disp('Duhamel Remapping ...');
                     Remapping(subsim_dir, 'basic-DuhamelRemapping', false, [name ext]);
                     
+                    %{
                     disp('Duhamel Remapping Trace ...');
                     Remapping(subsim_dir, 'basic-DuhamelRemappingTrace', false, [name ext]);
                                   
                     disp('Duhamel Truncation ...');
                     Remapping(subsim_dir, 'basic-DuhamelTrunction', false, [name ext]);
+                    %}
                     
                     disp('Saccade Control ...');
                     Remapping(subsim_dir, 'basic-SaccadeControl', false, [name ext]);
+                    
                     
                     disp('Stimulus Control ...');
                     Remapping(subsim_dir, 'basic-StimuliControl', false, [name ext]);
