@@ -123,55 +123,55 @@ function viewNeuronDynamics(activityFile, stimuliName)
         s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes, dt);
 
         subplot(5,2,1);
-        imagesc(flipud(V_firingrate));
+        imagesc(V_firingrate);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('V Firing');
 
         subplot(5,2,2);
-        imagesc(flipud(V_activation));
+        imagesc(V_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('V Firing');
 
         subplot(5,2,3);
-        imagesc(flipud(R_firingrate));
+        imagesc(R_firingrate);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('R Firing');
 
         subplot(5,2,4);
-        imagesc(flipud(R_activation));
+        imagesc(R_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('R Activation');
 
         subplot(5,2,5);
-        imagesc(flipud(S_firingrate));
+        imagesc(S_firingrate);
         colorbar
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('S Firing');
 
         subplot(5,2,6);
-        imagesc(flipud(S_activation));
+        imagesc(S_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('S Activation');
 
         subplot(5,2,7);
-        imagesc(flipud(C_firingrate));
+        imagesc(C_firingrate);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('C Firing');
 
         subplot(5,2,8);
-        imagesc(flipud(C_activation));
+        imagesc(C_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
@@ -185,7 +185,8 @@ function viewNeuronDynamics(activityFile, stimuliName)
         xlabel('Time step');
         legend({'Eye Position','Stimuli Retinal Locations'});
         ylim([-45 45]); % we hard code limit since not all stimuli has stimuli.R_eccentricity
-
+        set(gca,'YDir','reverse');
+        
         subplot(5,2,10);
         cla
         plot(stimuli.stimuli{period}.eyePositionTrace, 'r');
@@ -194,6 +195,7 @@ function viewNeuronDynamics(activityFile, stimuliName)
         xlabel('Time step');
         legend({'Eye Position','Stimuli Retinal Locations'});
         ylim([-45 45]); % we hard code limit since not all stimuli has stimuli.R_eccentricity
+        set(gca,'YDir','reverse');
         
     end
 end

@@ -49,7 +49,7 @@ function GenerateExperiment()
     % R
     parameterCombinations('R_eccentricity') = [45];
     parameterCombinations('R_tau')          = [0.100]; % (s)
-    parameterCombinations('R_w_INHB')       = [10/91 20/91 30/91 40/91 50/91]; %0.7
+    parameterCombinations('R_w_INHB')       = [20/91]; %0.7
     parameterCombinations('R_slope')        = [1];
     parameterCombinations('R_threshold')    = [2.0];
     %parameterCombinations('R_to_C_alpha')   = [0.1]; % learning rate

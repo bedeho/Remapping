@@ -60,10 +60,12 @@ function analysisSummary = Analyze(netDir, stimulinames)
             
         elseif strcmp(type,'DuhamelRemapping'),
             
+            %{
             disp('Doing duhamel remapping task analysis...');
             saccade_response = AnalyzeDuhamelRemapping(activity, stimuli);
             
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'saccade_response');
+            %}
             
         elseif strcmp(type,'Kusonoki'),
             

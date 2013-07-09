@@ -28,7 +28,6 @@ function [baselineResponse, stim_response, location, foundOnset, foundOffset, la
     numEpochs           = activity.numEpochs;
     stimuliOnsetDelay   = stimuli.stimuliOnsetDelay;
     onsetTimeStep       = timeToTimeStep(stimuliOnsetDelay, dt);
-    responseThreshold   = 0.5;
     
     % Analysis params
     responseWindowStart = 0.050; % Colby window control, [50ms,250ms] after stim onset.
@@ -101,17 +100,38 @@ function [baselineResponse, stim_response, location, foundOnset, foundOffset, la
         % Save to figure
         neuronResponse(n, :) = bestPeriodActivity;
         
+        % Compute response in different latency shifts
+        thresholdResponse   = stim_response(n, I)*0.5; % stimulus period when stimuli is closest
         
-        responseVector
-        
-        %stim_response should start at onset_timestep
-        %findNeuronalLatency(0.5, stim_response(n, I), )
+        num = length(bestPeriodActivity);
+        windowResponse = zeros(1, num);
+        latencyWindowOffset = 0:ceil(latencyWindowSize/dt);
 
-
-        [latencyTimeStep, durationTimeSteps] = findNeuronalLatency(responseThreshold, responseVector, ceil(latencyWindowSize/dt));
-        
-        
-       
+        for t=onsetTimeStep:(length(bestPeriodActivity)-length(latencyWindowOffset)+1),
+            
+            % Get time steps in question
+            latencyWindow = t + latencyWindowOffset;
+            
+            % Integrate to find response
+            windowResponse(t) = trapz(bestPeriodActivity(latencyWindow));
+            
+            % Normalize
+            windowResponse(t) = windowResponse(t)/(length(latencyWindow)-1);
+            
+            if ~foundOnset(n),
+                
+                if windowResponse(t) >= thresholdResponse;
+                    latencyTimeStep(n) = t;
+                    foundOnset(n) = true;
+                end
+            elseif ~foundOffset(n),
+                
+                if windowResponse(t) <= thresholdResponse;
+                    durationTimeStep(n) = t;
+                    foundOffset(n) = true;
+                end
+            end
+        end        
     end
     
 end

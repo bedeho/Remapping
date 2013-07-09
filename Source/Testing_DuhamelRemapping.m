@@ -34,6 +34,7 @@ function Testing_DuhamelRemapping(Name)
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1) % round to nearest hundred above
     Duration                        = saccadeOnset + saccadeDelayTime + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
     headCenteredTargetLocations     = 0; %-R_eccentricity:1:R_eccentricity;
+    saccadeTargets                  = zeros(1, length(headCenteredTargetLocations));
     saccades                        = -S_eccentricity:1:S_eccentricity;
     
     for i = 1:length(headCenteredTargetLocations);
@@ -49,7 +50,9 @@ function Testing_DuhamelRemapping(Name)
             s = randi(length(saccades));
         end
         
-        stimuli{i}.headCenteredTargetLocations  = r + saccades(s);
+        saccadeTargets(i) = saccades(s);
+        
+        stimuli{i}.headCenteredTargetLocations  = r;
         stimuli{i}.saccadeTargets               = saccades(s);
         stimuli{i}.saccadeTimes                 = saccadeOnset;
         stimuli{i}.numSaccades                  = length(saccadeOnset);
@@ -75,6 +78,7 @@ function Testing_DuhamelRemapping(Name)
                                     'saccadeOnset', ...
                                     'fixationPeriod', ...
                                     'headCenteredTargetLocations', ...
+                                    'saccadeTargets', ...
                                     'stimulitype', ...
                                     'stimuli', ...
                                     'Duration', ...
