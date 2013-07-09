@@ -23,9 +23,9 @@ function Testing_StimuliControl(Name)
     R_density                   = 10;
     
     % Dynamical quantities
-    stimuliOnsetDelay           = 0.1; %(s)
-    stimuliDuration             = 0.1; %(s)
-    stimuliOffsetPeriod         = 0.3; %(s)
+    stimuliOnsetDelay           = 0.100; %(s)
+    stimuliDuration             = 0.300; %(s)
+    stimuliOffsetPeriod         = 0.300; %(s)
 
     % Generate stimuli
     rng(seed);

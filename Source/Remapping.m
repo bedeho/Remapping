@@ -101,12 +101,12 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     S_firingrate    = zeros(1,S_N);
     
     S_delay_sigma   = parameters.simulation('S_delay_sigma');
-    S_presaccadicOffset = ones(1,S_N);%parameters.simulation('S_presaccadicOffset');
+    S_presaccadicOffset = parameters.simulation('S_presaccadicOffset'); %
     S_tau           = parameters.simulation('S_tau'); % (s)
-    S_psi           = parameters.simulation('S_psi');
     S_to_C_psi      = parameters.simulation('S_to_C_psi');
-    S_slope         = parameters.simulation('S_slope');
-    S_threshold     = parameters.simulation('S_threshold');
+    %S_psi           = parameters.simulation('S_psi');
+    %S_slope         = parameters.simulation('S_slope');
+    %S_threshold     = parameters.simulation('S_threshold');
     S_to_C_alpha    = parameters.simulation('S_to_C_alpha'); % learning rate
     S_sigma         = V_sigma; % (deg) receptive field size
 
@@ -162,6 +162,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             if(numSaccades > 0),
                 saccade_times = repmat(saccadeTimes,S_N,1); % Used to get F
                 saccade_time_offset = saccade_times - repmat(S_presaccadicOffset',1,numSaccades); % Used to get F
+                saccade_time_pos_offset = saccade_times + repmat(S_presaccadicOffset',1,numSaccades); % Used to get F
+                saccade_time_neg_offset = saccade_times - repmat(S_presaccadicOffset',1,numSaccades); % Used to get F
                 saccade_target_offset = exp(-((repmat(S_preferences', 1, numSaccades) - repmat(saccadeTargets, S_N, 1)).^2)./(2*S_sigma^2)); % term multiplied by F
             end
             
@@ -207,8 +209,10 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
 
                 % S
                 if(numSaccades > 0),
+                    %F = (saccade_time_neg_offset <= time) & (time <= saccade_time_pos_offset); % check both conditions: y-z <= x <= y
                     F = (saccade_time_offset <= time) & (time <= saccade_times); % check both conditions: y-z <= x <= y
-                    S_driver = S_psi*sum(bsxfun(@times, F, saccade_target_offset),2); % cannot be done with matrix mult since exponential depends on i
+                    %S_driver = S_psi*sum(bsxfun(@times, F, saccade_target_offset),2); % cannot be done with matrix mult since exponential depends on i
+                    S_driver = sum(bsxfun(@times, F, saccade_target_offset),2); % cannot be done with matrix mult since exponential depends on i
                     S_activation = S_activation + (dt/S_tau)*(-S_activation + S_driver');
                 else
                     S_activation = S_activation + (dt/S_tau)*(-S_activation); 
@@ -244,7 +248,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
 
                 % Compute firing rates
                 R_firingrate = 1./(1 + exp(-2*R_slope*(R_activation - R_threshold)));
-                S_firingrate = 1./(1 + exp(-2*S_slope*(S_activation - S_threshold)));
+                %S_firingrate = 1./(1 + exp(-2*S_slope*(S_activation - S_threshold)));
+                S_firingrate = S_activation;
                 C_firingrate = 1./(1 + exp(-2*C_slope*(C_activation - C_threshold)));
 
                 % Save activity                

@@ -1,21 +1,21 @@
 
 %
-%  AnalyzeStimuliControlTask.m
+%  AnalyzeDuhamelRemapping.m
 %  Remapping
 %
-%  Created by Bedeho Mender on 30/06/13.
+%  Created by Bedeho Mender on 09/06/13.
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [baselineResponse, stim_response, location, foundOnset, foundOffset, latencyTimeStep, durationTimeStep, neuronResponse] = AnalyzeStimuliControlTask(activity, stimuli)
+function [baselineResponse, stim_response, location, foundOnset, foundOffset, latencyTimeStep, durationTimeStep, neuronResponse] = AnalyzeDuhamelRemapping(activity, stimuli)
 
     % Check if this is manual run 
     if nargin == 0,
         
         disp('Loading input files...');
         %LoadActivity
-        activity = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-StimuliControlTask.mat');
-        stimuli  = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-StimuliControlTask/stim.mat');
+        activity = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-AnalyzeDuhamelRemapping.mat');
+        stimuli  = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-AnalyzeDuhamelRemapping/stim.mat');
     end
     
     % Get data
@@ -28,7 +28,6 @@ function [baselineResponse, stim_response, location, foundOnset, foundOffset, la
     numEpochs           = activity.numEpochs;
     stimuliOnsetDelay   = stimuli.stimuliOnsetDelay;
     onsetTimeStep       = timeToTimeStep(stimuliOnsetDelay, dt);
-    responseThreshold   = 0.5;
     
     % Analysis params
     responseWindowStart = 0.050; % Colby window control, [50ms,250ms] after stim onset.
@@ -38,6 +37,8 @@ function [baselineResponse, stim_response, location, foundOnset, foundOffset, la
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
 
     %% Baseline response
+    
+    %{
     
     % Get time steps in question
     baselineTimeSteps   = 1:(onsetTimeStep-1);
@@ -78,6 +79,8 @@ function [baselineResponse, stim_response, location, foundOnset, foundOffset, la
     normalization_response = sum(stim_response_modenormalized,2);
     location = (stim_response*stimuli.headCenteredTargetLocations')./normalization_response;
     
+    %}
+    
     %% Latency & Duration
     
     % vectorization became problematic when it came to extracting the right
@@ -101,17 +104,38 @@ function [baselineResponse, stim_response, location, foundOnset, foundOffset, la
         % Save to figure
         neuronResponse(n, :) = bestPeriodActivity;
         
+        % Compute response in different latency shifts
+        thresholdResponse   = stim_response(n, I)*0.5; % stimulus period when stimuli is closest
         
-        responseVector
-        
-        %stim_response should start at onset_timestep
-        %findNeuronalLatency(0.5, stim_response(n, I), )
+        num = length(bestPeriodActivity);
+        windowResponse = zeros(1, num);
+        latencyWindowOffset = 0:ceil(latencyWindowSize/dt);
 
-
-        [latencyTimeStep, durationTimeSteps] = findNeuronalLatency(responseThreshold, responseVector, ceil(latencyWindowSize/dt));
-        
-        
-       
+        for t=onsetTimeStep:(length(bestPeriodActivity)-length(latencyWindowOffset)+1),
+            
+            % Get time steps in question
+            latencyWindow = t + latencyWindowOffset;
+            
+            % Integrate to find response
+            windowResponse(t) = trapz(bestPeriodActivity(latencyWindow));
+            
+            % Normalize
+            windowResponse(t) = windowResponse(t)/(length(latencyWindow)-1);
+            
+            if ~foundOnset(n),
+                
+                if windowResponse(t) >= thresholdResponse;
+                    latencyTimeStep(n) = t;
+                    foundOnset(n) = true;
+                end
+            elseif ~foundOffset(n),
+                
+                if windowResponse(t) <= thresholdResponse;
+                    durationTimeStep(n) = t;
+                    foundOffset(n) = true;
+                end
+            end
+        end        
     end
     
 end
