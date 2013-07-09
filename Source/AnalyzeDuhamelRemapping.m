@@ -31,27 +31,22 @@ function [NeuronsAnalyzed, LatencyTimeSteps, Durations] = AnalyzeDuhamelRemappin
     latencyWindowSize   = 0.020; % (s), colby papers
     latencyWindowLength = ceil(latencyWindowSize/dt);
     RF_inclusion_th     = 5; % (deg) neurons this far away from any given trial are analysed together
+    responseThreshold   = 0.5;
     
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
     
     %% Latency & Duration
     
-    c = 0;
+    c = 1;
     NeuronsAnalyzed = [];
     LatencyTimeSteps = [];
     Durations = [];
     
-    % Allocate some result buffers
-    %foundOnset       = zeros(1, R_N);
-    %foundOffset      = zeros(1, R_N);
-    %latencyTimeStep  = nan*zeros(1, R_N);
-    %durationTimeStep = nan*zeros(1, R_N);
-    
     for p=1:numPeriods,
         
         % Target location
-        currentRFLocation = stimuli.headCenteredTargetLocations(p);
-        futureRFLocation = currentRFLocation + stimuli.saccadeTargets(p);
+        currentRFLocation_HeadCentered = stimuli.headCenteredTargetLocations(p);
+        futureRFLocation = currentRFLocation_HeadCentered - stimuli.saccadeTargets(p);
         
         % Find neurons that are close enough
         neuron_RFLocations = max(-R_eccentricity,futureRFLocation - RF_inclusion_th):1:min(R_eccentricity,futureRFLocation + RF_inclusion_th);
@@ -63,13 +58,15 @@ function [NeuronsAnalyzed, LatencyTimeSteps, Durations] = AnalyzeDuhamelRemappin
 
             % Get data for best period of each neuron
             responseVector  = R_firing_history(neuronIndex, :, p, 1);
-
-            % Find start of vector
+            
+            % Find latency and duration
             [latencyTimeStep, duration] = findNeuronalLatency(responseThreshold, responseVector, latencyWindowLength);
+            
+            %figure;plot(responseVector);hold on; plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
             
             % Save
             NeuronsAnalyzed(c)  = neuronIndex;
-            LatencyTimeSteps(c) = timeStepToTime(latencyTimeStep,dt);
+            LatencyTimeSteps(c) = stepToTime(latencyTimeStep,dt);
             Duration(c)         = duration*dt;
             
             c = c + 1;

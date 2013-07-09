@@ -7,18 +7,21 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [latencyTimeStep, durationTimeSteps] = findNeuronalLatency(responseThreshold, responseVector, latencyWindowLength)
+function [latencyTimeStep, duration] = findNeuronalLatency(responseThreshold, responseVector, latencyWindowLength)
 
     % Working vars
     responseLength      = length(responseVector);
     foundOnset          = false; % Inidicator for if we have found onset
     foundOffset         = false; % Inidicator for if we have found onset/offset
-    thresholdResponse   = responseVector*responseThreshold; % cutoff
+    thresholdResponse   = max(responseVector)*responseThreshold; % cutoff
+    
+    latencyTimeStep = nan;
+    duration = nan;
 
     for t=1:(responseLength-latencyWindowLength+1),
 
         % Get time steps in question
-        latencyWindow = responseVector(t + 1:latencyWindowLength);
+        latencyWindow = responseVector(t + (0:(latencyWindowLength-1)));
 
         % Integrate to find response
         windowResponse = trapz(latencyWindow);
@@ -36,11 +39,12 @@ function [latencyTimeStep, durationTimeSteps] = findNeuronalLatency(responseThre
         elseif ~foundOffset,
 
             if windowResponse <= thresholdResponse;
-                durationTimeSteps = t;
+                duration = t-latencyTimeStep;
                 foundOffset = true;
 
                 return;
             end
         end
     end
+
 end
