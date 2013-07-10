@@ -1,21 +1,21 @@
 
 %
-%  AnalyzeDuhamelRemappingTrace.m
+%  AnalyzeDuhamelTruncation.m
 %  Remapping
 %
-%  Created by Bedeho Mender on 10/06/13.
+%  Created by Bedeho Mender on 10/07/13.
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [DuhamelRemappingTrace_Neurons, DuhamelRemappingTrace_indexes] = AnalyzeDuhamelRemappingTrace(activity, stimuli)
+function [DuhamelTruncation_Neurons, DuhamelTruncation_indexes] = AnalyzeDuhamelTruncation(activity, stimuli)
 
     % Check if this is manual run 
     if nargin == 0,
         
         disp('Loading input files...');
         %LoadActivity
-        activity = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-DuhamelRemappingTrace.mat');
-        stimuli  = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-DuhamelRemappingTrace/stim.mat');
+        activity = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-DuhamelTruncation.mat');
+        stimuli  = load('/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Stimuli/basic-DuhamelTruncation/stim.mat');
     end
     
     % Get data
@@ -27,7 +27,6 @@ function [DuhamelRemappingTrace_Neurons, DuhamelRemappingTrace_indexes] = Analyz
     numPeriods           = activity.numPeriods;
     numEpochs            = activity.numEpochs;
     saccadeOnset         = stimuli.saccadeOnset;
-    FutureRFLocations    = stimuli.FutureRFLocations;
     
     % Analysis params
     %latencyWindowSize   = 0.020; % (s), colby papers
@@ -41,15 +40,15 @@ function [DuhamelRemappingTrace_Neurons, DuhamelRemappingTrace_indexes] = Analyz
     %% Latency & Duration
     
     c = 1;
-    DuhamelRemapping_neuronIndexes = [];
+    DuhamelTruncation_indexes = [];
     
     for p=1:numPeriods,
         
         % Target location
-        futureRFLocation = FutureRFLocations(p);
+        currentRFLocation_HeadCentered = stimuli.headCenteredTargetLocations(p);
         
         % Find neurons that are close enough
-        neuron_RFLocations = max(-R_eccentricity,futureRFLocation - RF_inclusion_th):1:min(R_eccentricity,futureRFLocation + RF_inclusion_th);
+        neuron_RFLocations = max(-R_eccentricity,currentRFLocation_HeadCentered - RF_inclusion_th):1:min(R_eccentricity,currentRFLocation_HeadCentered + RF_inclusion_th);
         
         for f=neuron_RFLocations,
         
@@ -65,10 +64,10 @@ function [DuhamelRemappingTrace_Neurons, DuhamelRemappingTrace_indexes] = Analyz
             figure;plot(neuronActivity);hold on; plot(timeToTimeStep([saccadeOnset saccadeOnset], dt), [0 1], 'r');
             
             % Save
-            DuhamelRemappingTrace_Neurons(c).index                   = neuronIndex;
-            DuhamelRemappingTrace_Neurons(c).saccadeonset_response   = saccadeonset_response;
+            DuhamelTruncation_Neurons(c).index                   = neuronIndex;
+            DuhamelTruncation_Neurons(c).saccadeonset_response   = saccadeonset_response;
             
-            DuhamelRemappingTrace_indexes(c) = neuronIndex;
+            DuhamelTruncation_indexes(c) = neuronIndex;
             
             c = c + 1;
             

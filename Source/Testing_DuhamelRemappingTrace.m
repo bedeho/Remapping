@@ -34,28 +34,31 @@ function Testing_DuhamelRemappingTrace(Name)
     rng(seed);
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1) % round to nearest hundred above
     Duration                        = saccadeOnset + saccadeDelayTime + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
-    headCenteredTargetLocations     = 0;%-R_eccentricity:1:R_eccentricity;
-    saccadeTargets                  = zeros(1, length(headCenteredTargetLocations));
+    FutureRFLocations               = 15;%-R_eccentricity:1:R_eccentricity;
+    
+    saccadeTargets                  = zeros(1, length(FutureRFLocations));
+    headCenteredTargetLocations     = zeros(1, length(FutureRFLocations));
     
     saccades                        = -S_eccentricity:1:S_eccentricity;
     targetOffIntervals{1}           = [stimuliOffset Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
-    for i = 1:length(headCenteredTargetLocations);
+    for i = 1:length(FutureRFLocations);
         
-        % Location of target
-        r = headCenteredTargetLocations(i);
+        % Future location of target
+        r = FutureRFLocations(i);
         
         % Pick saccade
         s = randi(length(saccades));
         
         % Make sure it is big enough and keeps target on retina
-        while((abs(saccades(s)) < saccade_threshold) && ((-R_eccentricity + r) <= saccades(s) && saccades(s) <= (r + R_eccentricity)))
+        while((abs(saccades(s)) < saccade_threshold))
             s = randi(length(saccades));
         end
         
+        headCenteredTargetLocations(i) = r + saccades(s);
         saccadeTargets(i) = saccades(s);
         
-        stimuli{i}.headCenteredTargetLocations  = r;
+        stimuli{i}.headCenteredTargetLocations  = headCenteredTargetLocations(i);
         stimuli{i}.saccadeTargets               = saccades(s);
         stimuli{i}.saccadeTimes                 = saccadeOnset;
         stimuli{i}.numSaccades                  = length(saccadeOnset);
@@ -81,6 +84,7 @@ function Testing_DuhamelRemappingTrace(Name)
                                     'saccadeOnset', ...
                                     'fixationPeriod', ...
                                     'stimuliOffset', ...
+                                    'FutureRFLocations', ...
                                     'headCenteredTargetLocations', ...
                                     'saccadeTargets', ...
                                     'stimulitype', ...

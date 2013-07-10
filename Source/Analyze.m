@@ -58,7 +58,6 @@ function analysisSummary = Analyze(netDir, stimulinames)
             
             disp('Doing saccade control task analysis...');
             [saccade_response] = AnalyzeSaccadeControlTask(activity, stimuli);
-            
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'saccade_response');
             
         elseif strcmp(type,'DuhamelRemapping'),
@@ -66,7 +65,6 @@ function analysisSummary = Analyze(netDir, stimulinames)
             
             disp('Doing duhamel remapping task analysis...');
             [DuhamelRemapping_Neurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRemapping(activity, stimuli);
-            
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemapping_Neurons', 'DuhamelRemapping_indexes');
             
         elseif strcmp(type,'DuhamelRemappingTrace'),
@@ -74,8 +72,12 @@ function analysisSummary = Analyze(netDir, stimulinames)
             
             disp('Doing duhamel remapping trace task analysis...');
             [DuhamelRemappingTrace_Neurons, DuhamelRemappingTrace_indexes] = AnalyzeDuhamelRemappingTrace(activity, stimuli);
-            
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemapping_Neurons', 'DuhamelRemapping_indexes');
+            
+        elseif strcmp(type,'DuhamelTruncation'),
+            
+            [DuhamelTruncation_Neurons, DuhamelTruncation_indexes] = AnalyzeDuhamelTruncation(activity, stimuli);
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelTruncation_Neurons', 'DuhamelTruncation_indexes');
               
         elseif strcmp(type,'Kusonoki'),
             
@@ -149,6 +151,10 @@ function analysisSummary = Analyze(netDir, stimulinames)
     ylim([-0.5 0.5]);
     plot([-0.5 0.5],[-0.5 0.5],'--b');
     axis square
+    
+    %% Duhamel trace remapping analysis
+    
+    %% Duhamel truncation analysis
     
     analysisSummary = 0;
 end
