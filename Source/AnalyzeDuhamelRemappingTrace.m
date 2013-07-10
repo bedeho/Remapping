@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [DuhamelRemapping_analyzedNeurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRemappingTrace(activity, stimuli)
+function [DuhamelRemappingTrace_Neurons, DuhamelRemappingTrace_indexes] = AnalyzeDuhamelRemappingTrace(activity, stimuli)
 
     % Check if this is manual run 
     if nargin == 0,
@@ -26,12 +26,14 @@ function [DuhamelRemapping_analyzedNeurons, DuhamelRemapping_indexes] = AnalyzeD
     R_eccentricity       = stimuli.R_eccentricity;
     numPeriods           = activity.numPeriods;
     numEpochs            = activity.numEpochs;
+    saccadeOnset         = stimuli.saccadeOnset;
     
     % Analysis params
-    latencyWindowSize   = 0.020; % (s), colby papers
-    latencyWindowLength = ceil(latencyWindowSize/dt);
+    %latencyWindowSize   = 0.020; % (s), colby papers
+    %latencyWindowLength = ceil(latencyWindowSize/dt);
     RF_inclusion_th     = 5; % (deg) neurons this far away from any given trial are analysed together
-    responseThreshold   = 0.5;
+    responseWindowDuration = 0.200;
+    %responseThreshold   = 0.5;
     
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
     
@@ -54,20 +56,19 @@ function [DuhamelRemapping_analyzedNeurons, DuhamelRemapping_indexes] = AnalyzeD
             % Find neuron
             neuronIndex = R_eccentricity + f + 1;
 
-            % Get data for best period of each neuron
-            responseVector  = R_firing_history(neuronIndex, :, p, 1);
+            % Get data neuron
+            neuronActivity  = R_firing_history(neuronIndex, :, p, 1);
             
-            % Find latency and duration
-            [latencyTimeStep, duration] = findNeuronalLatency(responseThreshold, responseVector, latencyWindowLength);
+            % Offset response
+            saccadeonset_response = normalizedIntegration(neuronActivity, dt, saccadeOnset, responseWindowDuration);
             
-            %figure;plot(responseVector);hold on; plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
+            figure;plot(neuronActivity);hold on; plot(timeToTimeStep([saccadeOnset saccadeOnset], dt), [0 1], 'r');
             
             % Save
-            DuhamelRemapping_Neurons(c).index            = neuronIndex;
-            DuhamelRemapping_Neurons(c).latencyTimeStep  = stepToTime(latencyTimeStep, dt);
-            DuhamelRemapping_Neurons(c).Duration         = duration*dt;
+            DuhamelRemappingTrace_Neurons(c).index                   = neuronIndex;
+            DuhamelRemappingTrace_Neurons(c).saccadeonset_response   = saccadeonset_response;
             
-            DuhamelRemapping_indexes(c) = neuronIndex;
+            DuhamelRemappingTrace_indexes(c) = neuronIndex;
             
             c = c + 1;
             

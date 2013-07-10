@@ -196,10 +196,11 @@ function GenerateExperiment()
                     disp('Duhamel Remapping ...');
                     Remapping(subsim_dir, 'basic-DuhamelRemapping', false, [name ext]);
                     
-                    %{
+                    
                     disp('Duhamel Remapping Trace ...');
                     Remapping(subsim_dir, 'basic-DuhamelRemappingTrace', false, [name ext]);
-                                  
+                    
+                    %{           
                     disp('Duhamel Truncation ...');
                     Remapping(subsim_dir, 'basic-DuhamelTrunction', false, [name ext]);
                     %}

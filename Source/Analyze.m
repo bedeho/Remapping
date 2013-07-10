@@ -69,7 +69,14 @@ function analysisSummary = Analyze(netDir, stimulinames)
             
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemapping_Neurons', 'DuhamelRemapping_indexes');
             
+        elseif strcmp(type,'DuhamelRemappingTrace'),
             
+            
+            disp('Doing duhamel remapping trace task analysis...');
+            [DuhamelRemappingTrace_Neurons, DuhamelRemappingTrace_indexes] = AnalyzeDuhamelRemappingTrace(activity, stimuli);
+            
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemapping_Neurons', 'DuhamelRemapping_indexes');
+              
         elseif strcmp(type,'Kusonoki'),
             
             disp('Doing Kusonoki analysis...');

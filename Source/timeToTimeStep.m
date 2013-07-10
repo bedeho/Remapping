@@ -7,6 +7,6 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-    function i = timeToTimeStep(t,dt)
-        i = floor(t/dt) + 1;
-    end
+function i = timeToTimeStep(t,dt)
+    i = floor(t/dt) + 1;
+end

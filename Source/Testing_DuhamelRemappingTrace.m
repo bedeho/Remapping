@@ -28,13 +28,15 @@ function Testing_DuhamelRemappingTrace(Name)
     saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!
     saccadeOnset                    = 0.300; % (s) w.r.t start of task
     fixationPeriod                  = 0.300; % (s) time from saccade onset
-    stimuliOffset                   = 0.050; % (s)
+    stimuliOffset                   = saccadeOnset/2;%0.050; % (s)
     
     % Generate stimuli
     rng(seed);
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1) % round to nearest hundred above
     Duration                        = saccadeOnset + saccadeDelayTime + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
-    headCenteredTargetLocations     = -R_eccentricity:1:R_eccentricity;
+    headCenteredTargetLocations     = 0;%-R_eccentricity:1:R_eccentricity;
+    saccadeTargets                  = zeros(1, length(headCenteredTargetLocations));
+    
     saccades                        = -S_eccentricity:1:S_eccentricity;
     targetOffIntervals{1}           = [stimuliOffset Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
@@ -51,7 +53,9 @@ function Testing_DuhamelRemappingTrace(Name)
             s = randi(length(saccades));
         end
         
-        stimuli{i}.headCenteredTargetLocations  = r + saccades(s);
+        saccadeTargets(i) = saccades(s);
+        
+        stimuli{i}.headCenteredTargetLocations  = r;
         stimuli{i}.saccadeTargets               = saccades(s);
         stimuli{i}.saccadeTimes                 = saccadeOnset;
         stimuli{i}.numSaccades                  = length(saccadeOnset);
@@ -78,6 +82,7 @@ function Testing_DuhamelRemappingTrace(Name)
                                     'fixationPeriod', ...
                                     'stimuliOffset', ...
                                     'headCenteredTargetLocations', ...
+                                    'saccadeTargets', ...
                                     'stimulitype', ...
                                     'stimuli', ...
                                     'Duration', ...

@@ -21,7 +21,7 @@ function AnalyzeExperiment(experiment)
                     'basic-SaccadeControl', ...
                     'basic-StimuliControl'}; %'basic-Kusonoki', ...
                 
-    stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemapping'};
+    stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemapping', 'basic-DuhamelRemappingTrace'};
     
     % Import global variables
     declareGlobalVars();
