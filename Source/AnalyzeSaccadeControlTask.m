@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function saccade_response = AnalyzeSaccadeControlTask(activity, stimuli)
+function [saccade_response] = AnalyzeSaccadeControlTask(activity, stimuli)
 
     % Check if this is manual run
     if nargin == 0,
@@ -25,7 +25,7 @@ function saccade_response = AnalyzeSaccadeControlTask(activity, stimuli)
     dt                  = activity.dt;
     numEpochs           = activity.numEpochs;
     saccadeOnsetDelay   = stimuli.saccadeOnsetDelay;
-
+    %S_eccentricity      = stimuli.S_eccentricity;
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
         
     % Analysis params

@@ -33,7 +33,7 @@ function Testing_DuhamelRemapping(Name)
     rng(seed);
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1) % round to nearest hundred above
     Duration                        = saccadeOnset + saccadeDelayTime + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
-    headCenteredTargetLocations     = 0; %-R_eccentricity:1:R_eccentricity;
+    headCenteredTargetLocations     = -R_eccentricity:10:R_eccentricity;
     saccadeTargets                  = zeros(1, length(headCenteredTargetLocations));
     saccades                        = -S_eccentricity:1:S_eccentricity;
     

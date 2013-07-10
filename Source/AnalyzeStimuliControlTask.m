@@ -102,7 +102,8 @@ function [StimuliControl_Neurons, StimuliControl_indexes] = AnalyzeStimuliContro
         [latencyTimeStep duration] = findNeuronalLatency(responseThreshold, neuronActivity, latencyWindowLength);
         
         % Baseline response
-        baselineActivity = neuronActivity(1:(onsetTimeStep-1));
+        baselineTimeSteps = 1:(onsetTimeStep-1);
+        baselineActivity = neuronActivity(baselineTimeSteps);
         baselineResponse = squeeze(trapz(baselineActivity,2)); % Integrate
         baselineResponse = baselineResponse/(length(baselineTimeSteps)-1); % Normaliztion step, gives normalized (sp/s) units to response
         
@@ -113,11 +114,11 @@ function [StimuliControl_Neurons, StimuliControl_indexes] = AnalyzeStimuliContro
         stim_response       = stim_response/(length(activityTimeSteps) - 1); % Normaliztion step, gives normalized (sp/s) units to response
         
         % Plot
-        figure;plot(neuronActivity);hold on; plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
+        %figure;plot(neuronActivity);hold on; plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
         
         % Save
         StimuliControl_Neurons(c).index            = neuronIndex;
-        StimuliControl_Neurons(c).latencyTimeStep  = stepToTime(latencyTimeStep, dt);
+        StimuliControl_Neurons(c).latency          = stepToTime(latencyTimeStep, dt)-stimuliOnsetDelay;
         StimuliControl_Neurons(c).duration         = duration*dt;
         StimuliControl_Neurons(c).baselineResponse = baselineResponse;
         StimuliControl_Neurons(c).stimulusresponse = stim_response;

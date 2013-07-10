@@ -57,18 +57,18 @@ function analysisSummary = Analyze(netDir, stimulinames)
         elseif strcmp(type,'SaccadeControl'),
             
             disp('Doing saccade control task analysis...');
-            saccade_response = AnalyzeSaccadeControlTask(activity, stimuli);
+            [saccade_response] = AnalyzeSaccadeControlTask(activity, stimuli);
             
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'saccade_response');
             
         elseif strcmp(type,'DuhamelRemapping'),
             
-            %{
-            disp('Doing duhamel remapping task analysis...');
-            saccade_response = AnalyzeDuhamelRemapping(activity, stimuli);
             
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'saccade_response');
-            %}
+            disp('Doing duhamel remapping task analysis...');
+            [DuhamelRemapping_Neurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRemapping(activity, stimuli);
+            
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemapping_Neurons', 'DuhamelRemapping_indexes');
+            
             
         elseif strcmp(type,'Kusonoki'),
             
@@ -116,6 +116,32 @@ function analysisSummary = Analyze(netDir, stimulinames)
         end
             
     end
+    
+    %% Duhamel remapping analysis
+    % stim: [StimuliControl_Neurons, StimuliControl_indexes]
+    % duhamel: [DuhamelRemapping_analyzedNeurons, DuhamelRemapping_indexes]
+    
+    figure;
+    hold on;
+    for i=1:length(StimuliControl_indexes),
+        
+        index_1 = StimuliControl_indexes(i);
+        j = find(DuhamelRemapping_indexes == index_1);
+        
+        if(length(j) == 1),
+            
+            plot(StimuliControl_Neurons(i).latency, DuhamelRemapping_Neurons(j).latency,'ro');
+            disp('found');
+        end
+        
+    end
+    
+    xlabel('Stimulus Control Latency (s)');
+    ylabel('Remapping Latency (s)');
+    xlim([-0.5 0.5]);
+    ylim([-0.5 0.5]);
+    plot([-0.5 0.5],[-0.5 0.5],'--b');
+    axis square
     
     analysisSummary = 0;
 end

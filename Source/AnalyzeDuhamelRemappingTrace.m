@@ -1,13 +1,13 @@
 
 %
-%  AnalyzeDuhamelRemapping.m
+%  AnalyzeDuhamelRemappingTrace.m
 %  Remapping
 %
-%  Created by Bedeho Mender on 09/06/13.
+%  Created by Bedeho Mender on 10/06/13.
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [DuhamelRemapping_Neurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRemapping(activity, stimuli)
+function [DuhamelRemapping_analyzedNeurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRemappingTrace(activity, stimuli)
 
     % Check if this is manual run 
     if nargin == 0,
@@ -24,7 +24,6 @@ function [DuhamelRemapping_Neurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRe
     % Set parameters
     dt                   = activity.dt;
     R_eccentricity       = stimuli.R_eccentricity;
-    saccadeOnset         = stimuli.saccadeOnset;
     numPeriods           = activity.numPeriods;
     numEpochs            = activity.numEpochs;
     
@@ -65,7 +64,7 @@ function [DuhamelRemapping_Neurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRe
             
             % Save
             DuhamelRemapping_Neurons(c).index            = neuronIndex;
-            DuhamelRemapping_Neurons(c).latency          = stepToTime(latencyTimeStep, dt)-saccadeOnset;
+            DuhamelRemapping_Neurons(c).latencyTimeStep  = stepToTime(latencyTimeStep, dt);
             DuhamelRemapping_Neurons(c).Duration         = duration*dt;
             
             DuhamelRemapping_indexes(c) = neuronIndex;
