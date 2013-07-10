@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [baselineResponse, stim_response, foundOnset, foundOffset, latencyTimeStep, durationTimeStep, neuronResponse] = AnalyzeStimuliControlTask(activity, stimuli)
+function [StimuliControl_Neurons, StimuliControl_indexes] = AnalyzeStimuliControlTask(activity, stimuli)
 
     % Check if this is manual run 
     if nargin == 0,
@@ -24,7 +24,7 @@ function [baselineResponse, stim_response, foundOnset, foundOffset, latencyTimeS
     % Set parameters
     dt                  = activity.dt;
     R_N                 = activity.R_N;
-    R_eccentricity       = stimuli.R_eccentricity;
+    R_eccentricity      = stimuli.R_eccentricity;
     numPeriods          = activity.numPeriods;
     numEpochs           = activity.numEpochs;
     stimuliOnsetDelay   = stimuli.stimuliOnsetDelay;
@@ -41,6 +41,8 @@ function [baselineResponse, stim_response, foundOnset, foundOffset, latencyTimeS
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
 
     %% Baseline response
+    
+    %{
     
     % Get time steps in question
     baselineTimeSteps   = 1:(onsetTimeStep-1);
@@ -73,8 +75,6 @@ function [baselineResponse, stim_response, foundOnset, foundOffset, latencyTimeS
     
     %% Receptive field location
     
-    %{
-    
     % Level normalization
     stim_response_modenormalized = stim_response - repmat(mode(stim_response, 2),1, numPeriods);
     stim_response_modenormalized(stim_response_modenormalized < 0) = 0;
@@ -85,60 +85,46 @@ function [baselineResponse, stim_response, foundOnset, foundOffset, latencyTimeS
     
     %}
     
-    %% Latency & Duration
+    %% Latency & Duration - nonvectorized form is more practical.
     
     c = 1;
-    NeuronsAnalyzed = [];
-    LatencyTimeSteps = [];
-    Durations = [];
-    
-    %{
-    % Allocate some result buffers
-    foundOnset       = zeros(1, R_N);
-    foundOffset      = zeros(1, R_N);
-    latencyTimeSteps = nan*zeros(1, R_N);
-    durations        = nan*zeros(1, R_N);
-    neuronResponse   = zeros(R_N, size(R_firing_history,2));
-    %}
+    StimuliControl_indexes = [];
     
     for p=1:numPeriods,
         
-        % FIND CLOSEST NEURON
-        %dist = abs(location(n) - stimuli.headCenteredTargetLocations);
-        %[C,I] = min(dist);
-        
-        I = stimuli.headCenteredTargetLocations(p);
+        % Find neuron
+        neuronIndex = R_eccentricity + stimuli.headCenteredTargetLocations(p) + 1;
         
         % Get data for best period of each neuron
-        bestPeriodActivity = R_firing_history(p, :, I, 1);
-        
-        % Save to figure
-        neuronResponse(p, :) = bestPeriodActivity;
+        neuronActivity = R_firing_history(neuronIndex, :, p, 1);
         
         % Find latency and duration
-        [latencyTimeStep duration] = findNeuronalLatency(responseThreshold, bestPeriodActivity, latencyWindowLength);
+        [latencyTimeStep duration] = findNeuronalLatency(responseThreshold, neuronActivity, latencyWindowLength);
         
-        if(~isnan(latencyTimeStep)),
-            latencyTimeSteps(p) = latencyTimeStep;
-            foundOnset(p) = true;
-            
-            figure;plot(bestPeriodActivity);hold on; plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
-        end
+        % Baseline response
+        baselineActivity = neuronActivity(1:(onsetTimeStep-1));
+        baselineResponse = squeeze(trapz(baselineActivity,2)); % Integrate
+        baselineResponse = baselineResponse/(length(baselineTimeSteps)-1); % Normaliztion step, gives normalized (sp/s) units to response
         
-        if(~isnan(duration)),
-            durations(p) = duration;
-            foundOffset(p) = true;
-        end
+        % Stim response
+        activityTimeSteps   = timeToTimeStep(stimuliOnsetDelay + responseWindowStart:dt:responseWindowEnd, dt);  % Get time steps in question
+        stim_activity       = neuronActivity(activityTimeSteps); % [onsetTimeStep+50:250]
+        stim_response       = squeeze(trapz(stim_activity,2)); % Integrate to find response
+        stim_response       = stim_response/(length(activityTimeSteps) - 1); % Normaliztion step, gives normalized (sp/s) units to response
         
+        % Plot
+        figure;plot(neuronActivity);hold on; plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
         
+        % Save
+        StimuliControl_Neurons(c).index            = neuronIndex;
+        StimuliControl_Neurons(c).latencyTimeStep  = stepToTime(latencyTimeStep, dt);
+        StimuliControl_Neurons(c).duration         = duration*dt;
+        StimuliControl_Neurons(c).baselineResponse = baselineResponse;
+        StimuliControl_Neurons(c).stimulusresponse = stim_response;
         
-                    % Save
-                    NeuronsAnalyzed(c)  = neuronIndex;
-                    LatencyTimeSteps(c) = stepToTime(latencyTimeStep,dt);
-                    Duration(c)         = duration*dt;
+        StimuliControl_indexes(c) = neuronIndex;
 
-                    c = c + 1;
-        
+        c = c + 1;
     end
     
     x=1;

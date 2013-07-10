@@ -30,8 +30,10 @@ function analysisSummary = Analyze(netDir, stimulinames)
         if strcmp(type,'StimuliControl'),
             
             disp('Doing stimuli control task analysis...');
-            [baselineResponse, stim_response, location, foundOnset, foundOffset, latencyTimeStep, durationTimeStep, neuronResponse] = AnalyzeStimuliControlTask(activity, stimuli);
-            
+            [StimuliControl_Neurons, StimuliControl_indexes] = AnalyzeStimuliControlTask(activity, stimuli);
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'StimuliControl_Neurons', 'StimuliControl_indexes');
+                
+            %{
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , ...
                     'baselineResponse', ...
                     'stim_response', ...
@@ -50,6 +52,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
             plot(latencyTimeStep,1:R_N,'wo');
             saveas(f,[netDir filesep stimulinames{i} '.png']);
             close(f);
+            %}
             
         elseif strcmp(type,'SaccadeControl'),
             

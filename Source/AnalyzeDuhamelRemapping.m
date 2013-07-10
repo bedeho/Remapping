@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [NeuronsAnalyzed, LatencyTimeSteps, Durations] = AnalyzeDuhamelRemapping(activity, stimuli)
+function [DuhamelRemapping_analyzedNeurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRemapping(activity, stimuli)
 
     % Check if this is manual run 
     if nargin == 0,
@@ -38,9 +38,7 @@ function [NeuronsAnalyzed, LatencyTimeSteps, Durations] = AnalyzeDuhamelRemappin
     %% Latency & Duration
     
     c = 1;
-    NeuronsAnalyzed = [];
-    LatencyTimeSteps = [];
-    Durations = [];
+    DuhamelRemapping_neuronIndexes = [];
     
     for p=1:numPeriods,
         
@@ -65,9 +63,11 @@ function [NeuronsAnalyzed, LatencyTimeSteps, Durations] = AnalyzeDuhamelRemappin
             %figure;plot(responseVector);hold on; plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
             
             % Save
-            NeuronsAnalyzed(c)  = neuronIndex;
-            LatencyTimeSteps(c) = stepToTime(latencyTimeStep,dt);
-            Duration(c)         = duration*dt;
+            DuhamelRemapping_Neurons(c).index            = neuronIndex;
+            DuhamelRemapping_Neurons(c).latencyTimeStep  = stepToTime(latencyTimeStep, dt);
+            DuhamelRemapping_Neurons(c).Duration         = duration*dt;
+            
+            DuhamelRemapping_indexes(c) = neuronIndex;
             
             c = c + 1;
             
