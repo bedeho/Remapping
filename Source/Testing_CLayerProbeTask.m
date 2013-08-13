@@ -12,6 +12,10 @@ function Testing_CLayerProbeTask(Name)
     % Import global variables
     declareGlobalVars();
     global base;
+    
+    if(nargin < 1)
+        Name = 'basic';
+    end
 
     filename = [Name '-CLayerProbe'];
     stimulitype = 'CLayerProbe';
@@ -20,13 +24,14 @@ function Testing_CLayerProbeTask(Name)
     dt                          = 0.010; %(s)
     seed                        = 77;
     S_eccentricity              = 30;
-    S_density                   = 5;
+    S_density                   = 4;
     R_eccentricity              = 45;
     R_density                   = 5;
 
     % Generate stimuli
     rng(seed);
     Duration                        = 0.100; % (s), the middle part of sum is to account for maximum saccade times
+    saccadeOnset                    = 0.050; % (s)
     saccadeTargets                  = -S_eccentricity:S_density:S_eccentricity;
     headCenteredTargetLocations     = -R_eccentricity:R_density:R_eccentricity;
 
@@ -43,7 +48,7 @@ function Testing_CLayerProbeTask(Name)
 
             stimuli{k}.initialEyePosition           = 0;
             stimuli{k}.headCenteredTargetLocations  = h;
-            stimuli{k}.saccadeTimes                 = 0;
+            stimuli{k}.saccadeTimes                 = saccadeOnset;
             stimuli{k}.saccadeTargets               = s;
             stimuli{k}.numSaccades                  = 1;
             stimuli{k}.targetOffIntervals           = {[]};
@@ -78,6 +83,7 @@ function Testing_CLayerProbeTask(Name)
                                     'headCenteredTargetLocations', ...
                                     'stimulitype', ...
                                     'stimuli', ...
+                                    'saccadeOnset', ...
                                     'Duration', ...
                                     'dt', ...
                                     'seed');

@@ -9,8 +9,15 @@
 
 function response = normalizedIntegration(activity, dt, startTime, Duration)
 
-    timeSteps           = timeToTimeStep(startTime, dt):1:timeToTimeStep(startTime+Duration, dt);
-    offset_activity     = activity(timeSteps);
+    timeSteps                 = timeToTimeStep(startTime, dt):1:timeToTimeStep(startTime+Duration, dt);
+    [numNeurons numTimeSteps] = size(activity);
+
+    if(numNeurons > 1),
+        offset_activity = activity(:,timeSteps);
+    else
+        offset_activity = activity(timeSteps);
+    end
+    
     offset_response     = squeeze(trapz(offset_activity,2)); % Integrate to find response
     response            = offset_response/(length(timeSteps) - 1); % Normaliztion step, gives normalized (sp/s) units to response
     

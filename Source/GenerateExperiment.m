@@ -52,8 +52,8 @@ function GenerateExperiment()
     parameterCombinations('R_w_INHB')       = [20/91]; %0.7
     parameterCombinations('R_slope')        = [1];
     parameterCombinations('R_threshold')    = [2.0];
-    %parameterCombinations('R_to_C_alpha')   = [0.1]; % learning rate
-    %parameterCombinations('R_to_C_psi')   = [1];
+    %parameterCombinations('R_to_C_alpha')  = [0.1]; % learning rate
+    %parameterCombinations('R_to_C_psi')    = [1];
     
     % V
     parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
@@ -151,6 +151,9 @@ function GenerateExperiment()
             offset(offset < 0)                  = -offset(offset < 0);
             simulation('S_presaccadicOffset')   = ones(1, length(simulation('S_preferences')))*simulation('S_delay_sigma'); %unifromity, vs. distribution = offset;
 
+            R_N = length(simulation('R_preferences'));
+            S_N = length(simulation('S_preferences'));
+            
             % Save parameters, add miscelanous paramters
             parameterfile = [simulationFolder filesep 'Parameters.mat'];
             save(parameterfile, 'simulation', 'dt', 'numTrainingEpochs', 'outputSavingRate', 'saveActivityInTraining', 'saveNetworksAtEpochMultiples', 'seed');
@@ -167,7 +170,15 @@ function GenerateExperiment()
             
             % Create prewired network
             disp('Create prewired network...');
-            CreatePrewiredNetwork([simulationFolder filesep 'PrewiredNetwork.mat'], simulation('R_preferences'), simulation('S_preferences'), simulation('V_sigma'));
+            
+            hardwired_pref_R = simulation('R_preferences'); % 0*ones(1,R_N);, simulation('R_preferences')
+            hardwired_pref_S = simulation('S_preferences'); % 18*ones(1,S_N);, simulation('S_preferences')
+            
+            C_to_R_sigma = simulation('V_sigma');
+            V_to_C_sigma = simulation('V_sigma');
+            S_to_C_sigma = simulation('V_sigma');
+            
+            CreatePrewiredNetwork([simulationFolder filesep 'PrewiredNetwork.mat'], hardwired_pref_R, hardwired_pref_S, C_to_R_sigma, V_to_C_sigma, S_to_C_sigma);
             
             % Move each network to new folder & test
             listing = dir(simulationFolder); 
@@ -192,10 +203,8 @@ function GenerateExperiment()
                     %disp('Kusonoki ...');
                     %Remapping(subsim_dir, 'basic-Kusonoki', false, [name ext]);
                     
-                    
                     disp('Duhamel Remapping ...');
                     Remapping(subsim_dir, 'basic-DuhamelRemapping', false, [name ext]);
-                    
                     
                     disp('Duhamel Remapping Trace ...');
                     Remapping(subsim_dir, 'basic-DuhamelRemappingTrace', false, [name ext]);

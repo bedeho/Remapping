@@ -49,7 +49,7 @@ function [CLabeProbe_Neurons_S, CLabeProbe_Neurons_V] = AnalyzeCLayerProbe(activ
             %neuronActivity  = C_firing_history(:, :, p, 1);
             
             % Compute and save response
-            C_responses(i, j, :) =  C_firing_history_flat(:, p); %normalizedIntegration(neuronActivity, dt, 0, Duration);
+            C_responses(j, i, :) =  C_firing_history_flat(:, p); %normalizedIntegration(neuronActivity, dt, 0, Duration);
 
             % Next period
             p = p + 1;
@@ -61,7 +61,7 @@ function [CLabeProbe_Neurons_S, CLabeProbe_Neurons_V] = AnalyzeCLayerProbe(activ
     CLabeProbe_Neurons_S = zeros(1, C_N);
     CLabeProbe_Neurons_V = zeros(1, C_N);
     
-    [saccadeMesh targetMesh] = meshgrid(saccadeTargets, headCenteredTargetLocations);
+    [targetMesh saccadeMesh] = meshgrid(headCenteredTargetLocations, saccadeTargets);
     
     % Could have vectorized outer loop, but who cares
     for c=1:C_N,
@@ -74,6 +74,7 @@ function [CLabeProbe_Neurons_S, CLabeProbe_Neurons_V] = AnalyzeCLayerProbe(activ
         
         CLabeProbe_Neurons_S(c) = sum(sum(response .* saccadeMesh))/norm;
         CLabeProbe_Neurons_V(c) = sum(sum(response .* targetMesh))/norm;
+        
     end
     
 end

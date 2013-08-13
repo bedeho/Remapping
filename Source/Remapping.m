@@ -269,12 +269,21 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     S_activation_history(:, periodSaveCounter, period, epoch) = S_activation;
                     C_activation_history(:, periodSaveCounter, period, epoch) = C_activation;
                     
-                    C_firing_history_flat(periodSaveCounter, period, epoch) = normalizedIntegration(C_firingrate, dt, 0, dt*numTimeSteps);
-                    C_activation_history_flat(periodSaveCounter, period, epoch) = normalizedIntegration(C_activation, dt, 0, dt*numTimeSteps);
-                    
                     % Count one more dt
                     periodSaveCounter = periodSaveCounter + 1;
                 end 
+            end
+            
+            % HACK to save C for C Probe Task.
+            if numSaccades > 0,
+
+                %hacked solution to get rate during C probing task,
+                %despte all data not being savable.
+                firstSaccadeTime = saccadeTimes(1);
+                window = 0.050;
+
+                C_firing_history_flat(:, period, epoch) = normalizedIntegration(C_firing_history(:, :, period, epoch), dt, firstSaccadeTime - window, window);
+                C_activation_history_flat(:, period, epoch) = normalizedIntegration(C_activation_history(:, :, period, epoch), dt, firstSaccadeTime - window, window);
             end
             
             periodFinishTime = toc(periodTicID);

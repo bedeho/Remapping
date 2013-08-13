@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function CreatePrewiredNetwork(outputfile, R_preferences, S_preferences, V_sigma)
+function CreatePrewiredNetwork(outputfile, R_preferences, S_preferences, C_to_R_sigma, V_to_C_sigma, S_to_C_sigma)
 
     R_N = length(R_preferences);
     S_N = length(S_preferences);
@@ -17,16 +17,21 @@ function CreatePrewiredNetwork(outputfile, R_preferences, S_preferences, V_sigma
     [X Y Z] = meshgrid(R_preferences, S_preferences, R_preferences);
     
     % C_to_R_weights
-    C_to_R_raw      = exp(-(((Z - (X-Y))).^2)./(2*V_sigma^2));
+    C_to_R_raw      = exp(-(((Z - (X-Y))).^2)./(2*C_to_R_sigma^2));
     C_to_R_reshaped = reshape(C_to_R_raw, C_N, R_N)';
     C_to_R_norm     = 1./sqrt(squeeze(sum(C_to_R_reshaped.^2))); 
     C_to_R_weights  = bsxfun(@times, C_to_R_reshaped, C_to_R_norm); % Normalize
     
     % V_to_C_weights
-    V_to_C_raw      = exp(-((Z - X).^2)./(2*V_sigma^2));
+    V_to_C_raw      = exp(-((Z - X).^2)./(2*V_to_C_sigma^2));
     V_to_C_reshaped = reshape(V_to_C_raw, C_N, R_N);
     V_to_C_norm     = 1./sqrt(squeeze(sum(V_to_C_reshaped.^2))); 
     V_to_C_weights  = bsxfun(@times, V_to_C_reshaped, V_to_C_norm); % Normalize
+    
+    %% ADD SOMETHING HERE TO SAVE IN A FILE WHAT PAIRS OF RETINAL AND SCCADE PAIRS EACH C NEURON CORRESPONDS TO!!
+    %% ADD SOMETHING HERE TO SAVE IN A FILE WHAT PAIRS OF RETINAL AND SCCADE PAIRS EACH C NEURON CORRESPONDS TO!!
+    %% ADD SOMETHING HERE TO SAVE IN A FILE WHAT PAIRS OF RETINAL AND SCCADE PAIRS EACH C NEURON CORRESPONDS TO!!
+    %% ADD SOMETHING HERE TO SAVE IN A FILE WHAT PAIRS OF RETINAL AND SCCADE PAIRS EACH C NEURON CORRESPONDS TO!!
     
     %{
     % V_to_R_weights
@@ -39,7 +44,7 @@ function CreatePrewiredNetwork(outputfile, R_preferences, S_preferences, V_sigma
     % S_to_C_weights
     [X Y Z]         = meshgrid(R_preferences, S_preferences, S_preferences);
     
-    S_to_C_raw      = exp(-((Z - Y).^2))./(2*V_sigma^2);
+    S_to_C_raw      = exp(-((Z - Y).^2))./(2*S_to_C_sigma^2);
     S_to_C_reshaped = reshape(S_to_C_raw, C_N, S_N);
     S_to_C_norm     = 1./sqrt(squeeze(sum(S_to_C_reshaped.^2))); 
     S_to_C_weights  = bsxfun(@times, S_to_C_reshaped, S_to_C_norm); % Normalize

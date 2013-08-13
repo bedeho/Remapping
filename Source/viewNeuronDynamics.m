@@ -121,6 +121,7 @@ function viewNeuronDynamics(activityFile, stimuliName)
         
         % Plot
         s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes, dt);
+        numTimeSteps = length(stimuli.stimuli{period}.eyePositionTrace);
 
         subplot(5,2,1);
         imagesc(V_firingrate);
@@ -179,22 +180,25 @@ function viewNeuronDynamics(activityFile, stimuliName)
 
         subplot(5,2,9);
         cla
-        plot(stimuli.stimuli{period}.eyePositionTrace, 'r');
+        plot(0:(numTimeSteps-1), stimuli.stimuli{period}.eyePositionTrace, 'r');
         hold on;
-        plot(stimuli.stimuli{period}.retinalTargetTraces', 'b');
-        xlabel('Time step');
+        plot(0:(numTimeSteps-1), stimuli.stimuli{period}.retinalTargetTraces', 'b');
+        xlabel(['Time step (dt =' num2str(dt) ')']);
         legend({'Eye Position','Stimuli Retinal Locations'});
         ylim([-45 45]); % we hard code limit since not all stimuli has stimuli.R_eccentricity
+        xlim([0 (numTimeSteps-1)]);
         set(gca,'YDir','reverse');
+        
         
         subplot(5,2,10);
         cla
-        plot(stimuli.stimuli{period}.eyePositionTrace, 'r');
+        plot(0:(numTimeSteps-1), stimuli.stimuli{period}.eyePositionTrace, 'r');
         hold on;
-        plot(stimuli.stimuli{period}.retinalTargetTraces', 'b');
-        xlabel('Time step');
+        plot(0:(numTimeSteps-1), stimuli.stimuli{period}.retinalTargetTraces', 'b');
+        xlabel(['Time step (dt =' num2str(dt) ')']);
         legend({'Eye Position','Stimuli Retinal Locations'});
         ylim([-45 45]); % we hard code limit since not all stimuli has stimuli.R_eccentricity
+        xlim([0 (numTimeSteps-1)]);
         set(gca,'YDir','reverse');
         
     end

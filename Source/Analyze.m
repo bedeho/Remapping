@@ -91,7 +91,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
             disp('Doing C Layer Probe analysis...');
             [CLabeProbe_Neurons_S, CLabeProbe_Neurons_V] = AnalyzeCLayerProbe(activity,  stimuli);
             
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'CLabeProbe_Neurons', 'CLabeProbe_indexes');
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'CLabeProbe_Neurons_V', 'CLabeProbe_Neurons_V');
             
         else
             disp(['Unkonwn stimuli: ' num2str(stimulinames{i})]);
@@ -113,7 +113,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
         if(length(j) == 1),
             
             plot(StimuliControl_Neurons(i).latency, DuhamelRemapping_Neurons(j).latency,'ro');
-            disp('found');
+            %disp('found duhamel remapping neuron');
         end
         
     end
@@ -132,40 +132,48 @@ function analysisSummary = Analyze(netDir, stimulinames)
     %% Kusonoki
     
     % Get a plot up and running? MANUAL HOME BREW ANALYTICS
-            %{
-            
-            %activity = load(activityFile);
-            activity = LoadActivity(activityFile);
-            stimuli  = load(stimuliFile);
-            
-            period = 20;
-            R_N = activity.R_N;
-            dt = activity.dt;
-            
-            f=figure;
-            x = activity.R_firing_history(:, :, period, 1);
-            
-            s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes, dt);
-            
-            nr = stimuli.stimuli{period}.stimOnsetNr;
-            stim = timeToTimeStep(stimuli.stimulusOnsetTimes(nr), dt);
-            stim_off = timeToTimeStep(stimuli.stimulusOnsetTimes(nr) + stimuli.stimulusDuration, dt);
-            
-            imagesc(x);
-            
-            hold on;
-            
-            plot([stim stim],[ones(R_N,1) R_N*ones(R_N,1)],'--w','LineWidth', 4); % STIM ON
-            
-            plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'w','LineWidth', 4); % saccade
-            
-            plot([stim_off stim_off],[ones(R_N,1) R_N*ones(R_N,1)],'--w','LineWidth', 4); % STIM OFF
-            
-            title(num2str(period));
-            
-            saveas(f,[netDir filesep 'summary.png']);
-            close(f);
-            %}
+    %{
+
+    %activity = load(activityFile);
+    activity = LoadActivity(activityFile);
+    stimuli  = load(stimuliFile);
+
+    period = 20;
+    R_N = activity.R_N;
+    dt = activity.dt;
+
+    f=figure;
+    x = activity.R_firing_history(:, :, period, 1);
+
+    s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes, dt);
+
+    nr = stimuli.stimuli{period}.stimOnsetNr;
+    stim = timeToTimeStep(stimuli.stimulusOnsetTimes(nr), dt);
+    stim_off = timeToTimeStep(stimuli.stimulusOnsetTimes(nr) + stimuli.stimulusDuration, dt);
+
+    imagesc(x);
+
+    hold on;
+
+    plot([stim stim],[ones(R_N,1) R_N*ones(R_N,1)],'--w','LineWidth', 4); % STIM ON
+
+    plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'w','LineWidth', 4); % saccade
+
+    plot([stim_off stim_off],[ones(R_N,1) R_N*ones(R_N,1)],'--w','LineWidth', 4); % STIM OFF
+
+    title(num2str(period));
+
+    saveas(f,[netDir filesep 'summary.png']);
+    close(f);
+    %}
+    
+    %% C PRobe
+    f = figure;
+    plot(CLabeProbe_Neurons_V, CLabeProbe_Neurons_S, 'or');
+    xlabel('Retinal Locaton');
+    ylabel('Saccade Location');
+    
+    saveas(f,[netDir filesep 'CLabeProbe-summary.png']);
     
     analysisSummary = 0;
 end

@@ -61,7 +61,8 @@ function [DuhamelTruncation_Neurons, DuhamelTruncation_indexes] = AnalyzeDuhamel
             % Offset response
             saccadeonset_response = normalizedIntegration(neuronActivity, dt, saccadeOnset, responseWindowDuration);
             
-            figure;plot(neuronActivity);hold on; plot(timeToTimeStep([saccadeOnset saccadeOnset], dt), [0 1], 'r');
+            %% DEBUG - looked good
+            %figure;plot(neuronActivity);hold on; plot(timeToTimeStep([saccadeOnset saccadeOnset], dt), [0 1], 'r');
             
             % Save
             DuhamelTruncation_Neurons(c).index                   = neuronIndex;
