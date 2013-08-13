@@ -28,6 +28,7 @@ function AnalyzeExperiment(experiment)
     % Import global variables
     declareGlobalVars();
     
+    global STIMULI_FOLDER;
     global EXPERIMENTS_FOLDER;
     global base;
 
@@ -82,8 +83,14 @@ function AnalyzeExperiment(experiment)
     fprintf(fileID, '<th>Summary</th>');
     
     stimuli_files = cell(1,length(stimulinames));
+    stimuli_types = cell(1,length(stimulinames))'
     for i = 1:length(stimulinames),
+        
         fprintf(fileID, ['<th>' stimulinames{i} '</th>']);
+        stimuliFile         = [STIMULI_FOLDER stimulinames{i} filesep 'stim.mat'];
+        stimuli             = load(stimuliFile);
+        stimuli_types{i}    = stimuli.stimulitype;
+        
     end
     
     counter = 1;
@@ -148,7 +155,7 @@ function AnalyzeExperiment(experiment)
                         fprintf(fileID, '<td>');
                         
                         % Image
-                        %fprintf(fileID, '<img src="%s" width="250px" height="250px"/></br>\n', [netDir filesep stimulinames{i} '.png']);
+                        fprintf(fileID, '<img src="%s" width="250px" height="250px"/></br>\n', [netDir filesep stimuli_types{i} '-summary.png']);
                         
                         % Button
                         outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'',\\''' stimulinames{i} '\\'')']);

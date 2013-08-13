@@ -103,7 +103,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
     % stim: [StimuliControl_Neurons, StimuliControl_indexes]
     % duhamel: [DuhamelRemapping_analyzedNeurons, DuhamelRemapping_indexes]
     
-    figure;
+    f = figure;
     hold on;
     for i=1:length(StimuliControl_indexes),
         
@@ -124,6 +124,8 @@ function analysisSummary = Analyze(netDir, stimulinames)
     ylim([-0.5 0.5]);
     plot([-0.5 0.5],[-0.5 0.5],'--b');
     axis square
+    
+    saveas(f,[netDir filesep 'DuhamelRemapping-summary.png']);
     
     %% Duhamel trace remapping analysis
     
@@ -173,7 +175,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
     xlabel('Retinal Locaton');
     ylabel('Saccade Location');
     
-    saveas(f,[netDir filesep 'CLabeProbe-summary.png']);
+    saveas(f,[netDir filesep 'CLayerProbe-summary.png']);
     
     analysisSummary = 0;
 end
