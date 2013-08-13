@@ -62,7 +62,8 @@ function [DuhamelRemappingTrace_Neurons, DuhamelRemappingTrace_indexes] = Analyz
             % Offset response
             saccadeonset_response = normalizedIntegration(neuronActivity, dt, saccadeOnset, responseWindowDuration);
             
-            figure;plot(neuronActivity);hold on; plot(timeToTimeStep([saccadeOnset saccadeOnset], dt), [0 1], 'r');
+            %% DEBUG - looks GOOD!
+            %figure;plot(neuronActivity);hold on; plot(timeToTimeStep([saccadeOnset saccadeOnset], dt), [0 1], 'r');
             
             % Save
             DuhamelRemappingTrace_Neurons(c).index                   = neuronIndex;

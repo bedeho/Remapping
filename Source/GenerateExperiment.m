@@ -206,9 +206,11 @@ function GenerateExperiment()
                     disp('Saccade Control ...');
                     Remapping(subsim_dir, 'basic-SaccadeControl', false, [name ext]);
                     
-                    
                     disp('Stimulus Control ...');
                     Remapping(subsim_dir, 'basic-StimuliControl', false, [name ext]);
+                    
+                    disp('C Layer Probe ...');
+                    Remapping(subsim_dir, 'basic-CLayerProbe', false, [name ext]);
 
                 end
             end

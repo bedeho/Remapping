@@ -15,13 +15,15 @@ function AnalyzeExperiment(experiment)
     end
     
     % Stimuli names
+    %{
     stimulinames = {'basic-DuhamelRemapping', ...
                     'basic-DuhamelRemappingTrace', ...
                     'basic-DuhamelTruncation', ...
                     'basic-SaccadeControl', ...
                     'basic-StimuliControl'}; %'basic-Kusonoki', ...
-                
-    stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemapping', 'basic-DuhamelRemappingTrace', 'basic-DuhamelTruncation'};
+    %}
+    
+    stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemapping', 'basic-DuhamelRemappingTrace', 'basic-DuhamelTruncation', 'basic-CLayerProbe'};
     
     % Import global variables
     declareGlobalVars();

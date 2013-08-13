@@ -40,7 +40,7 @@ function Testing_Kusonoki(Name)
     headCenteredTargetLocations     = -R_eccentricity:R_density:R_eccentricity;
 
     k = 1;
-    for i = 1:length(headCenteredTargetLocations);
+    for i = 1:length(headCenteredTargetLocations),
         
         % Location of target
         h = headCenteredTargetLocations(i);
@@ -55,28 +55,28 @@ function Testing_Kusonoki(Name)
             
             for t = 1:length(stimulusOnsetTimes),
                 
-                    onsetTime                               = stimulusOnsetTimes(t);
-                    offsetTime                              = onsetTime + stimulusDuration;
-                    targetOffIntervals{1}                   = [0 onsetTime;offsetTime Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
-            
-                    stimuli{k}.initialEyePosition           = 0;
-                    stimuli{k}.headCenteredTargetLocations  = h;
-                    stimuli{k}.saccadeTimes                 = saccadeOnset;
-                    stimuli{k}.saccadeTargets               = s;
-                    stimuli{k}.numSaccades                  = length(stimuli{k}.saccadeTargets);
-                    stimuli{k}.targetOffIntervals           = targetOffIntervals;
-                    
-                    
-                    [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, stimuli{k}.targetOffIntervals, stimuli{k}.initialEyePosition, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
-                    stimuli{k}.eyePositionTrace             = eyePositionTrace;
-                    stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
-                    
-                    % meta data
-                    stimuli{k}.targetNr                     = i;
-                    stimuli{k}.saccadeNr                    = j;
-                    stimuli{k}.stimOnsetNr                  = t;
+                onsetTime                               = stimulusOnsetTimes(t);
+                offsetTime                              = onsetTime + stimulusDuration;
+                targetOffIntervals{1}                   = [0 onsetTime;offsetTime Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
 
-                    k = k + 1;
+                stimuli{k}.initialEyePosition           = 0;
+                stimuli{k}.headCenteredTargetLocations  = h;
+                stimuli{k}.saccadeTimes                 = saccadeOnset;
+                stimuli{k}.saccadeTargets               = s;
+                stimuli{k}.numSaccades                  = length(stimuli{k}.saccadeTargets);
+                stimuli{k}.targetOffIntervals           = targetOffIntervals;
+
+
+                [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, stimuli{k}.targetOffIntervals, stimuli{k}.initialEyePosition, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
+                stimuli{k}.eyePositionTrace             = eyePositionTrace;
+                stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
+
+                % meta data
+                stimuli{k}.targetNr                     = i;
+                stimuli{k}.saccadeNr                    = j;
+                stimuli{k}.stimOnsetNr                  = t;
+
+                k = k + 1;
             end
             
         end
