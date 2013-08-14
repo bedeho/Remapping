@@ -55,6 +55,10 @@ function GenerateExperiment()
     %parameterCombinations('R_to_C_alpha')  = [0.1]; % learning rate
     %parameterCombinations('R_to_C_psi')    = [1];
     
+    % derived
+    R_tau_leak_ratio = 3;
+    parameterCombinations('R_leak_alpha')   = R_tau_leak_ratio*parameterCombinations('R_tau');
+    
     % V
     parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
     parameterCombinations('V_tau')          = [0.020]; % (s)
@@ -85,6 +89,9 @@ function GenerateExperiment()
     parameterCombinations('C_threshold')    = [0.5]; % old 0.45
     parameterCombinations('C_to_R_psi')     = [0.3]; % 0.12 0.15 0.17 0.2 0.22
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
+    
+    C_tau_leak_ratio = 3;
+    parameterCombinations('C_leak_alpha')   = C_tau_leak_ratio*parameterCombinations('C_tau');
     
     % Save the experiment params
     save([experimentFolderPath filesep 'GenerateExperiment.mat'], 'parameterCombinations');

@@ -81,6 +81,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     R_threshold     = parameters.simulation('R_threshold');
     %R_to_C_alpha    = parameters.simulation('R_to_C_alpha'); % learning rate
     %R_to_C_psi     = parameters.simulation('R_to_C_psi'); % 4
+    R_leak_alpha    = parameters.simulation('R_leak_alpha');
     
     % V
     V_tau           = parameters.simulation('V_tau');
@@ -193,7 +194,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 R_inhibition = R_w_INHB*sum(R_firingrate);
                 C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate');
                 V_to_R_excitation = V_to_R_psi*V;
-                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + V_to_R_excitation);
+                R_activation = R_activation + (dt/R_tau)*(-R_leak_alpha.*R_activation + C_to_R_excitation' - R_inhibition + V_to_R_excitation);
 
                 % V
                 retinalTargets = retinalTargetTraces(:,t);
@@ -222,7 +223,6 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     S_activation = S_activation + (dt/S_tau)*(-S_activation); 
                 end
                 
-
                 % Weight Update
                 if isTraining,
 
