@@ -122,6 +122,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     C_w_INHB        = parameters.simulation('C_w_INHB');
     C_slope         = parameters.simulation('C_slope');
     C_threshold     = parameters.simulation('C_threshold');
+    C_leak_alpha    = parameters.simulation('C_leak_alpha');
     
     % Allocate buffer space
     V_firing_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
@@ -210,7 +211,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 %R_to_C_excitation = R_to_C_psi*(R_to_C_weights*R_firingrate');
                 V_to_C_excitation = V_to_C_psi*(V_to_C_weights*V');
                 S_to_C_excitation = S_to_C_psi*(S_to_C_weights*S_firingrate');
-                C_activation = C_activation + (dt/C_tau)*(-C_activation + V_to_C_excitation' + S_to_C_excitation' - C_inhibition); % _to_C_excitation
+                C_activation = C_activation + (dt/C_tau)*(-C_leak_alpha.*C_activation + V_to_C_excitation' + S_to_C_excitation' - C_inhibition); % _to_C_excitation
 
                 % S
                 if(numSaccades > 0),

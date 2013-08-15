@@ -54,10 +54,7 @@ function GenerateExperiment()
     parameterCombinations('R_threshold')    = [2.0];
     %parameterCombinations('R_to_C_alpha')  = [0.1]; % learning rate
     %parameterCombinations('R_to_C_psi')    = [1];
-    
-    % derived
-    R_tau_leak_ratio = 3;
-    parameterCombinations('R_leak_alpha')   = R_tau_leak_ratio*parameterCombinations('R_tau');
+    parameterCombinations('R_leak_alpha')   = [0.1]; % a<1 values give same rise but longer decay, a==1 gives classic symmetry
     
     % V
     parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
@@ -90,8 +87,7 @@ function GenerateExperiment()
     parameterCombinations('C_to_R_psi')     = [0.3]; % 0.12 0.15 0.17 0.2 0.22
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
     
-    C_tau_leak_ratio = 3;
-    parameterCombinations('C_leak_alpha')   = C_tau_leak_ratio*parameterCombinations('C_tau');
+    parameterCombinations('C_leak_alpha')   = [1]; % a<1 values give same rise, but longer decay, a==1 gives classic symmetry
     
     % Save the experiment params
     save([experimentFolderPath filesep 'GenerateExperiment.mat'], 'parameterCombinations');
@@ -151,7 +147,7 @@ function GenerateExperiment()
             simulationFolder = [experimentFolderPath filesep simulationName];
             mkdir(simulationFolder);
             
-            % Derive new paramters
+            %% Derive new paramters
             simulation('R_preferences')         = -simulation('R_eccentricity'):1:simulation('R_eccentricity');
             simulation('S_preferences')         = -simulation('S_eccentricity'):1:simulation('S_eccentricity');
             offset                              = simulation('S_delay_sigma')*randn(1, length(simulation('S_preferences'))); % (s)
@@ -161,7 +157,19 @@ function GenerateExperiment()
             R_N = length(simulation('R_preferences'));
             S_N = length(simulation('S_preferences'));
             
-            % Save parameters, add miscelanous paramters
+            % Adjust R due to leak: tau, slope, threshold
+            alpha = simulation('R_leak_alpha');
+            simulation('R_tau')         = alpha*simulation('R_tau');
+            simulation('R_slope')       = alpha*simulation('R_slope');
+            simulation('R_threshold')   = simulation('R_threshold')/alpha;
+    
+            % Adjust C due to leak: tau, slope, threshold
+            alpha = simulation('C_leak_alpha');
+            simulation('C_tau')         = alpha*simulation('C_tau');
+            simulation('C_slope')       = alpha*simulation('C_slope');
+            simulation('C_threshold')   = simulation('C_threshold')/alpha;
+            
+            %% Save parameters, add miscelanous paramters
             parameterfile = [simulationFolder filesep 'Parameters.mat'];
             save(parameterfile, 'simulation', 'dt', 'numTrainingEpochs', 'outputSavingRate', 'saveActivityInTraining', 'saveNetworksAtEpochMultiples', 'seed');
             
