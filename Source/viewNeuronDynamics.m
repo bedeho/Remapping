@@ -23,16 +23,6 @@ function viewNeuronDynamics(activityFile, stimuliName)
     activity = load(activityFile);
     stimuli  = load([STIMULI_FOLDER stimuliName filesep 'stim.mat']);
     
-    V_firing_history = activity.V_firing_history;
-    R_firing_history = activity.R_firing_history;
-    S_firing_history = activity.S_firing_history;
-    C_firing_history = activity.C_firing_history;
-
-    V_activation_history = activity.V_activation_history;
-    R_activation_history = activity.R_activation_history;
-    S_activation_history = activity.S_activation_history;
-    C_activation_history = activity.C_activation_history;
-    
     % Set parameters
     R_N = activity.R_N;
     C_N = activity.C_N;
@@ -102,18 +92,20 @@ function viewNeuronDynamics(activityFile, stimuliName)
         stimuli.stimuli{period}
         
         % Load
-        V_firingrate = V_firing_history(:, :, period, epoch);
-        R_firingrate = R_firing_history(:, :, period, epoch);
-        S_firingrate = S_firing_history(:, :, period, epoch);
+        E_firingrate = activity.E_firing_history(:, :, period, epoch);
+        V_firingrate = activity.V_firing_history(:, :, period, epoch);
+        R_firingrate = activity.R_firing_history(:, :, period, epoch);
+        S_firingrate = activity.S_firing_history(:, :, period, epoch);
         
-
-        V_activation = V_activation_history(:, :, period, epoch);
-        R_activation = R_activation_history(:, :, period, epoch);
-        S_activation = S_activation_history(:, :, period, epoch);
+        E_activation = activity.E_activation_history(:, :, period, epoch);
+        V_activation = activity.V_activation_history(:, :, period, epoch);
+        R_activation = activity.R_activation_history(:, :, period, epoch);
+        S_activation = activity.S_activation_history(:, :, period, epoch);
         
+        % If C is empty, just fill with blank
         if ~isempty(C_firing_history),
-            C_firingrate = C_firing_history(:, :, period, epoch);
-            C_activation = C_activation_history(:, :, period, epoch);
+            C_firingrate = activity.C_firing_history(:, :, period, epoch);
+            C_activation = activity.C_activation_history(:, :, period, epoch);
         else
             C_firingrate = zeros(C_N, activity.numPeriods);
             C_activation = zeros(C_N, activity.numPeriods);
@@ -123,62 +115,75 @@ function viewNeuronDynamics(activityFile, stimuliName)
         s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes, dt);
         numTimeSteps = length(stimuli.stimuli{period}.eyePositionTrace);
 
-        subplot(5,2,1);
+        subplot(6,2,1);
+        imagesc(E_firingrate);
+        hold on;colorbar
+        if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
+        title('E Firing');
+
+        subplot(6,2,2);
+        imagesc(E_activation);
+        hold on;colorbar
+        if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
+        colorbar
+        title('E Firing');
+        
+        subplot(6,2,3);
         imagesc(V_firingrate);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('V Firing');
 
-        subplot(5,2,2);
+        subplot(6,2,4);
         imagesc(V_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('V Firing');
 
-        subplot(5,2,3);
+        subplot(6,2,5);
         imagesc(R_firingrate);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('R Firing');
 
-        subplot(5,2,4);
+        subplot(6,2,6);
         imagesc(R_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('R Activation');
 
-        subplot(5,2,5);
+        subplot(6,2,7);
         imagesc(S_firingrate);
         colorbar
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('S Firing');
 
-        subplot(5,2,6);
+        subplot(6,2,8);
         imagesc(S_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('S Activation');
 
-        subplot(5,2,7);
+        subplot(6,2,9);
         imagesc(C_firingrate);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('C Firing');
 
-        subplot(5,2,8);
+        subplot(6,2,10);
         imagesc(C_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('C Actiation');
 
-        subplot(5,2,9);
+        subplot(6,2,11);
         cla
         plot(0:(numTimeSteps-1), stimuli.stimuli{period}.eyePositionTrace, 'r');
         hold on;
@@ -190,7 +195,7 @@ function viewNeuronDynamics(activityFile, stimuliName)
         set(gca,'YDir','reverse');
         
         
-        subplot(5,2,10);
+        subplot(6,2,12);
         cla
         plot(0:(numTimeSteps-1), stimuli.stimuli{period}.eyePositionTrace, 'r');
         hold on;

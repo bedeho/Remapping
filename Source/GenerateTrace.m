@@ -9,7 +9,7 @@
 
 function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, headCenteredTargetLocations, targetOffIntervals, initialEyePosition, saccadeTimes, saccadeTargets)
 
-    numTimeSteps = ceil(Duration/dt);
+    numTimeSteps = timeToTimeStep(Duration);
     
     % Visual
     maxNumberOfVisibleTargets = length(headCenteredTargetLocations);

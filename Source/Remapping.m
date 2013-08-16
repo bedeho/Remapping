@@ -76,26 +76,35 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     R_firingrate    = zeros(1,R_N);
     
     R_tau           = parameters.simulation('R_tau');
-    %R_tau_decay     = parameters.simulation('R_tau_decay');
-    %R_tau_sigma     = parameters.simulation('R_tau_sigma');
     R_w_INHB        = parameters.simulation('R_w_INHB');
     R_slope         = parameters.simulation('R_slope');
     R_threshold     = parameters.simulation('R_threshold');
     %R_to_C_alpha    = parameters.simulation('R_to_C_alpha'); % learning rate
     %R_to_C_psi     = parameters.simulation('R_to_C_psi'); % 4
     
-    % V  =======================================
+    % E  =======================================
+    
+    E_sigma      = parameters.simulation('E_sigma');
+    E_tau_rise   = parameters.simulation('E_tau_rise');
+    E_tau_decay  = parameters.simulation('E_tau_decay');
+    E_tau_sigma  = parameters.simulation('E_tau_sigma');
+    E_to_V_psi   = parameters.simulation('E_to_V_psi');
+    E_to_R_psi   = parameters.simulation('E_to_R_psi');
+    
+    E            = zeros(1,R_N);
+    
+    % V =======================================
     V_tau           = parameters.simulation('V_tau');
-    V_psi           = parameters.simulation('V_psi');
-    V_sigma         = parameters.simulation('V_sigma');
+    %V_psi           = parameters.simulation('V_psi');
+    %V_sigma         = parameters.simulation('V_sigma');
     V_to_R_psi      = parameters.simulation('V_to_R_psi');
     V_to_R_alpha    = parameters.simulation('V_to_R_alpha'); % learning rate
     V_to_C_psi      = parameters.simulation('V_to_C_psi');
     V_to_C_alpha    = parameters.simulation('V_to_C_alpha'); % learning rate
     V               = zeros(1,R_N);
-    
-    V_tau_decay     = parameters.simulation('V_tau_decay');
-    V_tau_sigma     = parameters.simulation('V_tau_sigma');
+
+    %V_tau_decay     = parameters.simulation('V_tau_decay');
+    %V_tau_sigma     = parameters.simulation('V_tau_sigma');
     
     % S  =======================================
     S_eccentricity  = parameters.simulation('S_eccentricity');
@@ -113,7 +122,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     %S_slope         = parameters.simulation('S_slope');
     %S_threshold     = parameters.simulation('S_threshold');
     S_to_C_alpha    = parameters.simulation('S_to_C_alpha'); % learning rate
-    S_sigma         = V_sigma; % (deg) receptive field size
+    S_sigma         = parameters.simulation('S_sigma');; % (deg) receptive field size
 
     % C  =======================================
     C_N             = S_N*R_N;
@@ -128,11 +137,13 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     C_threshold     = parameters.simulation('C_threshold');
     
     % Allocate buffer space
+    E_firing_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
     V_firing_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
     R_firing_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
     S_firing_history = zeros(S_N, numSavedTimeSteps, numPeriods, numEpochs);
     C_firing_history = zeros(C_N, numSavedTimeSteps, numPeriods, numEpochs);
 
+    E_activation_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
     V_activation_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
     R_activation_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
     S_activation_history = zeros(S_N, numSavedTimeSteps, numPeriods, numEpochs);
@@ -193,33 +204,33 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 time = stepToTime(t, dt);
 
                 %% Activation
-
+                
+                % E =======================================
+                
+                if(~isempty(retinalTargetTraces)),
+                    retinalTargets = retinalTargetTraces(:,t);
+                    diff = R_preference_comparison_matrix - repmat(retinalTargets,1,R_N);
+                    diff(isnan(diff)) = inf; % for nan values, make inf, so that exponantiation gives no contribution
+                    gauss = exp((-(diff).^2)./(2*E_sigma^2));
+                else
+                    gauss = 0;
+                end
+                
+                tau = E_tau_rise + exp(-(gauss.^2)/(2*E_tau_sigma^2))*(E_tau_decay-E_tau_rise);
+                E = E + (dt./tau).*(-E + gauss);  
+                
                 % R =======================================
                 R_inhibition = R_w_INHB*sum(R_firingrate);
                 C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate');
-                V_to_R_excitation = V_to_R_psi*V;
+                %V_to_R_excitation = V_to_R_psi*V;
                 
-                %{
-                R: Leaky
-                R_net_ext =  C_to_R_excitation' + V_to_R_excitation;
-                tau = R_tau + exp(-(R_net_ext.^2)/(2*R_tau_sigma^2))*(R_tau_decay-R_tau); 
-                R_activation = R_activation + (dt./tau).*(-R_activation + R_net_ext - R_inhibition);
-                %}
+                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + E_to_R_psi*E);
                 
                 %classic: 
-                R_activation = R_activation + (dt/R_tau)*(-R_leak_alpha.*R_activation + C_to_R_excitation' - R_inhibition + V_to_R_excitation);
-                
+                %R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + V_to_R_excitation);
+            
                 % V =======================================
-                retinalTargets = retinalTargetTraces(:,t);
-                diff = R_preference_comparison_matrix - repmat(retinalTargets,1,R_N);
-                diff(isnan(diff)) = inf; % for nan values, make inf, so that exponantiation gives no contribution
-                gauss = exp((-(diff).^2)./(2*V_sigma^2));
-
-                V_driver = V_psi*sum(gauss,1); % add upp all targets for each neuron to get one driving V value
-                tau = V_tau + exp(-(V_driver.^2)/(2*V_tau_sigma^2))*(V_tau_decay-V_tau); 
-                V = V + (dt./tau).*(-V + V_driver);
-                
-                % classic: V = V + (dt/V_tau)*(-V + V_driver);
+                V = V + (dt/V_tau)*(-V + E_to_V_psi*E);
 
                 % C =======================================
                 C_inhibition = C_w_INHB*sum(C_firingrate);
@@ -275,11 +286,13 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 %% Save activity                
                 if (~isTraining || isTraining && parameters.saveActivityInTraining) % && mod(t, outputSavingRate) == 0,
                     
+                    E_firing_history(:, periodSaveCounter, period, epoch) = E;
                     V_firing_history(:, periodSaveCounter, period, epoch) = V;
                     R_firing_history(:, periodSaveCounter, period, epoch) = R_firingrate;
                     S_firing_history(:, periodSaveCounter, period, epoch) = S_firingrate;
                     C_firing_history(:, periodSaveCounter, period, epoch) = C_firingrate;
 
+                    E_activation_history(:, periodSaveCounter, period, epoch) = E;
                     V_activation_history(:, periodSaveCounter, period, epoch) = V;
                     R_activation_history(:, periodSaveCounter, period, epoch) = R_activation;
                     S_activation_history(:, periodSaveCounter, period, epoch) = S_activation;
@@ -344,16 +357,19 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                                                                             , 'numSavedTimeSteps' ...
                                                                             , 'outputSavingRate' ...
                                                                             , 'dt' ...
+                                                                            , 'E_firing_history' ...
                                                                             , 'V_firing_history' ...
                                                                             , 'R_firing_history' ...
                                                                             , 'S_firing_history' ...
                                                                             , 'C_firing_history' ...
+                                                                            , 'E_activation_history' ...
                                                                             , 'V_activation_history' ...
                                                                             , 'R_activation_history' ...
                                                                             , 'S_activation_history' ...
                                                                             , 'C_activation_history' ...
                                                                             , 'C_firing_history_flat' ...
-                                                                            , 'C_activation_history_flat');
+                                                                            , 'C_activation_history_flat' ...
+                                                                            , 'E');
                                                                         
     disp('Done...');
 

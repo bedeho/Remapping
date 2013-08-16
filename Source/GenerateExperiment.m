@@ -55,26 +55,29 @@ function GenerateExperiment()
     %parameterCombinations('R_to_C_alpha')  = [0.1]; % learning rate
     %parameterCombinations('R_to_C_psi')    = [1];
     
-    %parameterCombinations('R_tau_decay')    = [0.1 0.6 1.0 2.0];
-
+    % E
+    parameterCombinations('E_sigma')        = [5]; % (deg) receptive field size
+    parameterCombinations('E_tau_rise')     = [0.01];
+    parameterCombinations('E_tau_decay')    = [0.1 0.6 1.0];
+    parameterCombinations('E_to_V_psi')     = [1];
+    parameterCombinations('E_to_R_psi')     = [1];
+    
     % V
-    parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
+    %parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
     parameterCombinations('V_tau')          = [0.050]; % (s)
-    parameterCombinations('V_psi')          = [1];
+    %parameterCombinations('V_psi')          = [1];
     
     parameterCombinations('V_to_R_psi')     = [6]; % 5 works
     parameterCombinations('V_to_R_alpha')   = [0.1];
     
     parameterCombinations('V_to_C_psi')     = [1];
     parameterCombinations('V_to_C_alpha')   = [0.1];
-    
-    parameterCombinations('V_tau_decay')    = [0.1 0.6 1.0];
-    
+
     % S
     parameterCombinations('S_eccentricity') = [30];
     parameterCombinations('S_delay_sigma')  = [0.100]; % (s)
     parameterCombinations('S_tau')          = [0.020]; % (s)
-    parameterCombinations('S_sigma')        = parameterCombinations('V_sigma'); % (deg) receptive field size
+    parameterCombinations('S_sigma')        = parameterCombinations('E_sigma'); % (deg) receptive field size
     %parameterCombinations('S_psi')          = [1];
     %parameterCombinations('S_slope')        = [8];
     %parameterCombinations('S_threshold')    = [0.3];
@@ -159,24 +162,8 @@ function GenerateExperiment()
             S_N = length(simulation('S_preferences'));
             
             % Sigma for decays, they are derived from thresholds
-            %simulation('R_tau_sigma')    = 0.5*simulation('R_threshold');
-            simulation('V_tau_sigma')    = 0.5*(simulation('V_psi')*exp(-1/2)); % when a V neuron has drive
-            
-            %{
-            NO LONGER USED, was to acheive assymety.
-            
-            % Adjust R due to leak: tau, slope, threshold
-            alpha = simulation('R_leak_alpha');
-            simulation('R_tau')         = alpha*simulation('R_tau');
-            simulation('R_slope')       = alpha*simulation('R_slope');
-            simulation('R_threshold')   = simulation('R_threshold')/alpha;
-    
-            % Adjust C due to leak: tau, slope, threshold
-            alpha = simulation('C_leak_alpha');
-            simulation('C_tau')         = alpha*simulation('C_tau');
-            simulation('C_slope')       = alpha*simulation('C_slope');
-            simulation('C_threshold')   = simulation('C_threshold')/alpha;
-            %}
+            %simulation('V_tau_sigma')    = 0.5*(simulation('V_psi')*exp(-1/2)); % when a V neuron has drive
+            simulation('E_tau_sigma') = (simulation('E_to_V_psi')*exp(-1/2)); % time constant switch sigma is set to standard deviation of E tuning curve, then
             
             %% Save parameters, add miscelanous paramters
             parameterfile = [simulationFolder filesep 'Parameters.mat'];
@@ -198,9 +185,9 @@ function GenerateExperiment()
             hardwired_pref_R = simulation('R_preferences'); % 0*ones(1,R_N);, simulation('R_preferences')
             hardwired_pref_S = simulation('S_preferences'); % 18*ones(1,S_N);, simulation('S_preferences')
             
-            C_to_R_sigma = simulation('V_sigma');
-            V_to_C_sigma = simulation('V_sigma');
-            S_to_C_sigma = simulation('V_sigma');
+            C_to_R_sigma = simulation('E_sigma');
+            V_to_C_sigma = simulation('E_sigma');
+            S_to_C_sigma = simulation('E_sigma');
             
             CreatePrewiredNetwork([simulationFolder filesep 'PrewiredNetwork.mat'], hardwired_pref_R, hardwired_pref_S, C_to_R_sigma, V_to_C_sigma, S_to_C_sigma);
             
