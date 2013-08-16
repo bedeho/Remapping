@@ -34,10 +34,12 @@ function CreatePrewiredNetwork(outputfile, R_preferences, S_preferences, C_to_R_
     % ADD SOMETHING HERE TO SAVE IN A FILE WHAT PAIRS OF RETINAL AND SCCADE PAIRS EACH C NEURON CORRESPONDS TO!!
     
     % NOT LONGER IN USE: V_to_R_weights
+    %{
     [X_2 Y_2]       = meshgrid(R_preferences, R_preferences);
     V_to_R_raw      = exp(-((X_2 - Y_2).^2)./(2*V_sigma^2));
     V_to_R_norm     = 1./sqrt(squeeze(sum(V_to_R_raw.^2))); 
     V_to_R_weights  = bsxfun(@times, V_to_R_raw, V_to_R_norm); % Normalize
+    %}
     
     % S_to_C_weights
     [X Y Z]         = meshgrid(R_preferences, S_preferences, S_preferences);
@@ -48,6 +50,6 @@ function CreatePrewiredNetwork(outputfile, R_preferences, S_preferences, C_to_R_
     S_to_C_weights  = bsxfun(@times, S_to_C_reshaped, S_to_C_norm); % Normalize
     
     % Save params
-    save(outputfile, 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'V_to_R_weights', 'R_to_C_weights', 'R_N', 'S_N', 'C_N');
+    save(outputfile, 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'R_to_C_weights', 'R_N', 'S_N', 'C_N'); % 'V_to_R_weights'
     
 end

@@ -1,6 +1,6 @@
 
 dt=0.01;
-time=2; %(s)
+time=6; %(s)
 numsteps = ceil(time/dt);
 
 % input
@@ -8,9 +8,9 @@ I_baseline = 1;
 I=I_baseline*ones(1,numsteps);
 I(ceil(numsteps/2):end) = 0; % cancel form the middle
 
-tau_rise=0.1; % rise time
+tau_rise=0.01; % rise time
 tau_decay=1.0;
-alpha=1;
+alpha=3;
 
 % data history
 eq1_history = zeros(1,numsteps);
@@ -31,6 +31,8 @@ plot(eq1_history, '-r');
 
 plot(eq2_history, '-k');
 %plot((I_baseline*ones(1,numsteps)/alpha_2)*0.5, 'k');
+
+plot([ceil(numsteps/2) ceil(numsteps/2)],[0 alpha],'g-');
 
 %set(gca, 'YScale','log');
 

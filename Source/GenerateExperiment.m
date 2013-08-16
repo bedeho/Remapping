@@ -54,11 +54,12 @@ function GenerateExperiment()
     parameterCombinations('R_threshold')    = [2.0];
     %parameterCombinations('R_to_C_alpha')  = [0.1]; % learning rate
     %parameterCombinations('R_to_C_psi')    = [1];
-    parameterCombinations('R_leak_alpha')   = [0.1]; % a<1 values give same rise but longer decay, a==1 gives classic symmetry
     
+    %parameterCombinations('R_tau_decay')    = [0.1 0.6 1.0 2.0];
+
     % V
     parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
-    parameterCombinations('V_tau')          = [0.020]; % (s)
+    parameterCombinations('V_tau')          = [0.050]; % (s)
     parameterCombinations('V_psi')          = [1];
     
     parameterCombinations('V_to_R_psi')     = [6]; % 5 works
@@ -66,6 +67,8 @@ function GenerateExperiment()
     
     parameterCombinations('V_to_C_psi')     = [1];
     parameterCombinations('V_to_C_alpha')   = [0.1];
+    
+    parameterCombinations('V_tau_decay')    = [0.1 0.6 1.0];
     
     % S
     parameterCombinations('S_eccentricity') = [30];
@@ -86,8 +89,6 @@ function GenerateExperiment()
     parameterCombinations('C_threshold')    = [0.5]; % old 0.45
     parameterCombinations('C_to_R_psi')     = [0.3]; % 0.12 0.15 0.17 0.2 0.22
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
-    
-    parameterCombinations('C_leak_alpha')   = [1]; % a<1 values give same rise, but longer decay, a==1 gives classic symmetry
     
     % Save the experiment params
     save([experimentFolderPath filesep 'GenerateExperiment.mat'], 'parameterCombinations');
@@ -157,6 +158,13 @@ function GenerateExperiment()
             R_N = length(simulation('R_preferences'));
             S_N = length(simulation('S_preferences'));
             
+            % Sigma for decays, they are derived from thresholds
+            %simulation('R_tau_sigma')    = 0.5*simulation('R_threshold');
+            simulation('V_tau_sigma')    = 0.5*(simulation('V_psi')*exp(-1/2)); % when a V neuron has drive
+            
+            %{
+            NO LONGER USED, was to acheive assymety.
+            
             % Adjust R due to leak: tau, slope, threshold
             alpha = simulation('R_leak_alpha');
             simulation('R_tau')         = alpha*simulation('R_tau');
@@ -168,6 +176,7 @@ function GenerateExperiment()
             simulation('C_tau')         = alpha*simulation('C_tau');
             simulation('C_slope')       = alpha*simulation('C_slope');
             simulation('C_threshold')   = simulation('C_threshold')/alpha;
+            %}
             
             %% Save parameters, add miscelanous paramters
             parameterfile = [simulationFolder filesep 'Parameters.mat'];

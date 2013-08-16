@@ -13,6 +13,7 @@ tau_1=0.1;
 
 tau_rise = 0.1;
 tau_decay = 1.0;
+sigma_rise = 0.1*I_baseline;
 
 alpha_2=0.0000001;
 tau_2=(tau_1/alpha_1)*alpha_2; % typically alpha_1=1, so we dont really need that in there
@@ -25,11 +26,14 @@ eq2_history = zeros(1,numsteps);
 for t=2:numsteps,
     
     %% time constant swtich
-    if(I(t) > 0),
-        tau = tau_rise;
-    else
-        tau = tau_decay;
-    end
+    
+    %if(I(t) > 0),
+    %    tau = tau_rise;
+    %else
+    %    tau = tau_decay;
+    %end
+    
+    tau = tau_rise + exp(-(I(t)^2)/(2*sigma_rise^2))*(tau_decay-tau_rise)
     
     eq1_history(t) = eq1_history(t-1) + (dt/tau)*(-eq1_history(t-1) + I(t));
     
@@ -49,3 +53,4 @@ plot(eq1_history, '-r');
 
 %set(gca, 'YScale','log');
 
+ylim([0 1]);

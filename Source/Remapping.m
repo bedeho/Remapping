@@ -68,7 +68,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
 
     %% Load dynamical parameters
     
-    % LIP: Retina
+    % R  =======================================
     R_eccentricity  = parameters.simulation('R_eccentricity');
     R_preferences   = parameters.simulation('R_preferences');
     R_N             = length(R_preferences);
@@ -76,14 +76,15 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     R_firingrate    = zeros(1,R_N);
     
     R_tau           = parameters.simulation('R_tau');
+    %R_tau_decay     = parameters.simulation('R_tau_decay');
+    %R_tau_sigma     = parameters.simulation('R_tau_sigma');
     R_w_INHB        = parameters.simulation('R_w_INHB');
     R_slope         = parameters.simulation('R_slope');
     R_threshold     = parameters.simulation('R_threshold');
     %R_to_C_alpha    = parameters.simulation('R_to_C_alpha'); % learning rate
     %R_to_C_psi     = parameters.simulation('R_to_C_psi'); % 4
-    R_leak_alpha    = parameters.simulation('R_leak_alpha');
     
-    % V
+    % V  =======================================
     V_tau           = parameters.simulation('V_tau');
     V_psi           = parameters.simulation('V_psi');
     V_sigma         = parameters.simulation('V_sigma');
@@ -93,7 +94,10 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     V_to_C_alpha    = parameters.simulation('V_to_C_alpha'); % learning rate
     V               = zeros(1,R_N);
     
-    % S
+    V_tau_decay     = parameters.simulation('V_tau_decay');
+    V_tau_sigma     = parameters.simulation('V_tau_sigma');
+    
+    % S  =======================================
     S_eccentricity  = parameters.simulation('S_eccentricity');
     S_preferences   = parameters.simulation('S_preferences');
     S_N             = length(S_preferences);
@@ -111,7 +115,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     S_to_C_alpha    = parameters.simulation('S_to_C_alpha'); % learning rate
     S_sigma         = V_sigma; % (deg) receptive field size
 
-    % C
+    % C  =======================================
     C_N             = S_N*R_N;
     C_activation    = zeros(1,C_N);
     C_firingrate    = zeros(1,C_N);
@@ -122,7 +126,6 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     C_w_INHB        = parameters.simulation('C_w_INHB');
     C_slope         = parameters.simulation('C_slope');
     C_threshold     = parameters.simulation('C_threshold');
-    C_leak_alpha    = parameters.simulation('C_leak_alpha');
     
     % Allocate buffer space
     V_firing_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
@@ -189,31 +192,43 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 % Turn time step into real time
                 time = stepToTime(t, dt);
 
-                % Activation
+                %% Activation
 
-                % R
+                % R =======================================
                 R_inhibition = R_w_INHB*sum(R_firingrate);
                 C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate');
                 V_to_R_excitation = V_to_R_psi*V;
+                
+                %{
+                R: Leaky
+                R_net_ext =  C_to_R_excitation' + V_to_R_excitation;
+                tau = R_tau + exp(-(R_net_ext.^2)/(2*R_tau_sigma^2))*(R_tau_decay-R_tau); 
+                R_activation = R_activation + (dt./tau).*(-R_activation + R_net_ext - R_inhibition);
+                %}
+                
+                %classic: 
                 R_activation = R_activation + (dt/R_tau)*(-R_leak_alpha.*R_activation + C_to_R_excitation' - R_inhibition + V_to_R_excitation);
-
-                % V
+                
+                % V =======================================
                 retinalTargets = retinalTargetTraces(:,t);
                 diff = R_preference_comparison_matrix - repmat(retinalTargets,1,R_N);
                 diff(isnan(diff)) = inf; % for nan values, make inf, so that exponantiation gives no contribution
                 gauss = exp((-(diff).^2)./(2*V_sigma^2));
 
                 V_driver = V_psi*sum(gauss,1); % add upp all targets for each neuron to get one driving V value
-                V = V + (dt/V_tau)*(-V + V_driver);
+                tau = V_tau + exp(-(V_driver.^2)/(2*V_tau_sigma^2))*(V_tau_decay-V_tau); 
+                V = V + (dt./tau).*(-V + V_driver);
+                
+                % classic: V = V + (dt/V_tau)*(-V + V_driver);
 
-                % C
+                % C =======================================
                 C_inhibition = C_w_INHB*sum(C_firingrate);
                 %R_to_C_excitation = R_to_C_psi*(R_to_C_weights*R_firingrate');
                 V_to_C_excitation = V_to_C_psi*(V_to_C_weights*V');
                 S_to_C_excitation = S_to_C_psi*(S_to_C_weights*S_firingrate');
-                C_activation = C_activation + (dt/C_tau)*(-C_leak_alpha.*C_activation + V_to_C_excitation' + S_to_C_excitation' - C_inhibition); % _to_C_excitation
+                C_activation = C_activation + (dt/C_tau)*(-C_activation + V_to_C_excitation' + S_to_C_excitation' - C_inhibition); % _to_C_excitation
 
-                % S
+                % S =======================================
                 if(numSaccades > 0),
                     %F = (saccade_time_neg_offset <= time) & (time <= saccade_time_pos_offset); % check both conditions: y-z <= x <= y
                     F = (saccade_time_offset <= time) & (time <= saccade_times); % check both conditions: y-z <= x <= y
@@ -224,7 +239,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     S_activation = S_activation + (dt/S_tau)*(-S_activation); 
                 end
                 
-                % Weight Update
+                %% Weight Update
                 if isTraining,
 
                     C_to_R_weights = C_to_R_weights + dt*C_to_R_alpha*(R_firingrate'*C_firingrate);
@@ -251,13 +266,13 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     
                 end
 
-                % Compute firing rates
+                %% Compute firing rates
                 R_firingrate = 1./(1 + exp(-2*R_slope*(R_activation - R_threshold)));
                 %S_firingrate = 1./(1 + exp(-2*S_slope*(S_activation - S_threshold)));
                 S_firingrate = S_activation;
                 C_firingrate = 1./(1 + exp(-2*C_slope*(C_activation - C_threshold)));
 
-                % Save activity                
+                %% Save activity                
                 if (~isTraining || isTraining && parameters.saveActivityInTraining) % && mod(t, outputSavingRate) == 0,
                     
                     V_firing_history(:, periodSaveCounter, period, epoch) = V;
