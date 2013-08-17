@@ -54,18 +54,22 @@ function GenerateExperiment()
     parameterCombinations('R_threshold')    = [2.0];
     %parameterCombinations('R_to_C_alpha')  = [0.1]; % learning rate
     %parameterCombinations('R_to_C_psi')    = [1];
+    parameterCombinations('R_psi')          = [5];
     
     % E
     parameterCombinations('E_sigma')        = [5]; % (deg) receptive field size
     parameterCombinations('E_tau_rise')     = [0.01];
-    parameterCombinations('E_tau_decay')    = [0.1 0.6 1.0];
+    parameterCombinations('E_tau_decay')    = [0.5];
     parameterCombinations('E_to_V_psi')     = [1];
-    parameterCombinations('E_to_R_psi')     = [1];
+    parameterCombinations('E_to_R_psi')     = [6];
     
     % V
     %parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
-    parameterCombinations('V_tau')          = [0.050]; % (s)
+    parameterCombinations('V_tau')          = [0.200]; % (s)
     %parameterCombinations('V_psi')          = [1];
+    %parameterCombinations('V_slope')        = [1];
+    %parameterCombinations('V_threshold')    = [0.5];
+    
     
     parameterCombinations('V_to_R_psi')     = [6]; % 5 works
     parameterCombinations('V_to_R_alpha')   = [0.1];
@@ -163,7 +167,7 @@ function GenerateExperiment()
             
             % Sigma for decays, they are derived from thresholds
             %simulation('V_tau_sigma')    = 0.5*(simulation('V_psi')*exp(-1/2)); % when a V neuron has drive
-            simulation('E_tau_sigma') = (simulation('E_to_V_psi')*exp(-1/2)); % time constant switch sigma is set to standard deviation of E tuning curve, then
+            simulation('E_tau_sigma') = 0.5*(simulation('E_to_V_psi')*exp(-1/2)); % time constant switch sigma is set to standard deviation of E tuning curve, then
             
             %% Save parameters, add miscelanous paramters
             parameterfile = [simulationFolder filesep 'Parameters.mat'];

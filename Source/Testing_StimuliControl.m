@@ -20,7 +20,7 @@ function Testing_StimuliControl(Name)
     dt                          = 0.010; %(s)
     seed                        = 77;
     R_eccentricity              = 45;
-    R_density                   = 1;
+    R_density                   = 1; % should be 1, we test everyones latency
     
     % Dynamical quantities
     stimuliOnsetDelay           = 0.100; %(s)
@@ -30,13 +30,13 @@ function Testing_StimuliControl(Name)
     % Generate stimuli
     rng(seed);
     Duration                    = stimuliOnsetDelay+stimuliDuration+stimuliOffsetPeriod; % (s)
-    headCenteredTargetLocations = -R_eccentricity:R_density:R_eccentricity;
+    headCenteredTargetLocation  = -R_eccentricity:1:R_eccentricity;
     targetOffIntervals{1}       = [0 stimuliOnsetDelay;(stimuliOnsetDelay+stimuliDuration) Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
-    for i = 1:length(headCenteredTargetLocations);
+    for i = 1:length(headCenteredTargetLocation);
         
         stimuli{i}.initialEyePosition           = 0;
-        stimuli{i}.headCenteredTargetLocations  = headCenteredTargetLocations(i);
+        stimuli{i}.headCenteredTargetLocations   = headCenteredTargetLocation(i);
         stimuli{i}.saccadeTimes                 = [];
         stimuli{i}.saccadeTargets               = [];
         stimuli{i}.numSaccades                  = length(stimuli{i}.saccadeTargets);
@@ -59,7 +59,6 @@ function Testing_StimuliControl(Name)
     
     save([stimuliFolder filesep 'stim.mat'] , ...
                                     'stimulitype', ...
-                                    'headCenteredTargetLocations', ...
                                     'targetOffIntervals', ...
                                     'R_eccentricity', ...
                                     'R_density', ...

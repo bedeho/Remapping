@@ -48,7 +48,7 @@ function [StimuliControl_Neurons, StimuliControl_indexes] = AnalyzeStimuliContro
     for p=1:numPeriods,
         
         % Find neuron
-        neuronIndex = R_eccentricity + stimuli.headCenteredTargetLocations(p) + 1;
+        neuronIndex = R_eccentricity + stimuli.stimuli{p}.headCenteredTargetLocations + 1;
         
         % Get data for best period of each neuron
         neuronActivity = R_firing_history(neuronIndex, :, p, 1);

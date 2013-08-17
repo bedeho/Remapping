@@ -81,6 +81,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     R_threshold     = parameters.simulation('R_threshold');
     %R_to_C_alpha    = parameters.simulation('R_to_C_alpha'); % learning rate
     %R_to_C_psi     = parameters.simulation('R_to_C_psi'); % 4
+    R_psi           = parameters.simulation('R_psi');
     
     % E  =======================================
     
@@ -189,6 +190,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             
             % Reset network variables
             periodSaveCounter   = 1;
+            E                   = E*0;
             V                   = V*0;
             R_firingrate        = R_firingrate*0;
             S_firingrate        = S_firingrate*0;
@@ -224,7 +226,11 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate');
                 %V_to_R_excitation = V_to_R_psi*V;
                 
-                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + E_to_R_psi*E);
+                % gauss drives R
+                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + R_psi*gauss);
+                
+                % E drives R
+                %R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + E_to_R_psi*E);
                 
                 %classic: 
                 %R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + V_to_R_excitation);

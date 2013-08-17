@@ -31,14 +31,44 @@ function [DuhamelRemapping_Neurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRe
     % Analysis params
     latencyWindowSize   = 0.020; % (s), colby papers
     latencyWindowLength = ceil(latencyWindowSize/dt);
-    RF_inclusion_th     = 5; % (deg) neurons this far away from any given trial are analysed together
+    %RF_inclusion_th     = 5; % (deg) neurons this far away from any given trial are analysed together
     responseThreshold   = 0.5;
     
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
     
     %% Latency & Duration
     
-    c = 1;
+    DuhamelRemapping_neuronIndexes = [];
+    
+    for p=1:numPeriods,
+        
+        % Target location
+        currentRFLocation_HeadCentered = stimuli.stimuli{p}.headCenteredTargetLocations;
+        futureRFLocation = currentRFLocation_HeadCentered + stimuli.stimuli{p}.saccadeTargets;
+        
+        % Find neuron
+        neuronIndex = R_eccentricity + futureRFLocation + 1;
+
+        % Get data for best period of each neuron
+        responseVector  = R_firing_history(neuronIndex, :, p, 1);
+
+        % Find latency and duration
+        [latencyTimeStep, duration] = findNeuronalLatency(responseThreshold, responseVector, latencyWindowLength);
+
+        %figure;plot(responseVector);hold on; plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
+
+        % Save
+        DuhamelRemapping_Neurons(p).index            = neuronIndex;
+        DuhamelRemapping_Neurons(p).latency          = stepToTime(latencyTimeStep, dt)-saccadeOnset;
+        DuhamelRemapping_Neurons(p).Duration         = duration*dt;
+        DuhamelRemapping_indexes(p)                  = neuronIndex;
+    end
+    
+    
+    %{
+    old style, with a single neuron included multiple times because
+    futureRF is close to , but not identical to its location
+        c = 1;
     DuhamelRemapping_neuronIndexes = [];
     
     for p=1:numPeriods,
@@ -74,5 +104,6 @@ function [DuhamelRemapping_Neurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRe
             
         end
     end
+    %}
     
 end

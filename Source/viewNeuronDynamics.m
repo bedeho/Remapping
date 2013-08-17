@@ -29,7 +29,7 @@ function viewNeuronDynamics(activityFile, stimuliName)
     dt = stimuli.dt;
     
     % Make figure
-    figure('Position', [100, 100, 1049, 895]);
+    figure('name',activityFile,'Position', [100, 100, 1049, 895]);
     
     % Adding controls
     if activity.numEpochs > 1
@@ -103,7 +103,7 @@ function viewNeuronDynamics(activityFile, stimuliName)
         S_activation = activity.S_activation_history(:, :, period, epoch);
         
         % If C is empty, just fill with blank
-        if ~isempty(C_firing_history),
+        if ~isempty(activity.C_firing_history),
             C_firingrate = activity.C_firing_history(:, :, period, epoch);
             C_activation = activity.C_activation_history(:, :, period, epoch);
         else
@@ -121,12 +121,14 @@ function viewNeuronDynamics(activityFile, stimuliName)
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('E Firing');
 
+        %{
         subplot(6,2,2);
         imagesc(E_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('E Firing');
+        %}
         
         subplot(6,2,3);
         imagesc(V_firingrate);
@@ -134,13 +136,15 @@ function viewNeuronDynamics(activityFile, stimuliName)
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('V Firing');
 
+        %{
         subplot(6,2,4);
         imagesc(V_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('V Firing');
-
+        %}
+        
         subplot(6,2,5);
         imagesc(R_firingrate);
         hold on;colorbar
@@ -182,29 +186,42 @@ function viewNeuronDynamics(activityFile, stimuliName)
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('C Actiation');
+        
+        % Add bottom traces
+        eyePositionTrace = stimuli.stimuli{period}.eyePositionTrace;
+        retinalTargetTraces = stimuli.stimuli{period}.retinalTargetTraces';
 
         subplot(6,2,11);
         cla
-        plot(0:(numTimeSteps-1), stimuli.stimuli{period}.eyePositionTrace, 'r');
+        plot(0:(numTimeSteps-1), eyePositionTrace, 'r');
         hold on;
-        plot(0:(numTimeSteps-1), stimuli.stimuli{period}.retinalTargetTraces', 'b');
+        
+        if(~isempty(retinalTargetTraces)),
+        
+            plot(0:(numTimeSteps-1), retinalTargetTraces, 'b');
+            legend({'Eye Position','Stimuli Retinal Locations'});
+        else
+            
+            legend({'Eye Position'});            
+        end
+        
         xlabel(['Time step (dt =' num2str(dt) ')']);
-        legend({'Eye Position','Stimuli Retinal Locations'});
         ylim([-45 45]); % we hard code limit since not all stimuli has stimuli.R_eccentricity
         xlim([0 (numTimeSteps-1)]);
         set(gca,'YDir','reverse');
         
-        
+        %{
         subplot(6,2,12);
         cla
-        plot(0:(numTimeSteps-1), stimuli.stimuli{period}.eyePositionTrace, 'r');
+        plot(0:(numTimeSteps-1), eyePositionTrace, 'r');
         hold on;
-        plot(0:(numTimeSteps-1), stimuli.stimuli{period}.retinalTargetTraces', 'b');
+        plot(0:(numTimeSteps-1), retinalTargetTraces, 'b');
         xlabel(['Time step (dt =' num2str(dt) ')']);
         legend({'Eye Position','Stimuli Retinal Locations'});
         ylim([-45 45]); % we hard code limit since not all stimuli has stimuli.R_eccentricity
         xlim([0 (numTimeSteps-1)]);
         set(gca,'YDir','reverse');
+        %}
         
     end
 end

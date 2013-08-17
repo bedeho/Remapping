@@ -32,27 +32,6 @@ function analysisSummary = Analyze(netDir, stimulinames)
             disp('Doing stimuli control task analysis...');
             [StimuliControl_Neurons, StimuliControl_indexes] = AnalyzeStimuliControlTask(activity, stimuli);
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'StimuliControl_Neurons', 'StimuliControl_indexes');
-                
-            %{
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , ...
-                    'baselineResponse', ...
-                    'stim_response', ...
-                    'location', ...
-                    'foundOnset', ...
-                    'foundOffset', ...
-                    'latencyTimeStep', ...
-                    'durationTimeStep');
-                            
-            R_N = size(latencyTimeStep,2);                
-            f = figure;
-            imagesc(neuronResponse);
-            ylabel('Neuron');
-            xlabel('Time');
-            hold on;
-            plot(latencyTimeStep,1:R_N,'wo');
-            saveas(f,[netDir filesep stimulinames{i} '.png']);
-            close(f);
-            %}
             
         elseif strcmp(type,'SaccadeControl'),
             
@@ -99,16 +78,65 @@ function analysisSummary = Analyze(netDir, stimulinames)
             
     end
     
+    %% Stimuli Control
+    
+    f = figure;
+    latency = [StimuliControl_Neurons(:).latency];
+    maxLatency = max(latency);
+    minLatency = min(latency);
+    dh = (minLatency - minLatency)/11;
+    
+    if(dh == 0),
+        
+        lat = latency(1);
+        
+        left_bins = fliplr(lat:-0.01:(lat-0.05));
+        right_bins = lat:0.01:(lat+0.05);
+        
+        x = [left_bins right_bins(2:end)]
+    else
+        x = minLatency:dh:maxLatency;
+    end
+    
+    bar(x,hist(latency,x));
+    
+    xlabel('Time (s)');
+    ylabel('Frequency');
+
+    saveas(f,[netDir filesep 'StimuliControl-summary.png']);
+    close(f);
+    
     %% Duhamel remapping analysis
     % stim: [StimuliControl_Neurons, StimuliControl_indexes]
     % duhamel: [DuhamelRemapping_analyzedNeurons, DuhamelRemapping_indexes]
     
     f = figure;
     hold on;
+    
+    % Iteratea all neurons studied in remapping context
+    for index=DuhamelRemapping_indexes,
+    
+        % Find the stimuli control latency of this neuron
+        j = find(StimuliControl_indexes == index);
+        
+        if(length(j) == 1)
+            plot(StimuliControl_Neurons(j).latency, DuhamelRemapping_Neurons(index).latency,'ro');
+        else
+            error('STIM CONTROL TASK SHOULD ONLY TEST EACH NEURON ONCE.');
+        end
+    end
+    
+    
+    
+    %{
+    old, when neurons were included multiple times,
+    but it picks neurons that were only included ones,
+    rather than pick the best instances of all neurons ever
+    included, so update this if it is ever used again s
     for i=1:length(StimuliControl_indexes),
         
         index_1 = StimuliControl_indexes(i);
-        j = find(DuhamelRemapping_indexes == index_1);
+        j = find( == index_1);
         
         if(length(j) == 1),
             
@@ -117,6 +145,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
         end
         
     end
+    %}
     
     xlabel('Stimulus Control Latency (s)');
     ylabel('Remapping Latency (s)');
@@ -126,6 +155,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
     axis square
     
     saveas(f,[netDir filesep 'DuhamelRemapping-summary.png']);
+    close(f);
     
     %% Duhamel trace remapping analysis
     
@@ -177,5 +207,32 @@ function analysisSummary = Analyze(netDir, stimulinames)
     
     saveas(f,[netDir filesep 'CLayerProbe-summary.png']);
     
+    close(f);
+    
     analysisSummary = 0;
+    
+    %% BACKUP
+    
+    % This was in the stimuli analysis case: what does it do?
+    
+                %{
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , ...
+                    'baselineResponse', ...
+                    'stim_response', ...
+                    'location', ...
+                    'foundOnset', ...
+                    'foundOffset', ...
+                    'latencyTimeStep', ...
+                    'durationTimeStep');
+                            
+            R_N = size(latencyTimeStep,2);                
+            f = figure;
+            imagesc(neuronResponse);
+            ylabel('Neuron');
+            xlabel('Time');
+            hold on;
+            plot(latencyTimeStep,1:R_N,'wo');
+            saveas(f,[netDir filesep stimulinames{i} '.png']);
+            close(f);
+            %}
 end
