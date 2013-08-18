@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [DuhamelRemapping_Neurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRemapping(activity, stimuli)
+function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity, sacc_control_activity)
 
     % Check if this is manual run 
     if nargin == 0,
@@ -25,26 +25,24 @@ function [DuhamelRemapping_Neurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRe
     dt                   = activity.dt;
     R_eccentricity       = stimuli.R_eccentricity;
     saccadeOnset         = stimuli.saccadeOnset;
+    stimuliOnset         = stimuli.stimuliOnset;
     numPeriods           = activity.numPeriods;
     numEpochs            = activity.numEpochs;
     
     % Analysis params
     latencyWindowSize   = 0.020; % (s), colby papers
-    latencyWindowLength = ceil(latencyWindowSize/dt);
-    %RF_inclusion_th     = 5; % (deg) neurons this far away from any given trial are analysed together
+    latencyWindowLength = timeToTimeStep(latencyWindowSize, dt);
+    responseWindowDuration = 0.200;
     responseThreshold   = 0.5;
     
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
     
     %% Latency & Duration
-    
-    DuhamelRemapping_neuronIndexes = [];
-    
     for p=1:numPeriods,
         
         % Target location
         currentRFLocation_HeadCentered = stimuli.stimuli{p}.headCenteredTargetLocations;
-        futureRFLocation = currentRFLocation_HeadCentered + stimuli.stimuli{p}.saccadeTargets;
+        futureRFLocation = currentRFLocation_HeadCentered - stimuli.stimuli{p}.saccadeTargets;
         
         % Find neuron
         neuronIndex = R_eccentricity + futureRFLocation + 1;
@@ -54,56 +52,34 @@ function [DuhamelRemapping_Neurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRe
 
         % Find latency and duration
         [latencyTimeStep, duration] = findNeuronalLatency(responseThreshold, responseVector, latencyWindowLength);
-
-        %figure;plot(responseVector);hold on; plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
-
+        
+        %{
+        figure;
+        subplot(1,2,1);
+        plot(responseVector);hold on; plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
+        subplot(1,2,2);
+        plot(responseVector);hold on; imagesc(R_firing_history(:, :, p, 1));
+        %}
+        
+        % Saccade aligned response window
+        saccadeonset_response = normalizedIntegration(responseVector, dt, saccadeOnset, responseWindowDuration);
+        
+        % Stimuli aligned response window
+        stimulionset_response = normalizedIntegration(responseVector, dt, stimuliOnset, responseWindowDuration);
+        
+        
+        stim_control_activity, sacc_control_activity
+        
+        
         % Save
-        DuhamelRemapping_Neurons(p).index            = neuronIndex;
-        DuhamelRemapping_Neurons(p).latency          = stepToTime(latencyTimeStep, dt)-saccadeOnset;
-        DuhamelRemapping_Neurons(p).Duration         = duration*dt;
-        DuhamelRemapping_indexes(p)                  = neuronIndex;
+        DuhamelRemappin_Result(p).index                   = neuronIndex;
+        DuhamelRemappin_Result(p).futureRF                = futureRFLocation;
+        DuhamelRemappin_Result(p).saccade                 = stimuli.stimuli{p}.saccadeTargets;
+        
+        DuhamelRemappin_Result(p).latency                 = stepToTime(latencyTimeStep, dt)-saccadeOnset;
+        DuhamelRemappin_Result(p).Duration                = duration*dt;
+        DuhamelRemappin_Result(p).saccadeonset_response   = saccadeonset_response;
+        DuhamelRemappin_Result(p).stimulionset_response   = stimulionset_response;
     end
-    
-    
-    %{
-    old style, with a single neuron included multiple times because
-    futureRF is close to , but not identical to its location
-        c = 1;
-    DuhamelRemapping_neuronIndexes = [];
-    
-    for p=1:numPeriods,
-        
-        % Target location
-        currentRFLocation_HeadCentered = stimuli.headCenteredTargetLocations(p);
-        futureRFLocation = currentRFLocation_HeadCentered - stimuli.saccadeTargets(p);
-        
-        % Find neurons that are close enough
-        neuron_RFLocations = max(-R_eccentricity,futureRFLocation - RF_inclusion_th):1:min(R_eccentricity,futureRFLocation + RF_inclusion_th);
-        
-        for f=neuron_RFLocations,
-        
-            % Find neuron
-            neuronIndex = R_eccentricity + f + 1;
-
-            % Get data for best period of each neuron
-            responseVector  = R_firing_history(neuronIndex, :, p, 1);
-            
-            % Find latency and duration
-            [latencyTimeStep, duration] = findNeuronalLatency(responseThreshold, responseVector, latencyWindowLength);
-            
-            %figure;plot(responseVector);hold on; plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
-            
-            % Save
-            DuhamelRemapping_Neurons(c).index            = neuronIndex;
-            DuhamelRemapping_Neurons(c).latency          = stepToTime(latencyTimeStep, dt)-saccadeOnset;
-            DuhamelRemapping_Neurons(c).Duration         = duration*dt;
-            
-            DuhamelRemapping_indexes(c) = neuronIndex;
-            
-            c = c + 1;
-            
-        end
-    end
-    %}
     
 end

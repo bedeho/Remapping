@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [saccade_response] = AnalyzeSaccadeControlTask(activity, stimuli)
+function [SaccadeControl_Result] = AnalyzeSaccadeControlTask(activity, stimuli)
 
     % Check if this is manual run
     if nargin == 0,
@@ -23,26 +23,24 @@ function [saccade_response] = AnalyzeSaccadeControlTask(activity, stimuli)
     
     % Set parameters
     dt                  = activity.dt;
+    numPeriods          = activity.numPeriods;
     numEpochs           = activity.numEpochs;
-    saccadeOnsetDelay   = stimuli.saccadeOnsetDelay;
-    %S_eccentricity      = stimuli.S_eccentricity;
+    saccadeOnset        = stimuli.saccadeOnset;
+    S_eccentricity      = stimuli.S_eccentricity;
+    
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
         
     % Analysis params
     responseWindowSize  = 0.200; % (s), Colby window aligned at saccadeOFFSET
     
-    %% Saccade onset
-    
-    % Get time steps in question
-    activityTimeSteps   = timeToTimeStep(saccadeOnsetDelay + 0:dt:responseWindowSize, dt);
-    
-    % Extract the given time steps from all neurons in all periods
-    saccade_activity    = R_firing_history(:, activityTimeSteps, :, 1); % [onsetTimeStep+50:250]
-    
-    % Integrate to find response
-    saccade_response    = squeeze(trapz(saccade_activity,2));
-    
-    % Normaliztion step, gives normalized (sp/s) units to response
-    saccade_response    = saccade_response/(length(activityTimeSteps) - 1);
-    
+    % Turn into struct array
+    for p=1:numPeriods,
+        
+        saccade = stimuli.stimuli{p}.saccadeTargets;
+        index   = S_eccentricity + saccade + 1;
+        
+        SaccadeControl_Result(p).index            = index;
+        SaccadeControl_Result(p).receptiveField   = saccade;
+        SaccadeControl_Result(p).saccadeonset_response = normalizedIntegration(R_firing_history(index,:,p), dt, saccadeOnset, responseWindowSize); % [onsetTimeStep+50:250]
+    end
 end

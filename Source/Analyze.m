@@ -30,28 +30,26 @@ function analysisSummary = Analyze(netDir, stimulinames)
         if strcmp(type,'StimuliControl'),
             
             disp('Doing stimuli control task analysis...');
-            [StimuliControl_Neurons, StimuliControl_indexes] = AnalyzeStimuliControlTask(activity, stimuli);
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'StimuliControl_Neurons', 'StimuliControl_indexes');
+            [StimuliControl_Result] = AnalyzeStimuliControlTask(activity, stimuli);
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'StimuliControl_Result');
             
         elseif strcmp(type,'SaccadeControl'),
             
             disp('Doing saccade control task analysis...');
-            [saccade_response] = AnalyzeSaccadeControlTask(activity, stimuli);
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'saccade_response');
+            [SaccadeControl_Result] = AnalyzeSaccadeControlTask(activity, stimuli);
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'SaccadeControl_Result');
             
         elseif strcmp(type,'DuhamelRemapping'),
             
-            
             disp('Doing duhamel remapping task analysis...');
-            [DuhamelRemapping_Neurons, DuhamelRemapping_indexes] = AnalyzeDuhamelRemapping(activity, stimuli);
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemapping_Neurons', 'DuhamelRemapping_indexes');
+            [DuhamelRemapping_Result] = AnalyzeDuhamelRemapping(activity, stimuli);
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemapping_Result');
             
         elseif strcmp(type,'DuhamelRemappingTrace'),
             
-            
             disp('Doing duhamel remapping trace task analysis...');
-            [DuhamelRemappingTrace_Neurons, DuhamelRemappingTrace_indexes] = AnalyzeDuhamelRemappingTrace(activity, stimuli);
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemapping_Neurons', 'DuhamelRemapping_indexes');
+            [DuhamelRemappingTrace_Result] = AnalyzeDuhamelRemapping(activity, stimuli);
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemappingTrace_Result');
             
         elseif strcmp(type,'DuhamelTruncation'),
             
@@ -79,9 +77,8 @@ function analysisSummary = Analyze(netDir, stimulinames)
     end
     
     %% Stimuli Control
-    
     f = figure;
-    latency = [StimuliControl_Neurons(:).latency];
+    latency = [StimuliControl_Result(:).latency];
     maxLatency = max(latency);
     minLatency = min(latency);
     dh = (minLatency - minLatency)/11;
@@ -93,7 +90,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
         left_bins = fliplr(lat:-0.01:(lat-0.05));
         right_bins = lat:0.01:(lat+0.05);
         
-        x = [left_bins right_bins(2:end)]
+        x = [left_bins right_bins(2:end)];
     else
         x = minLatency:dh:maxLatency;
     end
@@ -107,54 +104,99 @@ function analysisSummary = Analyze(netDir, stimulinames)
     close(f);
     
     %% Duhamel remapping analysis
-    % stim: [StimuliControl_Neurons, StimuliControl_indexes]
-    % duhamel: [DuhamelRemapping_analyzedNeurons, DuhamelRemapping_indexes]
     
-    f = figure;
-    hold on;
+    % Num neurons
+    numNeurons = length(DuhamelRemapping_Result);
+    
+    StimuliControl_rf      = [StimuliControl_Result(:).receptiveField];
+    SaccadeControl_saccade = [SaccadeControl_Result(:).receptiveField];
     
     % Iteratea all neurons studied in remapping context
-    for index=DuhamelRemapping_indexes,
-    
+    stim_index   = zeros(1, numNeurons);
+    sacc_index   = zeros(1, numNeurons);
+    stim_latency = zeros(1, numNeurons);
+
+    for i=1:numNeurons,
+
+        % future RF neuron index
+        futureRf = DuhamelRemapping_Result(i).futureRF;
+        
+        % saccade executed
+        saccade = DuhamelRemapping_Result(i).saccade;
+        
+        % original location prior to saccade
+        currentRf = futureRf + saccade;
+        
         % Find the stimuli control latency of this neuron
-        j = find(StimuliControl_indexes == index);
-        
-        if(length(j) == 1)
-            plot(StimuliControl_Neurons(j).latency, DuhamelRemapping_Neurons(index).latency,'ro');
-        else
-            error('STIM CONTROL TASK SHOULD ONLY TEST EACH NEURON ONCE.');
-        end
-    end
-    
-    
-    
-    %{
-    old, when neurons were included multiple times,
-    but it picks neurons that were only included ones,
-    rather than pick the best instances of all neurons ever
-    included, so update this if it is ever used again s
-    for i=1:length(StimuliControl_indexes),
-        
-        index_1 = StimuliControl_indexes(i);
-        j = find( == index_1);
-        
-        if(length(j) == 1),
-            
-            plot(StimuliControl_Neurons(i).latency, DuhamelRemapping_Neurons(j).latency,'ro');
-            %disp('found duhamel remapping neuron');
+        j_stim = find(StimuliControl_rf == currentRf);
+        j_sacc = find(SaccadeControl_saccade == saccade);
+
+        % Check that we only get one hit
+        if(length(j_stim) ~= 1 || length(j_sacc) ~= 1)
+            error('STIM & SACC. CONTROL TASK SHOULD ONLY TEST EACH NEURON ONCE, AND MUST TEST ALL NEURONS.');
         end
         
+        % Compute stimulus index: based on stim onset response in control
+        % task and remapping task
+        stim_index(i) = DuhamelRemapping_Result(i).saccadeonset_response - StimuliControl_Result(j_stim).stimulus_response;
+        
+        % Compute saccade index: based on saccade onset response in control
+        % task and remapping task
+        sacc_index(i) = DuhamelRemapping_Result(i).saccadeonset_response - SaccadeControl_Result(j_sacc).saccadeonset_response;
+        
+        % Get latency
+        stim_latency(i) = StimuliControl_Result(j_stim).latency;
+
     end
-    %}
+
+    remapping_index     = sqrt(stim_index.^2 + sacc_index.^2); % according to L.M.Heiser,Colby (2006)
+    remapping_latency   = [DuhamelRemapping_Result(:).latency];
+    DuhamelRemapping_Index = [DuhamelRemapping_Result(:).index];
+    
+    %% Start plotting
+    
+    % 1. scatter remap latency vs. stim control latency
+    f = figure;
+    hold on;
+    plot(remapping_latency, stim_latency, 'or');
+    plot([-0.5 0.5],[-0.5 0.5],'--b'); % y=x bar
     
     xlabel('Stimulus Control Latency (s)');
     ylabel('Remapping Latency (s)');
     xlim([-0.5 0.5]);
     ylim([-0.5 0.5]);
-    plot([-0.5 0.5],[-0.5 0.5],'--b');
-    axis square
+    axis square;
     
     saveas(f,[netDir filesep 'DuhamelRemapping-summary.png']);
+    close(f);
+
+    % 2. scatter stim index. vs sacc index.
+    f = figure;
+    hold on;
+    plot(sacc_index, stim_index, 'or');
+    plot([0 0],[-1 1],'--g'); % x=0 bar
+    plot([-1 1],[0 0],'--g'); % y=0 bar
+    
+    xlabel('Saccade Index');
+    ylabel('Stimulus Index');
+    xlim([-1 1]);
+    ylim([-1 1]);
+    axis square;
+    
+    saveas(f,[netDir filesep 'DuhamelRemapping-summary-2.png']);
+    close(f);
+    
+    % 3. remapping index distibution
+    f = figure;
+    hold on;
+    x = 0:0.1:sqrt(2);
+    bar(x,hist(remapping_index,x));
+    
+    xlabel('Remapping Index');
+    ylabel('Frequency');
+    axis square;
+    
+    saveas(f,[netDir filesep 'DuhamelRemapping-summary-3.png']);
     close(f);
     
     %% Duhamel trace remapping analysis
@@ -211,28 +253,9 @@ function analysisSummary = Analyze(netDir, stimulinames)
     
     analysisSummary = 0;
     
-    %% BACKUP
-    
-    % This was in the stimuli analysis case: what does it do?
-    
-                %{
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , ...
-                    'baselineResponse', ...
-                    'stim_response', ...
-                    'location', ...
-                    'foundOnset', ...
-                    'foundOffset', ...
-                    'latencyTimeStep', ...
-                    'durationTimeStep');
-                            
-            R_N = size(latencyTimeStep,2);                
-            f = figure;
-            imagesc(neuronResponse);
-            ylabel('Neuron');
-            xlabel('Time');
-            hold on;
-            plot(latencyTimeStep,1:R_N,'wo');
-            saveas(f,[netDir filesep stimulinames{i} '.png']);
-            close(f);
-            %}
+    function remappingAnalysis(remapping_indexes, remapping_neurons, stimcontrol_neurons, sacccontrol_neurons)
+        
+
+    end
+
 end

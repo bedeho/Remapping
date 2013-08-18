@@ -9,6 +9,7 @@
 
 function Testing_DuhamelRemappingTrace(Name)
 
-    Testing_DuhamelRemapping(Name, 'DuhamelRemappingTrace', 0.300, 0.100, 0.050, 0.300)
+   %Testing_DuhamelRemapping(Name, stimulitype, saccadeOnset, stimuliDuration, stimuliOnset, postSaccadefixationPeriod)
+    Testing_DuhamelRemapping(Name, 'DuhamelRemappingTrace', 0.600, 0.100, 0.050, 0.300)
     
 end

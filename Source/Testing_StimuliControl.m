@@ -23,15 +23,15 @@ function Testing_StimuliControl(Name)
     R_density                   = 1; % should be 1, we test everyones latency
     
     % Dynamical quantities
-    stimuliOnsetDelay           = 0.100; %(s)
+    stimuliOnset           = 0.100; %(s)
     stimuliDuration             = 0.300; %(s)
     stimuliOffsetPeriod         = 0.300; %(s)
 
     % Generate stimuli
     rng(seed);
-    Duration                    = stimuliOnsetDelay+stimuliDuration+stimuliOffsetPeriod; % (s)
-    headCenteredTargetLocation  = -R_eccentricity:1:R_eccentricity;
-    targetOffIntervals{1}       = [0 stimuliOnsetDelay;(stimuliOnsetDelay+stimuliDuration) Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
+    Duration                    = stimuliOnset+stimuliDuration+stimuliOffsetPeriod; % (s)
+    headCenteredTargetLocation  = -R_eccentricity:R_density:R_eccentricity;
+    targetOffIntervals{1}       = [0 stimuliOnset;(stimuliOnset+stimuliDuration) Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
     for i = 1:length(headCenteredTargetLocation);
         
@@ -64,7 +64,7 @@ function Testing_StimuliControl(Name)
                                     'R_density', ...
                                     'Duration', ...
                                     'stimuli', ...
-                                    'stimuliOnsetDelay', ...
+                                    'stimuliOnset', ...
                                     'stimuliDuration', ...
                                     'stimuliOffsetPeriod', ...
                                     'dt', ...

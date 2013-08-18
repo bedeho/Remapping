@@ -20,24 +20,24 @@ function Testing_SaccadeControl(Name)
     dt                          = 0.010; %(s)
     seed                        = 77;
     S_eccentricity              = 30;
-    S_density                   = 1;
+    S_density                   = 1; % should be 1, we test everyones response
     
     % Dynamical quantities
-    saccadeOnsetDelay           = 0.1; %(s)
-    fixationPeriod              = 0.4; %(s)
+    saccadeOnset                = 0.1; %(s) w.r.t start of task
+    postSaccadefixationPeriod   = 0.4; %(s)
     saccadeSpeed                = 300; %(deg/s)
 
     % Generate stimuli
     rng(seed);
-    Duration                    = saccadeOnsetDelay + fixationPeriod; % (s)
-    saccadeTargets              = 20;%-S_eccentricity:S_density:S_eccentricity;
+    Duration                    = saccadeOnset + postSaccadefixationPeriod; % (s)
+    saccadeTargets              = -S_eccentricity:S_density:S_eccentricity;
     targetOffIntervals{1}       = [0 Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
     for i = 1:length(saccadeTargets);
         
         stimuli{i}.initialEyePosition           = 0;
         stimuli{i}.headCenteredTargetLocations  = [];
-        stimuli{i}.saccadeTimes                 = saccadeOnsetDelay;
+        stimuli{i}.saccadeTimes                 = saccadeOnset;
         stimuli{i}.saccadeTargets               = saccadeTargets(i);
         stimuli{i}.numSaccades                  = length(stimuli{i}.saccadeTargets);
         stimuli{i}.targetOffIntervals           = targetOffIntervals;
@@ -63,9 +63,9 @@ function Testing_SaccadeControl(Name)
                                     'targetOffIntervals', ...
                                     'stimulitype', ...
                                     'stimuli', ...
-                                    'saccadeOnsetDelay', ...
+                                    'saccadeOnset', ...
                                     'Duration', ...
-                                    'fixationPeriod', ...
+                                    'postSaccadefixationPeriod', ...
                                     'saccadeSpeed', ...
                                     'dt', ...
                                     'seed');

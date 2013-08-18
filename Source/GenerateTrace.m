@@ -57,6 +57,9 @@ function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, h
                 % and saccade onset event to find saccade start position
                 
                 reduceSaccadeTimeInPresentTimeStepWith = timeOffset;
+                
+                % Keep track of where we want to go
+                newEyePosition = eyePositionTrace(t-1) + saccadeTargets(numCompletedSaccades+1);
             else
                 
                 % no, we passed at some previous time, so mini saccade starting
@@ -68,13 +71,13 @@ function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, h
             % Will one more stime step saccading from
             % miniSaccadeStartPosition take us past saccade target?
             
-            saccadeOffset = eyePositionTrace(t-1) - saccadeTargets(numCompletedSaccades+1);
+            remainingEyePositionOffset = newEyePosition - eyePositionTrace(t-1);
             timeStepSaccadeMagnitude = (dt - reduceSaccadeTimeInPresentTimeStepWith)*saccadeSpeed;
             
-            if (timeStepSaccadeMagnitude > saccadeOffset),
+            if (timeStepSaccadeMagnitude > remainingEyePositionOffset),
                 
                 % yes, so lets not do the whole thing
-                eyePositionTrace(t) = saccadeTargets(numCompletedSaccades+1);
+                eyePositionTrace(t) = newEyePosition;
                 
                 % and lets saccade as completed
                 numCompletedSaccades = numCompletedSaccades + 1;
@@ -82,7 +85,7 @@ function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, h
             else
                 
                 % no, then lets do the full thing and keep going.
-                eyePositionTrace(t) = eyePositionTrace(t-1) + -1*sign(saccadeOffset)*saccadeSpeed*dt;
+                eyePositionTrace(t) = eyePositionTrace(t-1) + sign(remainingEyePositionOffset)*saccadeSpeed*dt;
                 
             end
             

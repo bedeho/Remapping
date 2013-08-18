@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [StimuliControl_Neurons, StimuliControl_indexes] = AnalyzeStimuliControlTask(activity, stimuli)
+function [StimuliControl_Result] = AnalyzeStimuliControlTask(activity, stimuli)
 
     % Check if this is manual run 
     if nargin == 0,
@@ -26,13 +26,12 @@ function [StimuliControl_Neurons, StimuliControl_indexes] = AnalyzeStimuliContro
     R_eccentricity      = stimuli.R_eccentricity;
     numPeriods          = activity.numPeriods;
     numEpochs           = activity.numEpochs;
-    stimuliOnsetDelay   = stimuli.stimuliOnsetDelay;
+    stimuliOnset        = stimuli.stimuliOnset;
     stimuliDuration     = stimuli.stimuliDuration;
     
     % Analysis params
     responseWindowStart = 0.050; % Colby window control, [50ms,250ms] after stim onset.
     responseWindowDuration = 0.200; %(s), colby
-    %responseWindowEnd   = responseWindowStart + responseWindowDuration;
     
     latencyWindowSize   = 0.020; % (s), Colby
     latencyWindowLength = ceil(latencyWindowSize/dt);
@@ -41,10 +40,6 @@ function [StimuliControl_Neurons, StimuliControl_indexes] = AnalyzeStimuliContro
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
     
     % Latency & Duration - nonvectorized form is more practical.
-    
-    c = 1;
-    StimuliControl_indexes = [];
-    
     for p=1:numPeriods,
         
         % Find neuron
@@ -57,27 +52,24 @@ function [StimuliControl_Neurons, StimuliControl_indexes] = AnalyzeStimuliContro
         [latencyTimeStep duration] = findNeuronalLatency(responseThreshold, neuronActivity, latencyWindowLength);
         
         % Baseline response
-        baseline_response = normalizedIntegration(neuronActivity, dt, 0, stimuliOnsetDelay);
+        baseline_response = normalizedIntegration(neuronActivity, dt, 0, stimuliOnset);
         
         % Stim response
-        stim_response   = normalizedIntegration(neuronActivity, dt, stimuliOnsetDelay + responseWindowStart, responseWindowDuration);
+        stim_response   = normalizedIntegration(neuronActivity, dt, stimuliOnset + responseWindowStart, responseWindowDuration);
         
         % Offset response
-        offset_response = normalizedIntegration(neuronActivity, dt, stimuliOnsetDelay + stimuliDuration + responseWindowStart, responseWindowDuration);
+        offset_response = normalizedIntegration(neuronActivity, dt, stimuliOnset + stimuliDuration + responseWindowStart, responseWindowDuration);
         
         % Plot
         %figure;plot(neuronActivity);hold on; plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
         
         % Save
-        StimuliControl_Neurons(c).index            = neuronIndex;
-        StimuliControl_Neurons(c).latency          = stepToTime(latencyTimeStep, dt)-stimuliOnsetDelay;
-        StimuliControl_Neurons(c).duration         = duration*dt;
-        StimuliControl_Neurons(c).baselineResponse = baseline_response;
-        StimuliControl_Neurons(c).stimulusresponse = stim_response;
-        StimuliControl_Neurons(c).offset_response  = offset_response;
-        
-        StimuliControl_indexes(c) = neuronIndex;
-
-        c = c + 1;
+        StimuliControl_Result(p).index              = neuronIndex;
+        StimuliControl_Result(p).receptiveField     = stimuli.stimuli{p}.headCenteredTargetLocations;
+        StimuliControl_Result(p).latency            = stepToTime(latencyTimeStep, dt)-stimuliOnset;
+        StimuliControl_Result(p).duration           = duration*dt;
+        StimuliControl_Result(p).baseline_response  = baseline_response;
+        StimuliControl_Result(p).stimulus_response  = stim_response;
+        StimuliControl_Result(p).offset_response    = offset_response;
     end
 end
