@@ -12,7 +12,11 @@ function analysisSummary = Analyze(netDir, stimulinames)
     % Import global variables
     declareGlobalVars();
     global STIMULI_FOLDER;
-
+    
+    % keep track of thesee
+    stim_control_activity  = [];
+    sacc_control_activity = [];
+    
     for i = 1:length(stimulinames),
         
         % Load stimuli
@@ -33,16 +37,20 @@ function analysisSummary = Analyze(netDir, stimulinames)
             [StimuliControl_Result] = AnalyzeStimuliControlTask(activity, stimuli);
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'StimuliControl_Result');
             
+            stim_control_activity = activity;
+            
         elseif strcmp(type,'SaccadeControl'),
             
             disp('Doing saccade control task analysis...');
             [SaccadeControl_Result] = AnalyzeSaccadeControlTask(activity, stimuli);
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'SaccadeControl_Result');
             
+            sacc_control_activity = activity;
+            
         elseif strcmp(type,'DuhamelRemapping'),
             
             disp('Doing duhamel remapping task analysis...');
-            [DuhamelRemapping_Result] = AnalyzeDuhamelRemapping(activity, stimuli);
+            [DuhamelRemapping_Result] = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, sacc_control_activity.R_firing_history);
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemapping_Result');
             
         elseif strcmp(type,'DuhamelRemappingTrace'),
@@ -105,6 +113,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
     
     %% Duhamel remapping analysis
     
+    %{
     % Num neurons
     numNeurons = length(DuhamelRemapping_Result);
     
@@ -152,9 +161,10 @@ function analysisSummary = Analyze(netDir, stimulinames)
     remapping_index     = sqrt(stim_index.^2 + sacc_index.^2); % according to L.M.Heiser,Colby (2006)
     remapping_latency   = [DuhamelRemapping_Result(:).latency];
     DuhamelRemapping_Index = [DuhamelRemapping_Result(:).index];
+    %}
     
     %% Start plotting
-    
+    %{
     % 1. scatter remap latency vs. stim control latency
     f = figure;
     hold on;
@@ -198,7 +208,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
     
     saveas(f,[netDir filesep 'DuhamelRemapping-summary-3.png']);
     close(f);
-    
+    %}
     %% Duhamel trace remapping analysis
     
     %% Duhamel truncation analysis

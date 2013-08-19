@@ -34,7 +34,7 @@ function [StimuliControl_Result] = AnalyzeStimuliControlTask(activity, stimuli)
     responseWindowDuration = 0.200; %(s), colby
     
     latencyWindowSize   = 0.020; % (s), Colby
-    latencyWindowLength = ceil(latencyWindowSize/dt);
+    latencyWindowLength = timeToTimeStep(latencyWindowSize, dt);
     responseThreshold   = 0.5;
     
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');

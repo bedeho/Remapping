@@ -31,7 +31,7 @@ function [SaccadeControl_Result] = AnalyzeSaccadeControlTask(activity, stimuli)
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
         
     % Analysis params
-    responseWindowSize  = 0.200; % (s), Colby window aligned at saccadeOFFSET
+    responseWindowDuration  = 0.200; % (s), Colby window aligned at saccadeOFFSET
     
     % Turn into struct array
     for p=1:numPeriods,
@@ -41,6 +41,6 @@ function [SaccadeControl_Result] = AnalyzeSaccadeControlTask(activity, stimuli)
         
         SaccadeControl_Result(p).index            = index;
         SaccadeControl_Result(p).receptiveField   = saccade;
-        SaccadeControl_Result(p).saccadeonset_response = normalizedIntegration(R_firing_history(index,:,p), dt, saccadeOnset, responseWindowSize); % [onsetTimeStep+50:250]
+        SaccadeControl_Result(p).saccadeonset_response = normalizedIntegration(R_firing_history(index,:,p), dt, saccadeOnset, responseWindowDuration); % [onsetTimeStep+50:250]
     end
 end
