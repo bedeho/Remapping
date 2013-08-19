@@ -14,7 +14,6 @@ function analysisSummary = Analyze(netDir, stimulinames)
     global STIMULI_FOLDER;
     
     % keep track of thesee
-    stim_control_results = [];
     stim_control_activity  = [];
     sacc_control_activity = [];
     stim_stimuli = [];
@@ -67,7 +66,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
             
         elseif strcmp(type,'DuhamelTruncation'),
             
-            DuhamelTruncation_Result = AnalyzeDuhamelTruncation(activity, stimuli, stim_control_results);
+            DuhamelTruncation_Result = AnalyzeDuhamelTruncation(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli);
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelTruncation_Result');
               
         elseif strcmp(type,'Kusonoki'),
@@ -124,6 +123,19 @@ function analysisSummary = Analyze(netDir, stimulinames)
     remappingAnalysis(DuhamelRemappingTrace_Result, 'DuhamelRemappingTrace');
     
     %% Duhamel truncation analysis
+    f = figure;
+    hold on;
+    plot([DuhamelTruncation_Result(:).saccadeonset_response], [DuhamelTruncation_Result(:).stim_stim_offset_response], 'or');
+    plot([0 1],[0 1],'--b'); % y=x bar
+    xlabel('Truncation Saccade Onset Response');
+    ylabel('Stimulus Offset Response');
+    xlim([0 1]);
+    ylim([0 1]);
+    axis square;
+
+    saveas(f,[netDir filesep 'DuhamelTruncation-summary.png']);
+    close(f);
+        
     
     %% Kusonoki
     

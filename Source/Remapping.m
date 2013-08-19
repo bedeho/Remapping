@@ -175,7 +175,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             retinalTargetTraces = stimuli.stimuli{period}.retinalTargetTraces;
             saccadeTimes        = stimuli.stimuli{period}.saccadeTimes;
             saccadeTargets      = stimuli.stimuli{period}.saccadeTargets;
-            numSaccades         = stimuli.stimuli{period}.numSaccades;
+            numSaccades         = length(stimuli.stimuli{period}.saccadeTimes);
 
             % Setup static working variables
             R_preference_comparison_matrix = repmat(R_preferences, maxNumberOfVisibleTargets, 1); % used to compute driving term in V
