@@ -83,7 +83,7 @@ function AnalyzeExperiment(experiment)
     fprintf(fileID, '<th>Summary</th>');
     
     stimuli_files = cell(1,length(stimulinames));
-    stimuli_types = cell(1,length(stimulinames))'
+    stimuli_types = cell(1,length(stimulinames))';
     for i = 1:length(stimulinames),
         
         fprintf(fileID, ['<th>' stimulinames{i} '</th>']);

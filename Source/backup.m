@@ -254,3 +254,113 @@ end
     end
     %}
     
+%
+%  GenerateExperiment.m
+%  Remapping
+%
+%  Created by Bedeho Mender on 19/05/13.
+%  Copyright 2013 OFTNAI. All rights reserved.
+%
+    
+        %{
+    % Num neurons
+    numNeurons = length(DuhamelRemapping_Result);
+    
+    StimuliControl_rf      = [StimuliControl_Result(:).receptiveField];
+    SaccadeControl_saccade = [SaccadeControl_Result(:).receptiveField];
+    
+    % Iteratea all neurons studied in remapping context
+    stim_index   = zeros(1, numNeurons);
+    sacc_index   = zeros(1, numNeurons);
+    stim_latency = zeros(1, numNeurons);
+
+    for i=1:numNeurons,
+
+        % future RF neuron index
+        futureRf = DuhamelRemapping_Result(i).futureRF;
+        
+        % saccade executed
+        saccade = DuhamelRemapping_Result(i).saccade;
+        
+        % original location prior to saccade
+        currentRf = futureRf + saccade;
+        
+        % Find the stimuli control latency of this neuron
+        j_stim = find(StimuliControl_rf == currentRf);
+        j_sacc = find(SaccadeControl_saccade == saccade);
+
+        % Check that we only get one hit
+        if(length(j_stim) ~= 1 || length(j_sacc) ~= 1)
+            error('STIM & SACC. CONTROL TASK SHOULD ONLY TEST EACH NEURON ONCE, AND MUST TEST ALL NEURONS.');
+        end
+        
+        % Compute stimulus index: based on stim onset response in control
+        % task and remapping task
+        stim_index(i) = DuhamelRemapping_Result(i).saccadeonset_response - StimuliControl_Result(j_stim).stimulus_response;
+        
+        % Compute saccade index: based on saccade onset response in control
+        % task and remapping task
+        sacc_index(i) = DuhamelRemapping_Result(i).saccadeonset_response - SaccadeControl_Result(j_sacc).saccadeonset_response;
+        
+        % Get latency
+        stim_latency(i) = StimuliControl_Result(j_stim).latency;
+
+    end
+
+    remapping_index     = sqrt(stim_index.^2 + sacc_index.^2); % according to L.M.Heiser,Colby (2006)
+    remapping_latency   = [DuhamelRemapping_Result(:).latency];
+    DuhamelRemapping_Index = [DuhamelRemapping_Result(:).index];
+    %}
+
+
+%
+%  AnalyzeDuhamelTruncation.m
+%  Remapping
+%
+%  Created by Bedeho Mender on 10/07/13.
+%  Copyright 2013 OFTNAI. All rights reserved.
+%
+
+
+%{
+
+    assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
+    
+    %% Latency & Duration
+    
+    c = 1;
+    DuhamelTruncation_indexes = [];
+    
+    for p=1:numPeriods,
+        
+        % Target location
+        currentRFLocation_HeadCentered = stimuli.headCenteredTargetLocations(p);
+        
+        % Find neurons that are close enough
+        neuron_RFLocations = max(-R_eccentricity,currentRFLocation_HeadCentered - RF_inclusion_th):1:min(R_eccentricity,currentRFLocation_HeadCentered + RF_inclusion_th);
+        
+        for f=neuron_RFLocations,
+        
+            % Find neuron
+            neuronIndex = R_eccentricity + f + 1;
+
+            % Get data neuron
+            neuronActivity  = R_firing_history(neuronIndex, :, p, 1);
+            
+            % Offset response
+            saccadeonset_response = normalizedIntegration(neuronActivity, dt, saccadeOnset, responseWindowDuration);
+            
+            %% DEBUG - looked good
+            %figure;plot(neuronActivity);hold on; plot(timeToTimeStep([saccadeOnset saccadeOnset], dt), [0 1], 'r');
+            
+            % Save
+            DuhamelTruncation_Neurons(c).index                   = neuronIndex;
+            DuhamelTruncation_Neurons(c).saccadeonset_response   = saccadeonset_response;
+            
+            DuhamelTruncation_indexes(c) = neuronIndex;
+            
+            c = c + 1;
+            
+        end
+    end
+%}

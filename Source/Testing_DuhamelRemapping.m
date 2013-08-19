@@ -37,8 +37,8 @@ function Testing_DuhamelRemapping(Name, stimulitype, saccadeOnset, stimuliDurati
         postSaccadefixationPeriod       = 0.300; % (s) time from saccade COMPLETION ESTIMATE "saccadeDelayTime" below.
     end
     
-    %% Utilities - derived
-    currentRF  = 10;%-R_eccentricity:1:R_eccentricity; % Remapping TARGET, i.e. postsaccadic (-R_eccentricity+R_edge_effect_buffer):1:(R_eccentricity+R_edge_effect_buffer)
+    % Utilities - derived
+    currentRF                       = 10;%-R_eccentricity:1:R_eccentricity; % Remapping TARGET, i.e. postsaccadic (-R_eccentricity+R_edge_effect_buffer):1:(R_eccentricity+R_edge_effect_buffer)
     saccades                        = -S_eccentricity:1:S_eccentricity; % Pick among these saccades
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed) + 0.05,-1); % round to nearest hundred above
     Duration                        = saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
@@ -53,8 +53,8 @@ function Testing_DuhamelRemapping(Name, stimulitype, saccadeOnset, stimuliDurati
         % Pick saccade
         s = randi(length(saccades));
         
-        % Make sure it is big enough and keeps target on retina
-        while((abs(saccades(s)) < saccade_threshold) || ~(-R_eccentricity <= r+saccades(s) && r+saccades(s) <=R_eccentricity)) % Make sure this saccade is big enough, and has current_ref on retina
+        % Make sure this saccade is big enough, and has current_ref on retina
+        while((abs(saccades(s)) < saccade_threshold) || ~(-R_eccentricity <= r+saccades(s) && r+saccades(s) <=R_eccentricity))
             s = randi(length(saccades));
         end
         
@@ -66,14 +66,13 @@ function Testing_DuhamelRemapping(Name, stimulitype, saccadeOnset, stimuliDurati
         stimuli{i}.saccadeTargets               = saccades(s);
         stimuli{i}.saccadeTimes                 = saccadeOnset;
         stimuli{i}.targetOffIntervals           = targetOffIntervals;
-        [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, stimuli{i}.targetOffIntervals, 0, stimuli{i}.saccadeTimes, stimuli{i}.saccadeTargets);
+        [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, stimuli{i}.targetOffIntervals, 0, saccadeOnset, stimuli{i}.saccadeTargets);
         stimuli{i}.eyePositionTrace             = eyePositionTrace;
         stimuli{i}.retinalTargetTraces          = retinalTargetTraces;
         
         % Add simple information
         stimuli{i}.currentRF             = r;
         stimuli{i}.stim_screen_location  = stim_screen_location;
-        stimuli{i}.numSaccades           = length(saccadeOnset);
     end
     
     % Save params
