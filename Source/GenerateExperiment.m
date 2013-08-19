@@ -92,7 +92,7 @@ function GenerateExperiment()
     % C
     parameterCombinations('C_tau')          = [0.010]; % (s)
     parameterCombinations('C_w_INHB')       = [1/5000]; %10/5000 50/5000 100/5000  C_N = 5400
-    parameterCombinations('C_slope')        = [8 7 6 5 4]; % classic= 500
+    parameterCombinations('C_slope')        = [8 6 4]; % classic= 500
     parameterCombinations('C_threshold')    = [0.5]; % old 0.45
     parameterCombinations('C_to_R_psi')     = [0.3]; % 0.12 0.15 0.17 0.2 0.22
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate

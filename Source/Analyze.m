@@ -16,6 +16,8 @@ function analysisSummary = Analyze(netDir, stimulinames)
     % keep track of thesee
     stim_control_activity  = [];
     sacc_control_activity = [];
+    stim_stimuli = [];
+    sacc_stimuli = [];
     
     for i = 1:length(stimulinames),
         
@@ -37,6 +39,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
             [StimuliControl_Result] = AnalyzeStimuliControlTask(activity, stimuli);
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'StimuliControl_Result');
             
+            stim_stimuli = stimuli;
             stim_control_activity = activity;
             
         elseif strcmp(type,'SaccadeControl'),
@@ -45,18 +48,19 @@ function analysisSummary = Analyze(netDir, stimulinames)
             [SaccadeControl_Result] = AnalyzeSaccadeControlTask(activity, stimuli);
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'SaccadeControl_Result');
             
+            sacc_stimuli = stimuli;
             sacc_control_activity = activity;
             
         elseif strcmp(type,'DuhamelRemapping'),
             
             disp('Doing duhamel remapping task analysis...');
-            [DuhamelRemapping_Result] = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, sacc_control_activity.R_firing_history);
+            [DuhamelRemapping_Result] = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemapping_Result');
             
         elseif strcmp(type,'DuhamelRemappingTrace'),
             
             disp('Doing duhamel remapping trace task analysis...');
-            [DuhamelRemappingTrace_Result] = AnalyzeDuhamelRemapping(activity, stimuli);
+            [DuhamelRemappingTrace_Result] = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemappingTrace_Result');
             
         elseif strcmp(type,'DuhamelTruncation'),
