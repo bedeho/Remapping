@@ -23,58 +23,65 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
     
     % Set parameters
     dt                          = activity.dt;
-    R_N                         = activity.R_N;
     numEpochs                   = activity.numEpochs;
     numPeriods                  = activity.numPeriods;
     
     saccadeOnset                = stimuli.saccadeOnset;
     stimulusOnsetTimes          = stimuli.stimulusOnsetTimes;
-    saccadeTargets              = stimuli.saccadeTargets;
-    headCenteredTargetLocations = stimuli.headCenteredTargetLocations;
-    
-    numStimuliOnsetTimes        = length(stimulusOnsetTimes);
-    numSaccadeTargets           = length(saccadeTargets);
-    numTargetsLocations         = length(headCenteredTargetLocations);
-                  
-    assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
     
     % Analysis params
-    responseWindowSize  = 0.300; % (s) from kusonoki paper, it is used in both saccade aligned and stimulus aligned analysis
+    responseWindowDuration  = 0.300; % (s) from kusonoki paper, it is used in both saccade aligned and stimulus aligned analysis
+    stim_responseWindowStart = 0.050 % (s) from kusonoki paper
+    
+    % Check that this is actually testing stimuli
+    assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
+    
+    % Buffers
+    stim_buffer = cell(1, length(stimulusOnsetTimes));
+    sacc_buffer = cell(1, length(stimulusOnsetTimes));
     
     %% Analysis for each period
     for p=1:numPeriods,
         
-        % Params of this period
-        targetNr    = stimuli.stimuli{p}.targetNr;
-        saccadeNr   = stimuli.stimuli{p}.saccadeNr;
-        stimOnsetNr = stimuli.stimuli{p}.stimOnsetNr;
+        % Rf where stim is located
+        stim_location = stimuli.stimuli{k}.headCenteredTargetLocations;
         
-        stimOnsetTime        = stimulusOnsetTimes(stimOnsetNr);
-        saccOnsetTimeSteps   = timeToTimeStep(saccadeOnset + 0:dt:responseWindowSize, dt);
-        stimOnsetTimeSteps   = timeToTimeStep(stimOnsetTime + 0:dt:responseWindowSize, dt);
+        % Get stim onset
+        stimOnsetNr = stimuli.stimuli{k}.stimOnsetNr;
+        stimuliOnset   = stimuli.stimulusOnsetTimes(stimOnsetNr);
         
-        % Extract the given time steps from all neurons in all periods
-        saccade_activity    = R_firing_history(:, saccOnsetTimeSteps, :, 1);
-        stimulus_activity   = R_firing_history(:, stimOnsetTimeSteps, :, 1);
+        % Get task type, deduce what neuron to record from
+        if(stimuli.stimuli{k}.trialType == 1),
+            rf = stim_location;
+        else
+            rf = stim_location - stimuli{k}.saccadeTargets;
+        end
         
-        % Integrate to find response
-        saccade_response    = squeeze(trapz(saccade_activity,2));
-        stimulus_response   = squeeze(trapz(stimulus_activity,2));
+        % Get neuron index of neuron
+        neuronIndex =  R_eccentricity + rf + 1;
+        
+        % Get data for best period of each neuron
+        responseVector  = R_firing_history(neuronIndex, :, p, 1);
+        
+        % Stimuli aligned response window
+        stimulionset_response = normalizedIntegration(responseVector, dt, stimuliOnset + stim_responseWindowStart, responseWindowDuration);
+        
+        % Saccade aligned response window
+        saccadeonset_response = normalizedIntegration(responseVector, dt, saccadeOnset, responseWindowDuration);
+        
+        % Save in buffers
+        stim_buffer{stimOnsetNr} = [stim_buffer{stimOnsetNr} stimulionset_response];
+        sacc_buffer{stimOnsetNr} = [sacc_buffer{stimOnsetNr} saccadeonset_response];
 
-        % Normaliztion step, gives normalized (sp/s) units to response
-        saccade_response    = saccade_response/(length(saccOnsetTimeSteps) - 1);
-        stimulus_response   = stimulus_response/(length(stimOnsetTimeSteps) - 1);            
+    end
+    
+    % Turn raw data into struct arrays
+    for p=1:numPeriods,
         
-        % Save results
-        kusonokiSACCAlignedAnalysis(p).targetNr     = targetNr;
-        kusonokiSACCAlignedAnalysis(p).saccadeNr    = saccadeNr;
-        kusonokiSACCAlignedAnalysis(p).stimOnsetNr  = stimOnsetNr;
-        kusonokiSACCAlignedAnalysis(p).response     = saccade_response;
+        kusonokiSTIMAlignedAnalysis(p).mean = mean(stim_buffer{p});
+        kusonokiSTIMAlignedAnalysis(p).std  = std(stim_buffer{p});
         
-        kusonokiSTIMAlignedAnalysis(p).targetNr     = targetNr;
-        kusonokiSTIMAlignedAnalysis(p).saccadeNr    = saccadeNr;
-        kusonokiSTIMAlignedAnalysis(p).stimOnsetNr  = stimOnsetNr;
-        kusonokiSTIMAlignedAnalysis(p).response     = stimulus_response;
-        
+        kusonokiSACCAlignedAnalysis(p).mean = mean(sacc_buffer{p});
+        kusonokiSACCAlignedAnalysis(p).std  = std(sacc_buffer{p});
     end
 end

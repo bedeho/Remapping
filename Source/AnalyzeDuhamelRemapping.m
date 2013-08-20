@@ -61,7 +61,7 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         % Index of R neuron which will recieve remapping activity: currentRF
         remappedInto_neuronIndex = R_eccentricity + stimuli.stimuli{p}.currentRF + 1;
         
-        % Get data for best period of each neuron
+        % Get data for neuron
         remap_responseVector  = R_firing_history(remappedInto_neuronIndex, :, p, 1);
 
         % Find latency and duration

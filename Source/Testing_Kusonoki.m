@@ -16,69 +16,83 @@ function Testing_Kusonoki(Name)
     filename = [Name '-Kusonoki'];
     stimulitype = 'Kusonoki';
     
-    % Params
+    %% Parameters
+    
+    % Technical
     dt                              = 0.010; % (s)
     seed                            = 77;
-    S_eccentricity                  = 30;
-    S_density                       = 10;
-    R_eccentricity                  = 45;
-    R_density                       = 10;
-    
-    % Dynamical quantities
-    saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!
-    saccadeOnset                    = 0.4; % w.r.t start of task
-    earliestStimulusOnsetTime       = 0.100; % w.r.t start of task
-    lastStimulusOnsetTime           = saccadeOnset + 0.500; % w.r.t start of task
-    stimulusDuration                = 0.1;
-    fixationPeriod                  = lastStimulusOnsetTime + stimulusDuration + 0.100; % time from saccade onset
-    stimulusOnsetTimes              = earliestStimulusOnsetTime:0.300:lastStimulusOnsetTime;% earliestStimulusOnsetTime
-
-    % Generate stimuli
     rng(seed);
-    Duration                        = saccadeOnset + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
-    saccadeTargets                  = -S_eccentricity:S_density:S_eccentricity;
-    headCenteredTargetLocations     = -R_eccentricity:R_density:R_eccentricity;
+    
+    % Spatial
+    S_eccentricity                  = 30;
+    R_eccentricity                  = 45;
+    saccade_threshold               = S_eccentricity/2;
+    
+    % Temporal
+    saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!
+    saccadeOnset                    = 0.4; % w.r.t start of task    
+    stimulusDuration                = 0.100;
+    stimulusOnsetTimes              = 0.100:0.200:(saccadeOnset + 0.500); % w.r.t start of trial
 
+    % Utilities - derived
+    screen_locations                = -7;%-R_eccentricity:1:R_eccentricity;
+    saccades                        = -S_eccentricity:1:S_eccentricity;
+    saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1); % round to nearest hundred above
+    Duration                        = max(max(stimulusOnsetTimes),saccadeOnset + saccadeDelayTime) + 0.300; % (s), make sure we have enough time after last stim onset time to have
+    % space for response window!
+    
     k = 1;
-    for i = 1:length(headCenteredTargetLocations),
+    for z=1:2,
         
-        % Location of target
-        h = headCenteredTargetLocations(i);
-        
-        % Deduce all valid saccades keeping this target on retina
-        sTargets = saccadeTargets(-R_eccentricity + h <= saccadeTargets <= h + R_eccentricity);
-        
-        for j = 1:length(sTargets),
+        % z=1: Current RF trials
+        % z=2: Future RF trials
+
+        % ITerate location where rf will be, current or future.
+        for i = 1:length(screen_locations),
             
-            % Get saccade
-            s = sTargets(j);
+            % Get rf location
+            RF_location = screen_locations(i);
+
+            % Pick a first random saccade
+            s = randi(length(saccades));
             
+            % Make sure this saccade is big enough, and that future RF is
+            % on retina
+            while((abs(saccades(s)) < saccade_threshold) || ~(-R_eccentricity <= RF_location+saccades(s) && RF_location+saccades(s) <=R_eccentricity))
+                s = randi(length(saccades));
+            end
+            
+            % Where to put stimuli prior to saccade
+            if(z==1), %current rf trial
+                stim_location = RF_location;
+            else
+                stim_location = RF_location + saccades(s);
+            end
+            
+            % Iterate different stimulus onset times
             for t = 1:length(stimulusOnsetTimes),
-                
+
                 onsetTime                               = stimulusOnsetTimes(t);
                 offsetTime                              = onsetTime + stimulusDuration;
                 targetOffIntervals{1}                   = [0 onsetTime;offsetTime Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
 
-                stimuli{k}.initialEyePosition           = 0;
-                stimuli{k}.headCenteredTargetLocations  = h;
+                % Generate trace
+                stimuli{k}.headCenteredTargetLocations  = stim_location;
+                stimuli{k}.saccadeTargets               = saccades(s);
                 stimuli{k}.saccadeTimes                 = saccadeOnset;
-                stimuli{k}.saccadeTargets               = s;
-                stimuli{k}.numSaccades                  = length(stimuli{k}.saccadeTargets);
                 stimuli{k}.targetOffIntervals           = targetOffIntervals;
-
-
-                [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, stimuli{k}.targetOffIntervals, stimuli{k}.initialEyePosition, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
+                [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, stimuli{k}.targetOffIntervals, 0, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
                 stimuli{k}.eyePositionTrace             = eyePositionTrace;
                 stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
 
-                % meta data
+                % Add simple information
+                stimuli{k}.trialType                    = z;
                 stimuli{k}.targetNr                     = i;
-                stimuli{k}.saccadeNr                    = j;
+                stimuli{k}.saccadeNr                    = s;
                 stimuli{k}.stimOnsetNr                  = t;
 
                 k = k + 1;
             end
-            
         end
     end
     
@@ -93,17 +107,11 @@ function Testing_Kusonoki(Name)
     
     save([stimuliFolder filesep 'stim.mat'] , ...
                                     'S_eccentricity', ...
-                                    'S_density', ...
                                     'R_eccentricity', ...
-                                    'R_density', ...
                                     'saccadeOnset', ...
-                                    'earliestStimulusOnsetTime', ...
-                                    'lastStimulusOnsetTime', ...
                                     'stimulusDuration', ...
-                                    'fixationPeriod', ...
                                     'stimulusOnsetTimes', ...
-                                    'saccadeTargets', ...
-                                    'headCenteredTargetLocations', ...
+                                    'saccades', ...
                                     'stimulitype', ...
                                     'stimuli', ...
                                     'Duration', ...
