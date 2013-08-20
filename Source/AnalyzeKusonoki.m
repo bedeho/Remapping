@@ -45,21 +45,14 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
     for p=1:numPeriods,
         
         % Rf where stim is located
-        stim_location = stimuli.stimuli{p}.headCenteredTargetLocations;
+        RF_location = stimuli.stimuli{p}.RF_location;
         
         % Get stim onset
         stimOnsetNr  = stimuli.stimuli{p}.stimOnsetNr;
         stimuliOnset = stimuli.stimulusOnsetTimes(stimOnsetNr);
         
-        % Get task type, deduce what neuron to record from
-        if(stimuli.stimuli{p}.trialType == 1),
-            rf = stim_location;
-        else
-            rf = stim_location - stimuli.stimuli{p}.saccadeTargets;
-        end
-        
         % Get neuron index of neuron
-        neuronIndex =  R_eccentricity + rf + 1;
+        neuronIndex =  R_eccentricity + RF_location + 1;
         
         % Get data for best period of each neuron
         responseVector  = R_firing_history(neuronIndex, :, p, 1);
@@ -75,6 +68,21 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
             stim_buffer{1,stimOnsetNr} = [stim_buffer{1,stimOnsetNr} stimulionset_response];
             sacc_buffer{1,stimOnsetNr} = [sacc_buffer{1,stimOnsetNr} saccadeonset_response];
         else
+            
+            %{
+            t = timeToTimeStep(stimuliOnset + stim_responseWindowStart, dt);
+            len = size(R_firing_history,2);
+            
+            figure;
+            subplot(1,2,1);
+            imagesc(R_firing_history(:, :, p, 1));
+            subplot(1,2,2);
+            hold on;
+            plot(responseVector);
+            plot([t t],[0 1],'r');
+            plot([0 (len-1)],[stimulionset_response stimulionset_response],'g-');
+            %}
+            
             stim_buffer{2,stimOnsetNr} = [stim_buffer{2,stimOnsetNr} stimulionset_response];
             sacc_buffer{2,stimOnsetNr} = [sacc_buffer{2,stimOnsetNr} saccadeonset_response];
         end

@@ -102,9 +102,11 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         remapping_index = sqrt(stim_index^2 + sacc_index^2); 
         
         %% FIGURE
+        
         %{
         figure;
        
+        R_N = size(R_firing_history, 1);
         remapNumTimeSteps = size(R_firing_history, 2);
         stimNumTimeSteps = size(stim_control_activity, 2);
         saccNumTimeSteps = size(sacc_control_activity,2);
@@ -116,7 +118,7 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         plot(0:(remapNumTimeSteps-1),remap_responseVector);
         plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
         plot([stimuliOnsetTimeStep stimuliOnsetTimeStep],[0 1], 'g');
-        plot([saccadeOnsetTimeStep saccadeOnsetTimeStep],[0 1], 'k');
+        plot([saccadeOnsetTimeStep saccadeOnsetTimeStep],[0 1], '--k');
         title('remapping single neuron response');
         xlabel(['Time - dt (' num2str(dt) ' s)']);
         xlim([0 (remapNumTimeSteps-1)]);
@@ -125,6 +127,9 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         hold on;
         imagesc(R_firing_history(:, :, p, 1));
         plot([0 (remapNumTimeSteps-1)],[remappedInto_neuronIndex remappedInto_neuronIndex], 'w');
+        plot([latencyTimeStep latencyTimeStep],[1 R_N], 'r');
+        plot([stimuliOnsetTimeStep stimuliOnsetTimeStep],[1 R_N], 'g');
+        plot([saccadeOnsetTimeStep saccadeOnsetTimeStep],[1 R_N], '--k');
         colorbar;
         axis tight;
         colorbar;
@@ -172,6 +177,8 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         axis tight;
         title('saccade population response');
         xlabel(['Time - dt (' num2str(dt) ' s)']);
+        
+
         %}
         
         %% Save
@@ -179,8 +186,8 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         DuhamelRemappin_Result(p).currentRF               = stimuli.stimuli{p}.currentRF;
         DuhamelRemappin_Result(p).futureRF                = stimuli.stimuli{p}.stim_screen_location;
         DuhamelRemappin_Result(p).saccade                 = stimuli.stimuli{p}.saccadeTargets;
-        DuhamelRemappin_Result(p).remappingLatency        = stepToTime(latencyTimeStep, dt)-saccadeOnset;
-        DuhamelRemappin_Result(p).stimLatency             = stepToTime(stim_latencyTimeStep, dt)-stim_stimuliOnset;
+        DuhamelRemappin_Result(p).remappingLatency        = (latencyTimeStep - timeToTimeStep(saccadeOnset,dt))*dt;
+        DuhamelRemappin_Result(p).stimLatency             = (stim_latencyTimeStep - timeToTimeStep(stim_stimuliOnset, dt))*dt;
         
         DuhamelRemappin_Result(p).Duration                = duration*dt;
         DuhamelRemappin_Result(p).saccadeonset_response   = saccadeonset_response;

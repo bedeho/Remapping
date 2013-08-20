@@ -32,7 +32,7 @@ function Testing_Kusonoki(Name)
     saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!
     saccadeOnset                    = 0.4; % w.r.t start of task    
     stimulusDuration                = 0.100;
-    stimulusOnsetTimes              = 0.100:0.200:(saccadeOnset + 0.500); % w.r.t start of trial
+    stimulusOnsetTimes              = saccadeOnset + (-0.400:0.050:0.200); % w.r.t start of trial
 
     % Utilities - derived
     screen_locations                = -7;%-R_eccentricity:1:R_eccentricity;
@@ -86,6 +86,7 @@ function Testing_Kusonoki(Name)
                 stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
 
                 % Add simple information
+                stimuli{k}.RF_location                  = RF_location;
                 stimuli{k}.trialType                    = z;
                 stimuli{k}.targetNr                     = i;
                 stimuli{k}.saccadeNr                    = s;

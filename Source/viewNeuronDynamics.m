@@ -106,9 +106,16 @@ function viewNeuronDynamics(activityFile, stimuliName)
         if ~isempty(activity.C_firing_history),
             C_firingrate = activity.C_firing_history(:, :, period, epoch);
             C_activation = activity.C_activation_history(:, :, period, epoch);
+            
+            includeC_layer = 1;
+            numRows = 2+5;
+            
         else
             C_firingrate = zeros(C_N, activity.numPeriods);
             C_activation = zeros(C_N, activity.numPeriods);
+            
+            includeC_layer = 0;
+            numRows = 5;
         end
         
         % Plot
@@ -122,7 +129,7 @@ function viewNeuronDynamics(activityFile, stimuliName)
         title('E Firing');
 
         %{
-        subplot(6,2,2);
+        subplot(numRows,2,2);
         imagesc(E_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
@@ -130,14 +137,14 @@ function viewNeuronDynamics(activityFile, stimuliName)
         title('E Firing');
         %}
         
-        subplot(6,2,3);
+        subplot(numRows,2,3);
         imagesc(V_firingrate);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('V Firing');
 
         %{
-        subplot(6,2,4);
+        subplot(numRows,2,4);
         imagesc(V_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
@@ -145,53 +152,59 @@ function viewNeuronDynamics(activityFile, stimuliName)
         title('V Firing');
         %}
         
-        subplot(6,2,5);
+        subplot(numRows,2,5);
         imagesc(R_firingrate);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('R Firing');
 
-        subplot(6,2,6);
+        subplot(numRows,2,6);
         imagesc(R_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('R Activation');
 
-        subplot(6,2,7);
+        subplot(numRows,2,7);
         imagesc(S_firingrate);
         colorbar
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('S Firing');
 
-        subplot(6,2,8);
+        subplot(numRows,2,8);
         imagesc(S_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('S Activation');
 
-        subplot(6,2,9);
-        imagesc(C_firingrate);
-        hold on;colorbar
-        if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
-        colorbar
-        title('C Firing');
+        if(includeC_layer),
+            subplot(numRows,2,[9 11]);
+            imagesc(C_firingrate);
+            hold on;colorbar
+            if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
+            colorbar
+            title('C Firing');
 
-        subplot(6,2,10);
-        imagesc(C_activation);
-        hold on;colorbar
-        if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
-        colorbar
-        title('C Actiation');
+            subplot(numRows,2,[10 12]);
+            imagesc(C_activation);
+            hold on;colorbar
+            if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
+            colorbar
+            title('C Actiation');
+            
+            nextplot = 13;
+        else
+            nextplot = 9;
+        end
         
         % Add bottom traces
         eyePositionTrace = stimuli.stimuli{period}.eyePositionTrace;
         retinalTargetTraces = stimuli.stimuli{period}.retinalTargetTraces';
 
-        subplot(6,2,11);
+        subplot(numRows,2,nextplot);
         cla
         plot(0:(numTimeSteps-1), eyePositionTrace, 'r');
         hold on;
@@ -211,7 +224,7 @@ function viewNeuronDynamics(activityFile, stimuliName)
         set(gca,'YDir','reverse');
         
         %{
-        subplot(6,2,12);
+        subplot(numRows,2,nextplot+1);
         cla
         plot(0:(numTimeSteps-1), eyePositionTrace, 'r');
         hold on;
