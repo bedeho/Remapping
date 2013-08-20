@@ -38,7 +38,7 @@ function Testing_Kusonoki(Name)
     screen_locations                = -7;%-R_eccentricity:1:R_eccentricity;
     saccades                        = -S_eccentricity:1:S_eccentricity;
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1); % round to nearest hundred above
-    Duration                        = max(max(stimulusOnsetTimes),saccadeOnset + saccadeDelayTime) + 0.300; % (s), make sure we have enough time after last stim onset time to have
+    Duration                        = max(stimulusOnsetTimes(end),saccadeOnset + saccadeDelayTime) + 0.400; % (s), make sure we have enough time after last stim onset time to have
     % space for response window!
     
     k = 1;

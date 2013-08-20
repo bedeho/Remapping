@@ -23,6 +23,7 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
     
     % Set parameters
     dt                          = activity.dt;
+    R_eccentricity              = stimuli.R_eccentricity;
     numEpochs                   = activity.numEpochs;
     numPeriods                  = activity.numPeriods;
     
@@ -31,30 +32,30 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
     
     % Analysis params
     responseWindowDuration  = 0.300; % (s) from kusonoki paper, it is used in both saccade aligned and stimulus aligned analysis
-    stim_responseWindowStart = 0.050 % (s) from kusonoki paper
+    stim_responseWindowStart = 0.050; % (s) from kusonoki paper
     
     % Check that this is actually testing stimuli
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
     
     % Buffers
-    stim_buffer = cell(1, length(stimulusOnsetTimes));
-    sacc_buffer = cell(1, length(stimulusOnsetTimes));
+    stim_buffer = cell(2, length(stimulusOnsetTimes));
+    sacc_buffer = cell(2, length(stimulusOnsetTimes));
     
     %% Analysis for each period
     for p=1:numPeriods,
         
         % Rf where stim is located
-        stim_location = stimuli.stimuli{k}.headCenteredTargetLocations;
+        stim_location = stimuli.stimuli{p}.headCenteredTargetLocations;
         
         % Get stim onset
-        stimOnsetNr = stimuli.stimuli{k}.stimOnsetNr;
-        stimuliOnset   = stimuli.stimulusOnsetTimes(stimOnsetNr);
+        stimOnsetNr  = stimuli.stimuli{p}.stimOnsetNr;
+        stimuliOnset = stimuli.stimulusOnsetTimes(stimOnsetNr);
         
         % Get task type, deduce what neuron to record from
-        if(stimuli.stimuli{k}.trialType == 1),
+        if(stimuli.stimuli{p}.trialType == 1),
             rf = stim_location;
         else
-            rf = stim_location - stimuli{k}.saccadeTargets;
+            rf = stim_location - stimuli.stimuli{p}.saccadeTargets;
         end
         
         % Get neuron index of neuron
@@ -69,19 +70,31 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
         % Saccade aligned response window
         saccadeonset_response = normalizedIntegration(responseVector, dt, saccadeOnset, responseWindowDuration);
         
-        % Save in buffers
-        stim_buffer{stimOnsetNr} = [stim_buffer{stimOnsetNr} stimulionset_response];
-        sacc_buffer{stimOnsetNr} = [sacc_buffer{stimOnsetNr} saccadeonset_response];
-
+        % Get task type, and save appripriately
+        if(stimuli.stimuli{p}.trialType == 1),
+            stim_buffer{1,stimOnsetNr} = [stim_buffer{1,stimOnsetNr} stimulionset_response];
+            sacc_buffer{1,stimOnsetNr} = [sacc_buffer{1,stimOnsetNr} saccadeonset_response];
+        else
+            stim_buffer{2,stimOnsetNr} = [stim_buffer{2,stimOnsetNr} stimulionset_response];
+            sacc_buffer{2,stimOnsetNr} = [sacc_buffer{2,stimOnsetNr} saccadeonset_response];
+        end
     end
     
     % Turn raw data into struct arrays
-    for p=1:numPeriods,
+    for i=1:length(stimulusOnsetTimes),
         
-        kusonokiSTIMAlignedAnalysis(p).mean = mean(stim_buffer{p});
-        kusonokiSTIMAlignedAnalysis(p).std  = std(stim_buffer{p});
+        % stim aligned analysis
+        kusonokiSTIMAlignedAnalysis(i).current_mean = mean(stim_buffer{1,i});
+        kusonokiSTIMAlignedAnalysis(i).current_std  = std(stim_buffer{1,i});
         
-        kusonokiSACCAlignedAnalysis(p).mean = mean(sacc_buffer{p});
-        kusonokiSACCAlignedAnalysis(p).std  = std(sacc_buffer{p});
+        kusonokiSTIMAlignedAnalysis(i).future_mean = mean(stim_buffer{2,i});
+        kusonokiSTIMAlignedAnalysis(i).future_std  = std(stim_buffer{2,i});
+        
+        % sacca aligned analysis
+        kusonokiSACCAlignedAnalysis(i).current_mean = mean(sacc_buffer{1,i});
+        kusonokiSACCAlignedAnalysis(i).current_std  = std(sacc_buffer{1,i});
+        
+        kusonokiSACCAlignedAnalysis(i).future_mean = mean(sacc_buffer{2,i});
+        kusonokiSACCAlignedAnalysis(i).future_std  = std(sacc_buffer{2,i});
     end
 end

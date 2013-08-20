@@ -215,8 +215,8 @@ function GenerateExperiment()
                     copyfile(parameterfile, subsim_dir);
                     
                     % Testing network
-                    %disp('Kusonoki ...');
-                    %Remapping(subsim_dir, 'basic-Kusonoki', false, [name ext]);
+                    disp('Kusonoki ...');
+                    Remapping(subsim_dir, 'basic-Kusonoki', false, [name ext]);
                     
                     disp('Duhamel Remapping ...');
                     Remapping(subsim_dir, 'basic-DuhamelRemapping', false, [name ext]);

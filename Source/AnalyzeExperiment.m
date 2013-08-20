@@ -23,7 +23,7 @@ function AnalyzeExperiment(experiment)
                     'basic-StimuliControl'}; %'basic-Kusonoki', ...
     %}
     
-    stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemapping', 'basic-DuhamelRemappingTrace', 'basic-DuhamelTruncation', 'basic-CLayerProbe'};
+    stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemapping', 'basic-DuhamelRemappingTrace', 'basic-DuhamelTruncation', 'basic-CLayerProbe','basic-Kusonoki'};
     
     % Import global variables
     declareGlobalVars();

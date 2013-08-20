@@ -364,3 +364,50 @@ end
         end
     end
 %}
+
+%
+%  Analyze.m
+%  Analyze
+%
+%  Created by Bedeho Mender on 11/05/13.
+%  Copyright 2013 OFTNAI. All rights reserved.
+%
+
+
+    %% Kusonoki
+    
+    % Get a plot up and running? MANUAL HOME BREW ANALYTICS
+    %{
+
+    %activity = load(activityFile);
+    activity = LoadActivity(activityFile);
+    stimuli  = load(stimuliFile);
+
+    period = 20;
+    R_N = activity.R_N;
+    dt = activity.dt;
+
+    f=figure;
+    x = activity.R_firing_history(:, :, period, 1);
+
+    s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes, dt);
+
+    nr = stimuli.stimuli{period}.stimOnsetNr;
+    stim = timeToTimeStep(stimuli.stimulusOnsetTimes(nr), dt);
+    stim_off = timeToTimeStep(stimuli.stimulusOnsetTimes(nr) + stimuli.stimulusDuration, dt);
+
+    imagesc(x);
+
+    hold on;
+
+    plot([stim stim],[ones(R_N,1) R_N*ones(R_N,1)],'--w','LineWidth', 4); % STIM ON
+
+    plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'w','LineWidth', 4); % saccade
+
+    plot([stim_off stim_off],[ones(R_N,1) R_N*ones(R_N,1)],'--w','LineWidth', 4); % STIM OFF
+
+    title(num2str(period));
+
+    saveas(f,[netDir filesep 'summary.png']);
+    close(f);
+    %}
