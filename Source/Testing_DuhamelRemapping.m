@@ -38,7 +38,7 @@ function Testing_DuhamelRemapping(Name, stimulitype, saccadeOnset, stimuliDurati
     end
     
     % Utilities - derived
-    currentRF                       = 10;%-R_eccentricity:1:R_eccentricity; % Remapping TARGET, i.e. postsaccadic (-R_eccentricity+R_edge_effect_buffer):1:(R_eccentricity+R_edge_effect_buffer)
+    currentRF                       = [-10 -5 0 5 10];%-R_eccentricity:1:R_eccentricity; % 10; Remapping TARGET, i.e. postsaccadic (-R_eccentricity+R_edge_effect_buffer):1:(R_eccentricity+R_edge_effect_buffer)
     saccades                        = -S_eccentricity:1:S_eccentricity; % Pick among these saccades
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed) + 0.05,-1); % round to nearest hundred above
     Duration                        = saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
@@ -69,6 +69,7 @@ function Testing_DuhamelRemapping(Name, stimulitype, saccadeOnset, stimuliDurati
         [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, stimuli{i}.targetOffIntervals, 0, saccadeOnset, stimuli{i}.saccadeTargets);
         stimuli{i}.eyePositionTrace             = eyePositionTrace;
         stimuli{i}.retinalTargetTraces          = retinalTargetTraces;
+        stimuli{i}.stimOnsetTimes               = stimuliOnset;
         
         % Add simple information
         stimuli{i}.currentRF             = r;

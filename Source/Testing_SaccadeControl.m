@@ -45,6 +45,7 @@ function Testing_SaccadeControl(Name)
         [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, targetOffIntervals, stimuli{i}.initialEyePosition, stimuli{i}.saccadeTimes, stimuli{i}.saccadeTargets);
         stimuli{i}.eyePositionTrace             = eyePositionTrace;
         stimuli{i}.retinalTargetTraces          = retinalTargetTraces;
+        stimuli{i}.stimOnsetTimes               = [];
     end
     
     % Save params

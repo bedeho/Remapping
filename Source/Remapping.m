@@ -80,8 +80,18 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     R_slope         = parameters.simulation('R_slope');
     R_threshold     = parameters.simulation('R_threshold');
     %R_to_C_alpha    = parameters.simulation('R_to_C_alpha'); % learning rate
-    %R_to_C_psi     = parameters.simulation('R_to_C_psi'); % 4
+    %R_to_C_psi      = parameters.simulation('R_to_C_psi'); % 4
     R_psi           = parameters.simulation('R_psi');
+    
+    R_tau_rise      = parameters.simulation('R_tau_rise');
+    R_tau_decay     = parameters.simulation('R_tau_decay');
+    R_tau_sigma     = parameters.simulation('R_tau_sigma');
+    
+    % K  =======================================
+    K_tau           = parameters.simulation('K_tau');
+    K_psi           = parameters.simulation('K_psi');
+    K_delays        = parameters.simulation('K_delays');
+    K               = zeros(1,R_N);
     
     % E  =======================================
     
@@ -176,6 +186,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             saccadeTimes        = stimuli.stimuli{period}.saccadeTimes;
             saccadeTargets      = stimuli.stimuli{period}.saccadeTargets;
             numSaccades         = length(stimuli.stimuli{period}.saccadeTimes);
+            stimOnsetTimes      = stimuli.stimuli{period}.stimOnsetTimes;
 
             % Setup static working variables
             R_preference_comparison_matrix = repmat(R_preferences, maxNumberOfVisibleTargets, 1); % used to compute driving term in V
@@ -192,6 +203,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             periodSaveCounter   = 1;
             E                   = E*0;
             V                   = V*0;
+            K                   = K*0;
             R_firingrate        = R_firingrate*0;
             S_firingrate        = S_firingrate*0;
             C_firingrate        = C_firingrate*0;
@@ -207,27 +219,58 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
 
                 %% Activation
                 
-                % E =======================================
+                % Keep old solution variables, they are used to compute new
+                % ones in Euler scheme
+                E_old = E;
+                V_old = V;
+                K_old = K;
                 
+                % Visual singals
                 if(~isempty(retinalTargetTraces)),
                     retinalTargets = retinalTargetTraces(:,t);
                     diff = R_preference_comparison_matrix - repmat(retinalTargets,1,R_N);
                     diff(isnan(diff)) = inf; % for nan values, make inf, so that exponantiation gives no contribution
-                    gauss = exp((-(diff).^2)./(2*E_sigma^2));
+                    gauss = exp((-(diff).^2)./(2*E_sigma^2)); % gauss has dimensions: maxNumberOfVisibleTargets X R_N
+                    
                 else
                     gauss = 0;
                 end
                 
-                tau = E_tau_rise + exp(-(gauss.^2)/(2*E_tau_sigma^2))*(E_tau_decay-E_tau_rise);
-                E = E + (dt./tau).*(-E + gauss);  
+                % E & V =======================================
+                
+                flat_gauss = sum(gauss,1); % collapse stimulus dimension, so that each neuron has one driving sum of exponentials, one exponential per stimulus
+                
+                E_tau = E_tau_rise + exp(-(flat_gauss.^2)/(2*E_tau_sigma^2))*(E_tau_decay-E_tau_rise);
+                
+                E = E_old + (dt./E_tau).*(-E_old + flat_gauss);
+                
+                V = V_old + (dt/V_tau)*(-V_old + E_to_V_psi*E_old); % V uses OLD E value for euler scheme to be correctly implemented.
                 
                 % R =======================================
+                
                 R_inhibition = R_w_INHB*sum(R_firingrate);
                 C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate');
                 %V_to_R_excitation = V_to_R_psi*V;
                 
+                % R asymmetric decay
+                %R_visual_excitation = R_psi*gauss; % classic
+                
+                if(~isempty(stimOnsetTimes)),
+                    
+                    stimOnsetTimes-time-K_delays
+                
+                    K = K_old + (dt/K_tau)*(-V + K_psi* + STIM());
+                else
+                    K = 0;
+                end
+                
+                R_visual_excitation = K.*gauss;
+                R_total_exication = C_to_R_excitation' + R_visual_excitation;
+                R_tau = R_tau_rise + exp(-(R_total_exication.^2)/(2*R_tau_sigma^2))*(R_tau_decay-R_tau_rise);
+                R_activation = R_activation + (dt./R_tau).*(-R_activation + R_total_exication - R_inhibition );
+                
                 % gauss drives R
-                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + R_psi*gauss);
+                %R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + R_psi*gauss);
                 
                 % E drives R
                 %R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + E_to_R_psi*E);
@@ -235,10 +278,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 %classic: 
                 %R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + V_to_R_excitation);
             
-                % V =======================================
-                V = V + (dt/V_tau)*(-V + E_to_V_psi*E);
-
                 % C =======================================
+                
                 C_inhibition = C_w_INHB*sum(C_firingrate);
                 %R_to_C_excitation = R_to_C_psi*(R_to_C_weights*R_firingrate');
                 V_to_C_excitation = V_to_C_psi*(V_to_C_weights*V');
@@ -288,6 +329,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 %S_firingrate = 1./(1 + exp(-2*S_slope*(S_activation - S_threshold)));
                 S_firingrate = S_activation;
                 C_firingrate = 1./(1 + exp(-2*C_slope*(C_activation - C_threshold)));
+                %V
 
                 %% Save activity                
                 if (~isTraining || isTraining && parameters.saveActivityInTraining) % && mod(t, outputSavingRate) == 0,
@@ -309,7 +351,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 end 
             end
             
-            % HACK to save C for C Probe Task.
+            % HACK to save C for C Probe Task, we dont have space to do
+            % this properly
             if numSaccades > 0,
 
                 %hacked solution to get rate during C probing task,

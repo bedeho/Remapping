@@ -155,8 +155,12 @@ function AnalyzeExperiment(experiment)
                         
                         fprintf(fileID, '<td>');
                         
-                        % Image
-                        fprintf(fileID, '<img src="%s" width="250px" height="250px"/></br>\n', [netDir filesep stimuli_types{i} '-summary.png']);
+                        % Image - only if it exists!
+                        imageFile = [netDir filesep stimuli_types{i} '-summary.png'];
+                        
+                        if exist(imageFile, 'file'),                        
+                            fprintf(fileID, '<img src="%s" width="250px" height="250px"/></br>\n', imageFile);
+                        end
                         
                         % Button
                         outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'',\\''' stimulinames{i} '\\'')']);

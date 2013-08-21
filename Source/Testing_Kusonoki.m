@@ -35,7 +35,7 @@ function Testing_Kusonoki(Name)
     stimulusOnsetTimes              = saccadeOnset + (-0.400:0.050:0.200); % w.r.t start of trial
 
     % Utilities - derived
-    screen_locations                = -7;%-R_eccentricity:1:R_eccentricity;
+    screen_locations                = [-10 -5 0 5 10];%-R_eccentricity:1:R_eccentricity; %-7
     saccades                        = -S_eccentricity:1:S_eccentricity;
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1); % round to nearest hundred above
     Duration                        = max(stimulusOnsetTimes(end),saccadeOnset + saccadeDelayTime) + 0.400; % (s), make sure we have enough time after last stim onset time to have
@@ -84,6 +84,7 @@ function Testing_Kusonoki(Name)
                 [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, stimuli{k}.targetOffIntervals, 0, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
                 stimuli{k}.eyePositionTrace             = eyePositionTrace;
                 stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
+                stimuli{i}.stimOnsetTimes               = onsetTime;
 
                 % Add simple information
                 stimuli{k}.RF_location                  = RF_location;

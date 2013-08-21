@@ -90,6 +90,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
     end
     
     %% Stimuli Control
+    %{
     f = figure;
     latency = [StimuliControl_Result(:).latency];
     maxLatency = max(latency);
@@ -115,6 +116,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
 
     saveas(f,[netDir filesep 'StimuliControl-summary.png']);
     close(f);
+    %}
     
     %% Duhamel remapping analysis plotting
     remappingAnalysis(DuhamelRemapping_Result, 'DuhamelRemapping');
@@ -201,7 +203,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
         f = figure;
         hold on;
         x = 0:0.1:sqrt(2);
-        bar(x,hist(remapping_result(:).remapping_index,x));
+        bar(x,hist([remapping_result(:).remapping_index],x));
 
         xlabel('Remapping Index');
         ylabel('Frequency');

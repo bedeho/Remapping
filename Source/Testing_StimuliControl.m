@@ -45,6 +45,7 @@ function Testing_StimuliControl(Name)
         [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, targetOffIntervals, stimuli{i}.initialEyePosition, stimuli{i}.saccadeTimes, stimuli{i}.saccadeTargets);
         stimuli{i}.eyePositionTrace             = eyePositionTrace;
         stimuli{i}.retinalTargetTraces          = retinalTargetTraces;
+        stimuli{i}.stimOnsetTimes               = stimuliOnset;
         
     end
     

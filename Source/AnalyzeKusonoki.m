@@ -81,10 +81,11 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
             plot(responseVector);
             plot([t t],[0 1],'r');
             plot([0 (len-1)],[stimulionset_response stimulionset_response],'g-');
-            %}
+            
             
             stim_buffer{2,stimOnsetNr} = [stim_buffer{2,stimOnsetNr} stimulionset_response];
             sacc_buffer{2,stimOnsetNr} = [sacc_buffer{2,stimOnsetNr} saccadeonset_response];
+            %}
         end
     end
     

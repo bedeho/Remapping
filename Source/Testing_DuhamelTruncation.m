@@ -34,7 +34,7 @@ function Testing_DuhamelTruncation(Name)
     %stimuliOffset                  = saccadeOnset;%(s) - turn off stimuli when saccade i
     
     % Utilities - derived
-    currentRF                       = 15;%-R_eccentricity:1:R_eccentricity;
+    currentRF                       = [-10 -5 0 5 10];%-R_eccentricity:1:R_eccentricity;% 15
     saccades                        = -S_eccentricity:1:S_eccentricity;
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1); % round to nearest hundred above
     Duration                        = saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
@@ -61,6 +61,7 @@ function Testing_DuhamelTruncation(Name)
         [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, targetOffIntervals, 0, saccadeOnset, stimuli{i}.saccadeTargets);
         stimuli{i}.eyePositionTrace             = eyePositionTrace;
         stimuli{i}.retinalTargetTraces          = retinalTargetTraces;
+        stimuli{i}.stimOnsetTimes               = 0;
         
         % Add simple information
         stimuli{i}.currentRF = r;
