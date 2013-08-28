@@ -163,7 +163,7 @@ function AnalyzeExperiment(experiment)
                         end
                         
                         % Button
-                        outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'',\\''' stimulinames{i} '\\'')']);
+                        outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'',\\''' stimulinames{i} '\\'',\\''' [netDir filesep network '.mat'] '\\'')']);
                         
                         fprintf(fileID, '</td>');
                     end

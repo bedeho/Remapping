@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function viewNeuronDynamics(activityFile, stimuliName)
+function viewNeuronDynamics(activityFile, stimuliName, networkFile)
 
     % Import global variables
     declareGlobalVars();
@@ -17,11 +17,17 @@ function viewNeuronDynamics(activityFile, stimuliName)
         activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-KusonokiTesting.mat';
         stimuliName     = 'basic-KusonokiTesting';
     end
+
+    % CLayerProbe
+    [pathstr, name, ext] = fileparts(activityFile);
+    CLayerProbleFile = [pathstr filesep 'analysis-basic-CLayerProbe.mat']
     
     % Load input files
     disp('Loading input files...');
     activity = load(activityFile);
     stimuli  = load([STIMULI_FOLDER stimuliName filesep 'stim.mat']);
+    network = load(networkFile);
+    CLayerProbleFileAnalysis = load(CLayerProbleFile);
     
     % Set parameters
     R_N = activity.R_N;
@@ -29,7 +35,7 @@ function viewNeuronDynamics(activityFile, stimuliName)
     dt = stimuli.dt;
     
     % Make figure
-    figure('name',activityFile,'Position', [100, 100, 1049, 895]);
+    figure('name',stimuliName,'Position', [100, 100, 1049, 895]);
     
     % Adding controls
     if activity.numEpochs > 1
@@ -64,6 +70,10 @@ function viewNeuronDynamics(activityFile, stimuliName)
     % Setup global vars
     period = 1
     epoch = 1
+    imgV = [];
+    imgR = [];
+    imgS = [];
+    imgC = [];
     
     % Do first plot
     display();
@@ -108,21 +118,23 @@ function viewNeuronDynamics(activityFile, stimuliName)
             C_activation = activity.C_activation_history(:, :, period, epoch);
             
             includeC_layer = 1;
-            numRows = 2+5;
+            %numRows = 2+5;
             
         else
             C_firingrate = zeros(C_N, activity.numPeriods);
             C_activation = zeros(C_N, activity.numPeriods);
             
             includeC_layer = 0;
-            numRows = 5;
+            %numRows = 5;
         end
+        
+        numRows = 2+5;
         
         % Plot
         s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes, dt);
         numTimeSteps = length(stimuli.stimuli{period}.eyePositionTrace);
 
-        subplot(6,2,1);
+        subplot(numRows,2,1);
         imagesc(E_firingrate);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
@@ -138,10 +150,11 @@ function viewNeuronDynamics(activityFile, stimuliName)
         %}
         
         subplot(numRows,2,3);
-        imagesc(V_firingrate);
+        imgV = imagesc(V_firingrate);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('V Firing');
+        set(imgV, 'ButtonDownFcn', {@singleUnitCallBack, 'V'}); % Setup callback
 
         %{
         subplot(numRows,2,4);
@@ -153,11 +166,12 @@ function viewNeuronDynamics(activityFile, stimuliName)
         %}
         
         subplot(numRows,2,5);
-        imagesc(R_firingrate);
+        imgR = imagesc(R_firingrate);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('R Firing');
+        set(imgR, 'ButtonDownFcn', {@singleUnitCallBack, 'R'}); % Setup callback
 
         subplot(numRows,2,6);
         imagesc(R_activation);
@@ -167,11 +181,12 @@ function viewNeuronDynamics(activityFile, stimuliName)
         title('R Activation');
 
         subplot(numRows,2,7);
-        imagesc(S_firingrate);
+        imgS = imagesc(S_firingrate);
         colorbar
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('S Firing');
+        set(imgS, 'ButtonDownFcn', {@singleUnitCallBack, 'S'}); % Setup callback
 
         subplot(numRows,2,8);
         imagesc(S_activation);
@@ -180,13 +195,14 @@ function viewNeuronDynamics(activityFile, stimuliName)
         colorbar
         title('S Activation');
 
-        if(includeC_layer),
+        %if(includeC_layer),
             subplot(numRows,2,[9 11]);
-            imagesc(C_firingrate);
+            imgC = imagesc(C_firingrate);
             hold on;colorbar
             if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
             colorbar
             title('C Firing');
+            set(imgC, 'ButtonDownFcn', {@singleUnitCallBack, 'C'}); % Setup callback
 
             subplot(numRows,2,[10 12]);
             imagesc(C_activation);
@@ -196,9 +212,9 @@ function viewNeuronDynamics(activityFile, stimuliName)
             title('C Actiation');
             
             nextplot = 13;
-        else
-            nextplot = 9;
-        end
+        %else
+        %    nextplot = 9;
+        %end
         
         % Add bottom traces
         eyePositionTrace = stimuli.stimuli{period}.eyePositionTrace;
@@ -235,7 +251,148 @@ function viewNeuronDynamics(activityFile, stimuliName)
         xlim([0 (numTimeSteps-1)]);
         set(gca,'YDir','reverse');
         %}
-        
+
+        function singleUnitCallBack(varargin)
+            %
+            % Extract region,row,col
+            region = varargin{3}
+
+            % Pick neuron
+            x = inputdlg('Neuron #:', 'Sample', [1 50]);
+            neuron = str2num(cell2mat(x));
+
+            % single left  click => 'SelectionType' = 'normal'
+            % single right click => 'SelectionType' = 'alt'
+            % double right click => 'SelectionType' = 'open'
+            clickType = get(gcf,'SelectionType');
+            
+            % Check which pool we are looking atr
+            if(strcmp(region,'V')),
+                responseTrace = activity.V_firing_history(neuron, :, period, epoch);
+            elseif(strcmp(region,'R')),
+                responseTrace = activity.R_firing_history(neuron, :, period, epoch);
+            elseif(strcmp(region,'S')),
+                responseTrace = activity.S_firing_history(neuron, :, period, epoch);
+            elseif(strcmp(region,'C')),
+                
+                if(includeC_layer),
+                    responseTrace = activity.C_firing_history(neuron, :, period, epoch);
+                else
+                    responseTrace = ones(1,numTimeSteps);
+                end
+            end
+            
+            if(strcmp(clickType, 'normal')), % response trace
+
+                figure;
+                hold on;
+
+                eyePositionTrace = stimuli.stimuli{period}.eyePositionTrace;
+                retinalTargetTraces = stimuli.stimuli{period}.retinalTargetTraces';
+            
+                targetOffIntervals = stimuli.stimuli{period}.targetOffIntervals{1};
+                [numOffPeriods,~] = size(targetOffIntervals);
+                
+                lastStimOnsetTime = [];
+                for t=1:numOffPeriods,
+
+                    if(isempty(lastStimOnsetTime))
+                        lastStimOnsetTime = targetOffIntervals(t,2);
+                    else
+                        % plot rectangle
+                        stimDuration = targetOffIntervals(t,1)-lastStimOnsetTime;
+                        rectangle('Position', [timeToTimeStep(lastStimOnsetTime,dt), 0.001, timeToTimeStep(stimDuration,dt),  1],'FaceColor',[0.9 0.9 0.9],'EdgeColor',[0.9 0.9 0.9]);
+
+                        lastStimOnsetTime = [];
+                    end
+                end
+
+                if(~isempty(lastStimOnsetTime))
+                    rectangle('Position', [timeToTimeStep(lastStimOnsetTime, dt), 0.001, timeToTimeStep(numTimeSteps-lastStimOnsetTime, dt), 1],'FaceColor',[0.9 0.9 0.9],'EdgeColor',[0.9 0.9 0.9]);
+                end
+
+                plot(0:(numTimeSteps-1), responseTrace, 'b');
+                plot([s s],[0 1],'r'); % Saccade times
+                hXLabel = xlabel('Time (s)');
+                hYLabel = ylabel('Firing Rate');
+                ylim([0 1]);
+
+                xTick = 11:10:numTimeSteps;
+
+                for i=1:length(xTick),
+                    xTickLabels{i} = [num2str(stepToTime(xTick(i), dt))];
+                end
+
+                set(gca,'XTick', xTick);
+                set(gca,'XTickLabel', xTickLabels);
+                set(gca,'YTick', [0 1]);
+
+                set([hYLabel hXLabel], 'FontSize', 20);
+                set([gca], 'FontSize', 18);
+                daspect([40 1 1]);
+
+                box on;
+                
+            else
+                
+                if(strcmp(region,'V')),
+                    
+                    V_to_C_weights = network.V_to_C_weights;
+                    
+                    maxSynapseWeight = max(max(V_to_C_weights));
+                    
+                    S = CLayerProbleFileAnalysis.CLabeProbe_Neurons_S;
+                    V = CLayerProbleFileAnalysis.CLabeProbe_Neurons_V;
+                    
+                    min_S = min(S);
+                    max_S = max(S);
+                    
+                    min_V = min(V);
+                    max_V = max(V);
+                    
+                    min_ = min(min_S, min_V);
+                    max_ = max(max_S, max_V);
+                    
+                    numCSynapses = length(S);
+
+                    figure;
+                    hold on;
+
+                    for i=1:numCSynapses,
+                        synapticWeights = V_to_C_weights(i,neuron);
+                        plot(V(i),S(i),'o','Color',[1, 1 -  synapticWeights/maxSynapseWeight, 1 -  synapticWeights/maxSynapseWeight]);
+                    end
+                    
+                    xlim([min_ max_]);
+                    ylim([min_ max_]);
+                    
+                    hXLabel = xlabel('Retinal Location (deg)');
+                    hYLabel = ylabel('Saccade Target (deg)');
+                    set([hYLabel hXLabel], 'FontSize', 20);
+                    set([gca], 'FontSize', 18);
+                   
+                %elseif(strcmp(region,'R')),
+                %    
+                elseif(strcmp(region,'S')),
+                    %responseTrace = activity.S_firing_history(neuron, :, period, epoch);
+                elseif(strcmp(region,'C')),
+                    
+                    %% START plotting!
+                    
+                    C_to_R_weights = network.C_to_R_weights;
+                    
+                    weightvector = C_to_R_weights(:, neuron);
+                    
+                    figure;
+                    
+                    plot(weightvector);
+                end
+
+            end
+        end
+
     end
+
+
 end
 

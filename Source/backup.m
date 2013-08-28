@@ -1,3 +1,106 @@
+  
+%
+%  Remapping.m
+%  Remapping
+%
+%  Created by Bedeho Mender on 11/05/13.
+%  Copyright 2013 OFTNAI. All rights reserved.
+%
+  
+                %{
+                
+                R_inhibition = R_w_INHB*sum(R_firingrate);
+                C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate');
+                %V_to_R_excitation = V_to_R_psi*V;
+                
+                % R asymmetric decay
+                %R_visual_excitation = R_psi*gauss; % classic
+                R_visual_excitation = R_psi*flat_gauss; %sum(gauss,1);
+                R_total_exication = C_to_R_excitation' + R_visual_excitation;
+
+                R_total_input = R_total_exication - R_inhibition;
+
+                % classic dynamic tau
+                %R_tau_dynamic = R_tau_rise + exp(-(R_total_exication.^2)/(2*R_tau_sigma^2))*(R_tau_decay-R_tau_rise);
+
+                %R_tau_dynamic = R_tau_rise + (R_total_exication <= R_tau_threshold)*(R_tau_decay-R_tau_rise);
+
+                R_tau_dynamic = R_tau_rise + (abs(R_total_input) <= R_tau_threshold)*(R_tau_decay-R_tau_rise);
+
+                if(~isempty(stimOnsetTimes)),
+                    
+                    % Time comparison for delta impulse must be done in
+                    % time steps, not continous time, otherwise we it will
+                    % almost surely miss delta(0)
+                    precedingTimeStep = t-1;
+                    
+                    delta = (precedingTimeStep - stimOnset_comparison_matrix - K_delay_comparison_matrix);
+                    delta_sum = sum(delta == 0, 1);
+                    yes_delta_event = (delta_sum > 0);
+                    no_delta_event = ~yes_delta_event;
+
+                    % Update neurons with delta event
+                    R_activation(yes_delta_event) = R_activation(yes_delta_event) + R_psi*K_psi*delta_sum(yes_delta_event).*R_visual_excitation(yes_delta_event);
+
+                    % Update neurons without delta event: standard FE
+                    R_activation(no_delta_event) = R_activation(no_delta_event) + (dt./R_tau_dynamic(no_delta_event)).*(-R_activation(no_delta_event) + R_total_input(no_delta_event));
+                else
+                    
+                    % Do all neuron at ones
+                    R_activation = R_activation + (dt./R_tau_dynamic).*(-R_activation + R_total_exication - R_inhibition);
+                end
+                
+                %}
+                
+                %{
+                CLASSIC: This is with variable onset times for different
+                stimuli
+
+                if(~isempty(stimOnsetTimes)),
+                    
+                    % Time comparison for delta impusle must be done in
+                    % time steps, not continous time, otherwise we it will
+                    % almost surely miss delta(0)
+                    precedingTimeStep = t-1;
+                    
+                    delta = precedingTimeStep - stimOnset_comparison_matrix + K_delay_comparison_matrix;
+                    delta_sum = sum(delta == 0, 1);
+
+                    % We have to iterate neurons since delta function needs
+                    % explicit formula
+                    for i=1:R_N,
+
+                        if(delta_sum(i) > 0),
+                            K(i) = K_old(i) + K_psi*delta_sum(i);
+                        else
+                            K(i) = K_old(i) + (dt/K_tau)*(-K_old(i) + stimulus_presence_indicator(:,t-1));
+                        end
+                    end
+
+                else
+                    K = 0;
+                end
+                
+                R_visual_excitation = sum(K.*gauss,1);
+                R_total_exication = C_to_R_excitation' + R_visual_excitation;
+                R_tau = R_tau_rise + exp(-(R_total_exication.^2)/(2*R_tau_sigma^2))*(R_tau_decay-R_tau_rise);
+                R_activation = R_activation + (dt./R_tau).*(-R_activation + R_total_exication - R_inhibition );
+                %}
+
+                % gauss drives R
+                %R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + R_psi*gauss);
+                
+                % E drives R
+                %R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + E_to_R_psi*E);
+                
+                %classic: 
+                %R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + V_to_R_excitation);
+                
+            
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 % backup
 

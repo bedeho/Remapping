@@ -30,8 +30,8 @@ function Testing_CLayerProbeTask(Name)
 
     % Generate stimuli
     rng(seed);
-    Duration                        = 0.100; % (s), the middle part of sum is to account for maximum saccade times
-    saccadeOnset                    = 0.050; % (s)
+    saccadeOnset                    = 0.200; % (s)
+    Duration                        = saccadeOnset+0.100; % (s), recording window is 50ms after saccade, so atleast this much delay is needed,the middle part of sum is to account for maximum saccade times
     saccadeTargets                  = -S_eccentricity:S_density:S_eccentricity;
     headCenteredTargetLocations     = -R_eccentricity:R_density:R_eccentricity;
 
@@ -56,7 +56,7 @@ function Testing_CLayerProbeTask(Name)
             [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, stimuli{k}.targetOffIntervals, stimuli{k}.initialEyePosition, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
             stimuli{k}.eyePositionTrace             = eyePositionTrace;
             stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
-            stimuli{i}.stimOnsetTimes               = 0;
+            stimuli{k}.stimOnsetTimes               = 0;
 
             % meta data
             stimuli{k}.targetNr                     = i;

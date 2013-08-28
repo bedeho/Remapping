@@ -81,7 +81,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
             disp('Doing C Layer Probe analysis...');
             [CLabeProbe_Neurons_S, CLabeProbe_Neurons_V] = AnalyzeCLayerProbe(activity,  stimuli);
             
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'CLabeProbe_Neurons_V', 'CLabeProbe_Neurons_V');
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'CLabeProbe_Neurons_S', 'CLabeProbe_Neurons_V');
             
         else
             disp(['Unkonwn stimuli: ' num2str(stimulinames{i})]);
@@ -90,12 +90,12 @@ function analysisSummary = Analyze(netDir, stimulinames)
     end
     
     %% Stimuli Control
-    %{
+    
     f = figure;
     latency = [StimuliControl_Result(:).latency];
     maxLatency = max(latency);
     minLatency = min(latency);
-    dh = (minLatency - minLatency)/11;
+    dh = (maxLatency - minLatency)/21;
     
     if(dh == 0),
         
@@ -116,7 +116,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
 
     saveas(f,[netDir filesep 'StimuliControl-summary.png']);
     close(f);
-    %}
+    
     
     %% Duhamel remapping analysis plotting
     remappingAnalysis(DuhamelRemapping_Result, 'DuhamelRemapping');
@@ -149,6 +149,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
     errorbar([arr(:).future_mean], [arr(:).future_std],'-ob');
     
     legend('Current RF Trials','Future RF Trials');
+    ylim([0 0.6]);
 
     saveas(f,[netDir filesep 'Kusonoki-summary.png']);
     close(f);
@@ -171,15 +172,15 @@ function analysisSummary = Analyze(netDir, stimulinames)
         f = figure;
         hold on;
         plot([remapping_result(:).stimLatency], [remapping_result(:).remappingLatency], 'or');
-        plot([-0.5 0.5],[-0.5 0.5],'--b'); % y=x bar
+        plot([-0.2 0.2],[-0.2 0.2],'--b'); % y=x bar
 
         xlabel('Stimulus Control Latency (s)');
         ylabel('Remapping Latency (s)');
-        xlim([-0.5 0.5]);
-        ylim([-0.5 0.5]);
+        xlim([-0.2 0.2]);
+        ylim([-0.2 0.2]);
         axis square;
 
-        saveas(f,[netDir filesep name '-summary-0.png']);
+        saveas(f,[netDir filesep name '-summary.png']);
         close(f);
 
         % 2. scatter stim index. vs sacc index.
@@ -195,7 +196,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
         ylim([-1 1]);
         axis square;
 
-        saveas(f,[netDir filesep name '-summary.png']);
+        saveas(f,[netDir filesep name '-summary-1.png']);
         close(f);
 
 

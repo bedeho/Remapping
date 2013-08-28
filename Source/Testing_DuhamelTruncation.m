@@ -34,7 +34,7 @@ function Testing_DuhamelTruncation(Name)
     %stimuliOffset                  = saccadeOnset;%(s) - turn off stimuli when saccade i
     
     % Utilities - derived
-    currentRF                       = [-10 -5 0 5 10];%-R_eccentricity:1:R_eccentricity;% 15
+    currentRF                       = 12%[-10 -5 0 5 10];%-R_eccentricity:1:R_eccentricity;% 15
     saccades                        = -S_eccentricity:1:S_eccentricity;
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1); % round to nearest hundred above
     Duration                        = saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod; % (s), the middle part of sum is to account for maximum saccade times

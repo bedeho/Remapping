@@ -44,9 +44,15 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     
     numPeriods = length(stimuli.stimuli);
     timeStepsInPeriod = zeros(1,numPeriods);
+    maxNumberOfVisibleTargets = length(stimuli.stimuli{1}.headCenteredTargetLocations); % get from first period
     
     for period=1:numPeriods,
         timeStepsInPeriod(period) = length(stimuli.stimuli{period}.eyePositionTrace);
+        
+        % could make allocation conditional below, but perhaps that messes up some branch prediction stuff in matlab, better off just being stingy
+        if(length(stimuli.stimuli{period}.headCenteredTargetLocations) ~= maxNumberOfVisibleTargets)
+            error('Number maximally visible targets must not vary across periods, this is so model can be coded to avoid slowness by avoiding new reallocations of memory'); 
+        end
     end
     
     %numTimeStepsPerEpoch = sum(timeStepsInPeriod);
@@ -86,12 +92,22 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     R_tau_rise      = parameters.simulation('R_tau_rise');
     R_tau_decay     = parameters.simulation('R_tau_decay');
     R_tau_sigma     = parameters.simulation('R_tau_sigma');
+    R_tau_threshold = parameters.simulation('R_tau_threshold');
+
+    R_tau_dynamic   = zeros(1,R_N);
     
     % K  =======================================
     K_tau           = parameters.simulation('K_tau');
     K_psi           = parameters.simulation('K_psi');
     K_delays        = parameters.simulation('K_delays');
-    K               = zeros(1,R_N);
+    
+    if(maxNumberOfVisibleTargets > 0),
+        K = zeros(maxNumberOfVisibleTargets, R_N);
+    else
+        K = 0;
+    end
+
+    K_delaysTimeSteps = timeToTimeStep(K_delays, dt);
     
     % E  =======================================
     
@@ -103,6 +119,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     E_to_R_psi   = parameters.simulation('E_to_R_psi');
     
     E            = zeros(1,R_N);
+    E_tau_dynamic= zeros(1,R_N);
     
     % V =======================================
     V_tau           = parameters.simulation('V_tau');
@@ -130,8 +147,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     S_tau           = parameters.simulation('S_tau'); % (s)
     S_to_C_psi      = parameters.simulation('S_to_C_psi');
     %S_psi           = parameters.simulation('S_psi');
-    %S_slope         = parameters.simulation('S_slope');
-    %S_threshold     = parameters.simulation('S_threshold');
+    S_slope         = parameters.simulation('S_slope');
+    S_threshold     = parameters.simulation('S_threshold');
     S_to_C_alpha    = parameters.simulation('S_to_C_alpha'); % learning rate
     S_sigma         = parameters.simulation('S_sigma');; % (deg) receptive field size
 
@@ -172,7 +189,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             disp(['Starting epoch #' num2str(epoch)]);
         end
         
-        for period=1:numPeriods
+        for period=1:numPeriods,
             
             periodTicID = tic;
             
@@ -185,11 +202,21 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             retinalTargetTraces = stimuli.stimuli{period}.retinalTargetTraces;
             saccadeTimes        = stimuli.stimuli{period}.saccadeTimes;
             saccadeTargets      = stimuli.stimuli{period}.saccadeTargets;
-            numSaccades         = length(stimuli.stimuli{period}.saccadeTimes);
             stimOnsetTimes      = stimuli.stimuli{period}.stimOnsetTimes;
+            stimOnsetTimeSteps  = timeToTimeStep(stimOnsetTimes,dt);
 
+            numSaccades         = length(stimuli.stimuli{period}.saccadeTimes);
+            numStimOnsetTimes   = length(stimOnsetTimes);
+            lastStimOnsetTime   = max(stimOnsetTimes);
+            
             % Setup static working variables
-            R_preference_comparison_matrix = repmat(R_preferences, maxNumberOfVisibleTargets, 1); % used to compute driving term in V
+            R_preference_comparison_matrix = repmat(R_preferences, maxNumberOfVisibleTargets, 1);
+
+            stimOnset_comparison_matrix = repmat(stimOnsetTimeSteps', 1, R_N); 
+            
+            K_delay_comparison_matrix = repmat(K_delaysTimeSteps, numStimOnsetTimes, 1);
+            
+            %stimulus_presence_indicator = ~isnan(retinalTargetTraces);
             
             if(numSaccades > 0),
                 saccade_times = repmat(saccadeTimes,S_N,1); % Used to get F
@@ -200,10 +227,10 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             end
             
             % Reset network variables
-            periodSaveCounter   = 1;
+            periodSaveCounter   = 2; % First dt is automatically saved
             E                   = E*0;
             V                   = V*0;
-            K                   = K*0;
+            K                   = K*0; % must be reallocated since teh number of visiible targets can in theory change, although it never does in practice.
             R_firingrate        = R_firingrate*0;
             S_firingrate        = S_firingrate*0;
             C_firingrate        = C_firingrate*0;
@@ -212,10 +239,11 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             C_activation        = C_activation*0;
     
             % Run period
-            for t=1:numTimeSteps,
+            for t=2:numTimeSteps, % we cannot compute anything for t==1, since this is time=0, which are the initial conditions, we have not t=-dt input data to use for this
 
                 % Turn time step into real time
-                time = stepToTime(t, dt);
+                %time             = stepToTime(t, dt);
+                time_precedingdt = stepToTime(t-1, dt);
 
                 %% Activation
                 
@@ -225,58 +253,60 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 V_old = V;
                 K_old = K;
                 
-                % Visual singals
+                % Prepare response of all neurons to all visible targets
                 if(~isempty(retinalTargetTraces)),
-                    retinalTargets = retinalTargetTraces(:,t);
+                    
+                    retinalTargets = retinalTargetTraces(:,t-1); % retinal locations of stimuli in teh precedng time step
                     diff = R_preference_comparison_matrix - repmat(retinalTargets,1,R_N);
                     diff(isnan(diff)) = inf; % for nan values, make inf, so that exponantiation gives no contribution
                     gauss = exp((-(diff).^2)./(2*E_sigma^2)); % gauss has dimensions: maxNumberOfVisibleTargets X R_N
-                    
                 else
                     gauss = 0;
                 end
                 
-                % E & V =======================================
-                
                 flat_gauss = sum(gauss,1); % collapse stimulus dimension, so that each neuron has one driving sum of exponentials, one exponential per stimulus
                 
-                E_tau = E_tau_rise + exp(-(flat_gauss.^2)/(2*E_tau_sigma^2))*(E_tau_decay-E_tau_rise);
+                % E & V =======================================
                 
-                E = E_old + (dt./E_tau).*(-E_old + flat_gauss);
+                E_tau_dynamic = E_tau_rise + exp(-(flat_gauss.^2)/(2*E_tau_sigma^2))*(E_tau_decay-E_tau_rise);
                 
-                V = V_old + (dt/V_tau)*(-V_old + E_to_V_psi*E_old); % V uses OLD E value for euler scheme to be correctly implemented.
+                E = E_old + (dt./E_tau_dynamic).*(-E_old + flat_gauss);
+                
+                V = V_old + (dt/V_tau)*(-V_old + E_to_V_psi*E_old);
                 
                 % R =======================================
                 
-                R_inhibition = R_w_INHB*sum(R_firingrate);
-                C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate');
-                %V_to_R_excitation = V_to_R_psi*V;
+                K_gauss = flat_gauss;
                 
-                % R asymmetric decay
-                %R_visual_excitation = R_psi*gauss; % classic
+                K_tau_dynamic = R_tau_rise + (K_gauss <= R_tau_threshold)*(R_tau_decay-R_tau_rise);
                 
                 if(~isempty(stimOnsetTimes)),
                     
-                    stimOnsetTimes-time-K_delays
-                
-                    K = K_old + (dt/K_tau)*(-V + K_psi* + STIM());
+                    % Time comparison for delta impulse must be done in
+                    % time steps, not continous time, otherwise we it will
+                    % almost surely miss delta(0)
+                    precedingTimeStep = t-1;
+                    
+                    delta = (precedingTimeStep - stimOnset_comparison_matrix - K_delay_comparison_matrix);
+                    delta_sum = sum(delta == 0, 1);
+                    yes_delta_event = (delta_sum > 0);
+                    no_delta_event = ~yes_delta_event;
+
+                    % Update neurons with delta event
+                    K(yes_delta_event) = K_old(yes_delta_event) + K_psi*K_gauss(yes_delta_event); % dirac delta case, +K_psi*delta_sum(yes_delta_event).*flat_gauss(yes_delta_event)
+
+                    % Update neurons without delta event: standard FE
+                    K(no_delta_event) = K_old(no_delta_event) + (dt./K_tau_dynamic(no_delta_event)).*(-K(no_delta_event) + K_gauss(no_delta_event)); % continous case when there is no dirac delta event
                 else
-                    K = 0;
+                    
+                    % Do all neuron at ones
+                    K = K_old + (dt./K_tau_dynamic).*(-K_old + K_gauss);
                 end
                 
-                R_visual_excitation = K.*gauss;
-                R_total_exication = C_to_R_excitation' + R_visual_excitation;
-                R_tau = R_tau_rise + exp(-(R_total_exication.^2)/(2*R_tau_sigma^2))*(R_tau_decay-R_tau_rise);
-                R_activation = R_activation + (dt./R_tau).*(-R_activation + R_total_exication - R_inhibition );
+                R_inhibition = R_w_INHB*sum(R_firingrate); %  old firing rates
+                C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate');
+                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + R_psi*K);
                 
-                % gauss drives R
-                %R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + R_psi*gauss);
-                
-                % E drives R
-                %R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + E_to_R_psi*E);
-                
-                %classic: 
-                %R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation' - R_inhibition + V_to_R_excitation);
             
                 % C =======================================
                 
@@ -288,8 +318,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
 
                 % S =======================================
                 if(numSaccades > 0),
-                    %F = (saccade_time_neg_offset <= time) & (time <= saccade_time_pos_offset); % check both conditions: y-z <= x <= y
-                    F = (saccade_time_offset <= time) & (time <= saccade_times); % check both conditions: y-z <= x <= y
+                    F = (saccade_time_neg_offset <= time_precedingdt) & (time_precedingdt <= saccade_time_pos_offset); % check both conditions: y-z <= x <= y
+                    %F = (saccade_time_offset <= time_precedingdt) & (time_precedingdt <= saccade_times); % check both conditions: y-z <= x <= y
                     %S_driver = S_psi*sum(bsxfun(@times, F, saccade_target_offset),2); % cannot be done with matrix mult since exponential depends on i
                     S_driver = sum(bsxfun(@times, F, saccade_target_offset),2); % cannot be done with matrix mult since exponential depends on i
                     S_activation = S_activation + (dt/S_tau)*(-S_activation + S_driver');
@@ -334,7 +364,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 %% Save activity                
                 if (~isTraining || isTraining && parameters.saveActivityInTraining) % && mod(t, outputSavingRate) == 0,
                     
-                    E_firing_history(:, periodSaveCounter, period, epoch) = E;
+                    E_firing_history(:, periodSaveCounter, period, epoch) = K;%E;
                     V_firing_history(:, periodSaveCounter, period, epoch) = V;
                     R_firing_history(:, periodSaveCounter, period, epoch) = R_firingrate;
                     S_firing_history(:, periodSaveCounter, period, epoch) = S_firingrate;
