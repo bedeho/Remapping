@@ -6,6 +6,68 @@
 %  Created by Bedeho Mender on 11/05/13.
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
+
+%{
+                K_gauss = flat_gauss;
+                
+                K_tau_dynamic = K_tau*ones(1,R_N);%R_tau_rise + (K_gauss <= R_tau_threshold)*(R_tau_decay-R_tau_rise);
+                
+                if(~isempty(stimOnsetTimes)),
+                    
+                    % Time comparison for delta impulse must be done in
+                    % time steps, not continous time, otherwise we it will
+                    % almost surely miss delta(0)
+                    precedingTimeStep = t-1;
+                    
+                    delta = (precedingTimeStep - stimOnset_comparison_matrix - K_delay_comparison_matrix);
+                    delta_sum = sum(delta == 0, 1);
+                    yes_delta_event = (delta_sum > 0);
+                    no_delta_event = ~yes_delta_event;
+
+                    % Update neurons with delta event
+                    K(yes_delta_event) = K_old(yes_delta_event) + K_psi*K_gauss(yes_delta_event); % dirac delta case, +K_psi*delta_sum(yes_delta_event).*flat_gauss(yes_delta_event)
+
+                    % Update neurons without delta event: standard FE
+                    K(no_delta_event) = K_old(no_delta_event) + (dt./K_tau_dynamic(no_delta_event)).*(-K(no_delta_event)); % + K_gauss(no_delta_event), continous case when there is no dirac delta event
+                else
+                    
+                    % Do all neuron at ones
+                    K = K_old + (dt./K_tau_dynamic).*(-K_old); % K_gauss
+                end
+%}
+
+%{
+                K_gauss = flat_gauss;
+                
+                K_tau_dynamic = K_tau*ones(1,R_N);%R_tau_rise + (K_gauss <= R_tau_threshold)*(R_tau_decay-R_tau_rise);
+                
+                if(~isempty(stimOnsetTimes)),
+                    
+                    % Time comparison for delta impulse must be done in
+                    % time steps, not continous time, otherwise we it will
+                    % almost surely miss delta(0)
+                    precedingTimeStep = t-1;
+                    
+                    delta = (precedingTimeStep - stimOnset_comparison_matrix - K_delay_comparison_matrix);
+                    delta_sum = sum(delta == 0, 1);
+                    yes_delta_event = (delta_sum > 0);
+                    no_delta_event = ~yes_delta_event;
+
+                    % Update neurons with delta event
+                    K(yes_delta_event) = K_old(yes_delta_event) + K_psi*K_gauss(yes_delta_event); % dirac delta case, +K_psi*delta_sum(yes_delta_event).*flat_gauss(yes_delta_event)
+
+                    % Update neurons without delta event: standard FE
+                    K(no_delta_event) = K_old(no_delta_event) + (dt./K_tau_dynamic(no_delta_event)).*(-K(no_delta_event)); % + K_gauss(no_delta_event), continous case when there is no dirac delta event
+                else
+                    
+                    % Do all neuron at ones
+                    K = K_old + (dt./K_tau_dynamic).*(-K_old); % K_gauss
+                end
+                
+%}                
+                
+
+
   
                 %{
                 

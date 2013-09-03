@@ -143,7 +143,6 @@ function AnalyzeExperiment(experiment)
                         fprintf(fileID, ['<td> ' parameters{i,2} ' </td>\n']);
                     end
                     
-                    
                     % Summary
                     fprintf(fileID, '<td>');
                     %fprintf(fileID, '<img src="%s" width="350px" height="350px"/>\n', [netDir filesep 'summary.png']);

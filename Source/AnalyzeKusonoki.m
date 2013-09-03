@@ -52,7 +52,7 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
         stimuliOnset = stimuli.stimulusOnsetTimes(stimOnsetNr);
         
         % Get neuron index of neuron
-        neuronIndex =  R_eccentricity + RF_location + 1;
+        neuronIndex = R_eccentricity + RF_location + 1;
         
         % Get data for best period of each neuron
         responseVector  = R_firing_history(neuronIndex, :, p, 1);
@@ -65,12 +65,17 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
         
         % Get task type, and save appripriately
         if(stimuli.stimuli{p}.trialType == 1),
+            
+            truncator_neuronIndex = R_eccentricity + (RF_location  - stimuli.stimuli{p}.saccadeTargets) + 1;
+            truncator_responseVector  = R_firing_history(truncator_neuronIndex, :, p, 1);
+            
             stim_buffer{1,stimOnsetNr} = [stim_buffer{1,stimOnsetNr} stimulionset_response];
             sacc_buffer{1,stimOnsetNr} = [sacc_buffer{1,stimOnsetNr} saccadeonset_response];
-        else
+                       
+            t_start = timeToTimeStep(stimuliOnset + stim_responseWindowStart, dt);
+            t_end = timeToTimeStep(stimuliOnset + stim_responseWindowStart + responseWindowDuration, dt);
+            t_sacc = timeToTimeStep(saccadeOnset, dt);
             
-            %{
-            t = timeToTimeStep(stimuliOnset + stim_responseWindowStart, dt);
             len = size(R_firing_history,2);
             
             figure;
@@ -78,11 +83,16 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
             imagesc(R_firing_history(:, :, p, 1));
             subplot(1,2,2);
             hold on;
-            plot(responseVector);
-            plot([t t],[0 1],'r');
+            plot(responseVector,'b','LineWidth',2);
+            plot(truncator_responseVector, 'g','LineWidth',2);
+            plot([t_start t_start],[0 1],'r');
+            plot([t_end t_end],[0 1],'r');
+            plot([t_sacc t_sacc],[0 1],'k');
             plot([0 (len-1)],[stimulionset_response stimulionset_response],'g-');
-            %}
+            title(['Onset: ' num2str(100*stimuliOnset) 'ms']);
             
+            
+        else
             stim_buffer{2,stimOnsetNr} = [stim_buffer{2,stimOnsetNr} stimulionset_response];
             sacc_buffer{2,stimOnsetNr} = [sacc_buffer{2,stimOnsetNr} saccadeonset_response];
             

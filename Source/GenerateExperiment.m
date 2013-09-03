@@ -48,22 +48,24 @@ function GenerateExperiment()
     
     % R
     parameterCombinations('R_eccentricity') = [45];
-    parameterCombinations('R_tau')          = [0.050]; % (s)
-    parameterCombinations('R_w_INHB')       = [5/91]; %0.7 20/91 15/91 10/91 
-    parameterCombinations('R_slope')        = [0.7];
+    parameterCombinations('R_tau')          = [0.100]; % (s)
+    parameterCombinations('R_w_INHB')       = [5/91]; % works = 5/91
+    parameterCombinations('R_slope')        = [2.0]; % classic = 0.4
     parameterCombinations('R_threshold')    = [2.0];
     %parameterCombinations('R_to_C_alpha')  = [0.1]; % learning rate
     %parameterCombinations('R_to_C_psi')    = [1];
-    parameterCombinations('R_psi')          = [1.0];
+    parameterCombinations('R_psi')          = [2];
+    parameterCombinations('R_attractor_psi')= [0.34]; % 0.34=perfect,300ms tail,0.3=dies just a little to quick, 0.4=eq ,classic under SOM=1.3
+    parameterCombinations('R_background')   = [0]; % 4.0 when we do SOM
     
-    parameterCombinations('R_tau_rise')     = [0.050];
+    parameterCombinations('R_tau_rise')     = [0.100];
     parameterCombinations('R_tau_decay')    = [0.700];
     parameterCombinations('R_tau_sigma')    = [5];
     parameterCombinations('R_tau_threshold')= [0.4];
     
     % K
-    parameterCombinations('K_tau')          = [0.700];
-    parameterCombinations('K_psi')          = [4 5 6];
+    parameterCombinations('K_tau')          = [0.100];% 0.700
+    parameterCombinations('K_psi')          = [5];
     parameterCombinations('K_delay_sigma')  = [0.05];    
     
     % E
@@ -88,7 +90,7 @@ function GenerateExperiment()
 
     % S
     parameterCombinations('S_eccentricity') = [30];
-    parameterCombinations('S_delay_sigma')  = [0.100]; % (s)
+    parameterCombinations('S_delay_sigma')  = [0.050]; % (s)
     parameterCombinations('S_tau')          = [0.020]; % (s)
     parameterCombinations('S_sigma')        = parameterCombinations('E_sigma'); % (deg) receptive field size
     %parameterCombinations('S_psi')          = [1];
@@ -99,11 +101,11 @@ function GenerateExperiment()
     parameterCombinations('S_to_C_alpha')   = [0.1]; % learning rate
     
     % C
-    parameterCombinations('C_tau')          = [0.010]; % (s)
+    parameterCombinations('C_tau')          = [0.050]; % (s)
     parameterCombinations('C_w_INHB')       = [1/5000]; %10/5000 50/5000 100/5000  C_N = 5400
     parameterCombinations('C_slope')        = [1000000]; % classic= 500
     parameterCombinations('C_threshold')    = [0.5]; % old 0.45
-    parameterCombinations('C_to_R_psi')     = [0.125]; % classic: 0.5
+    parameterCombinations('C_to_R_psi')     = [0.7]; % classic: 0.4
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
     
     % Save the experiment params
@@ -174,9 +176,8 @@ function GenerateExperiment()
             
             % S delays
             S_delay = randn(1, S_N);
+            S_delay = 0.06 + simulation('S_delay_sigma')*S_delay; % change mean and std
             S_delay(S_delay < 0) = -S_delay(S_delay < 0); % flip negative delays to be positive
-            S_delay = 0.1 + simulation('S_delay_sigma')*S_delay; % change mean and std
-            %S_delay = ones(1, S_N)*simulation('S_delay_sigma'); %unifromity, vs. distribution = offset;
             simulation('S_presaccadicOffset') = S_delay;
             
             % K delays
@@ -214,8 +215,9 @@ function GenerateExperiment()
             C_to_R_sigma = simulation('E_sigma');
             V_to_C_sigma = simulation('E_sigma');
             S_to_C_sigma = simulation('E_sigma');
+            R_to_R_sigma = simulation('E_sigma');
             
-            CreatePrewiredNetwork([simulationFolder filesep 'PrewiredNetwork.mat'], hardwired_pref_R, hardwired_pref_S, C_to_R_sigma, V_to_C_sigma, S_to_C_sigma);
+            CreatePrewiredNetwork([simulationFolder filesep 'PrewiredNetwork.mat'], hardwired_pref_R, hardwired_pref_S, C_to_R_sigma, V_to_C_sigma, S_to_C_sigma, R_to_R_sigma);
             
             % Move each network to new folder & test
             listing = dir(simulationFolder); 

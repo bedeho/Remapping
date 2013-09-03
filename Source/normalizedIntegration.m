@@ -18,7 +18,8 @@ function response = normalizedIntegration(activity, dt, startTime, Duration)
         offset_activity = activity(timeSteps);
     end
     
-    offset_response     = squeeze(trapz(offset_activity,2)); % Integrate to find response
-    response            = offset_response/(length(timeSteps) - 1); % Normaliztion step, gives normalized (sp/s) units to response
+    offset_response     = dt*squeeze(trapz(offset_activity,2)); % Integrate to find response
+    duration            = dt*(length(timeSteps) - 1);
+    response            = offset_response/duration; % Normaliztion step, gives normalized (sp/s) units to response
     
 end

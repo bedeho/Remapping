@@ -149,7 +149,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
     errorbar([arr(:).future_mean], [arr(:).future_std],'-ob');
     
     legend('Current RF Trials','Future RF Trials');
-    ylim([0 0.6]);
+    ylim([0 1]);
 
     saveas(f,[netDir filesep 'Kusonoki-summary.png']);
     close(f);
@@ -180,7 +180,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
         ylim([-0.2 0.2]);
         axis square;
 
-        saveas(f,[netDir filesep name '-summary.png']);
+        saveas(f,[netDir filesep name '-summary-1.png']);
         close(f);
 
         % 2. scatter stim index. vs sacc index.
@@ -196,7 +196,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
         ylim([-1 1]);
         axis square;
 
-        saveas(f,[netDir filesep name '-summary-1.png']);
+        saveas(f,[netDir filesep name '-summary.png']);
         close(f);
 
 
