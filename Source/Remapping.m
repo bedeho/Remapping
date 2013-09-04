@@ -136,7 +136,11 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     V_to_C_psi      = parameters.simulation('V_to_C_psi');
     V_to_C_alpha    = parameters.simulation('V_to_C_alpha'); % learning rate
     V               = zeros(1,R_N);
+    V_firingrate    = zeros(1,R_N);
 
+    V_slope         = parameters.simulation('V_slope');
+    V_threshold     = parameters.simulation('V_threshold');
+    
     %V_tau_decay     = parameters.simulation('V_tau_decay');
     %V_tau_sigma     = parameters.simulation('V_tau_sigma');
     
@@ -240,6 +244,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             R_firingrate        = R_firingrate*0;
             S_firingrate        = S_firingrate*0;
             C_firingrate        = C_firingrate*0;
+            V_firingrate        = V_firingrate*0;
+            
             R_activation        = R_activation*0;
             S_activation        = S_activation*0;
             C_activation        = C_activation*0;
@@ -311,7 +317,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 end
                 %}
                 
-                R_attractor = R_attractor_psi*(R_to_R_weights*R_firingrate')';
+                R_attractor = 0;%R_attractor_psi*(R_to_R_weights*R_firingrate')';
                 R_inhibition = R_w_INHB*sum(R_firingrate);
                 C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate')';
                 
@@ -346,7 +352,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 
                 C_inhibition = C_w_INHB*sum(C_firingrate);
                 %R_to_C_excitation = R_to_C_psi*(R_to_C_weights*R_firingrate');
-                V_to_C_excitation = V_to_C_psi*(V_to_C_weights*V');
+                V_to_C_excitation = V_to_C_psi*(V_to_C_weights*V_firingrate');
                 S_to_C_excitation = S_to_C_psi*(S_to_C_weights*S_firingrate');
                 C_activation = C_activation + (dt/C_tau)*(-C_activation + V_to_C_excitation' + S_to_C_excitation' - C_inhibition); % _to_C_excitation
 
@@ -367,8 +373,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     C_to_R_weights = C_to_R_weights + dt*C_to_R_alpha*(R_firingrate'*C_firingrate);
                     S_to_C_weights = S_to_C_weights + dt*S_to_C_alpha*(C_firingrate'*S_firingrate);
                     %R_to_C_weights = R_to_C_weights + dt*R_to_C_alpha*(C_firingrate'*R_firingrate);
-                    V_to_C_weights = V_to_C_weights + dt*V_to_C_alpha*(C_firingrate'*V);
-                    V_to_R_weights = V_to_R_weights + dt*V_to_R_alpha*(R_firingrate'*V);
+                    V_to_C_weights = V_to_C_weights + dt*V_to_C_alpha*(C_firingrate'*V_firingrate);
+                    %V_to_R_weights = V_to_R_weights + dt*V_to_R_alpha*(R_firingrate'*V_firingrate);
 
                     % Normalize
                     C_to_R_norm = 1./sqrt(squeeze(sum(C_to_R_weights.^2))); 
@@ -393,13 +399,13 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 %S_firingrate = 1./(1 + exp(-2*S_slope*(S_activation - S_threshold)));
                 S_firingrate = S_activation;
                 C_firingrate = 1./(1 + exp(-2*C_slope*(C_activation - C_threshold)));
-                %V
+                V_firingrate = 1./(1 + exp(-2*C_slope*(V - V_threshold))); 
 
                 %% Save activity                
                 if (~isTraining || isTraining && parameters.saveActivityInTraining) % && mod(t, outputSavingRate) == 0,
                     
                     E_firing_history(:, periodSaveCounter, period, epoch) = K;%E;
-                    V_firing_history(:, periodSaveCounter, period, epoch) = V;
+                    V_firing_history(:, periodSaveCounter, period, epoch) = V_firingrate;
                     R_firing_history(:, periodSaveCounter, period, epoch) = R_firingrate;
                     S_firing_history(:, periodSaveCounter, period, epoch) = S_firingrate;
                     C_firing_history(:, periodSaveCounter, period, epoch) = C_firingrate;

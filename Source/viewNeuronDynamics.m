@@ -156,14 +156,14 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile)
         title('V Firing');
         set(imgV, 'ButtonDownFcn', {@singleUnitCallBack, 'V'}); % Setup callback
 
-        %{
+        
         subplot(numRows,2,4);
         imagesc(V_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
-        title('V Firing');
-        %}
+        title('V Activation');
+        
         
         subplot(numRows,2,5);
         imgR = imagesc(R_firingrate);
@@ -312,10 +312,10 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile)
                 end
 
                 plot(0:(numTimeSteps-1), responseTrace, 'b');
-                plot([s s],[0 1],'r'); % Saccade times
+                if ~isempty(s), plot([s s],[0 1],'r'); end % Saccade times
                 hXLabel = xlabel('Time (s)');
                 hYLabel = ylabel('Firing Rate');
-                ylim([0 1]);
+                ylim([0 1.1]);
 
                 xTick = 11:10:numTimeSteps;
 
@@ -333,7 +333,7 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile)
 
                 box on;
                 
-            else
+            else % weight vectors!
                 
                 if(strcmp(region,'V')),
                     

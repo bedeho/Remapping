@@ -49,13 +49,13 @@ function GenerateExperiment()
     % R
     parameterCombinations('R_eccentricity') = [45];
     parameterCombinations('R_tau')          = [0.100]; % (s)
-    parameterCombinations('R_w_INHB')       = [5/91]; % works = 5/91
+    parameterCombinations('R_w_INHB')       = [20/91]; % works = 5/91
     parameterCombinations('R_slope')        = [2.0]; % classic = 0.4
     parameterCombinations('R_threshold')    = [2.0];
     %parameterCombinations('R_to_C_alpha')  = [0.1]; % learning rate
     %parameterCombinations('R_to_C_psi')    = [1];
     parameterCombinations('R_psi')          = [2];
-    parameterCombinations('R_attractor_psi')= [0.34]; % 0.34=perfect,300ms tail,0.3=dies just a little to quick, 0.4=eq ,classic under SOM=1.3
+    parameterCombinations('R_attractor_psi')= [0.46 0.5 0.6]; % 0.34=perfect,300ms tail,0.3=dies just a little to quick, 0.4=eq ,classic under SOM=1.3
     parameterCombinations('R_background')   = [0]; % 4.0 when we do SOM
     
     parameterCombinations('R_tau_rise')     = [0.100];
@@ -79,8 +79,8 @@ function GenerateExperiment()
     %parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
     parameterCombinations('V_tau')           = [0.050]; % (s)
     %parameterCombinations('V_psi')          = [1];
-    %parameterCombinations('V_slope')        = [1];
-    %parameterCombinations('V_threshold')    = [0.5];
+    parameterCombinations('V_slope')        = [100000000000];
+    parameterCombinations('V_threshold')    = [0.4];
     
     parameterCombinations('V_to_R_psi')     = [6]; % 5 works
     parameterCombinations('V_to_R_alpha')   = [0.1];
@@ -104,8 +104,8 @@ function GenerateExperiment()
     parameterCombinations('C_tau')          = [0.050]; % (s)
     parameterCombinations('C_w_INHB')       = [1/5000]; %10/5000 50/5000 100/5000  C_N = 5400
     parameterCombinations('C_slope')        = [1000000]; % classic= 500
-    parameterCombinations('C_threshold')    = [0.5]; % old 0.45
-    parameterCombinations('C_to_R_psi')     = [0.7]; % classic: 0.4
+    parameterCombinations('C_threshold')    = [0.45]; % 0.3 works well, old 0.45
+    parameterCombinations('C_to_R_psi')     = [0.4]; % classic: 0.4
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
     
     % Save the experiment params
