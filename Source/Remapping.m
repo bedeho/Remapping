@@ -256,6 +256,11 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 % Turn time step into real time
                 %time             = stepToTime(t, dt);
                 time_precedingdt = stepToTime(t-1, dt);
+                
+                % Time comparison for delta impulse must be done in
+                % time steps, not continous time, otherwise we it will
+                % almost surely miss delta(0)
+                precedingTimeStep = t-1;
 
                 %% Activation
                 
@@ -288,35 +293,36 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 
                 % R =======================================
                 
-                %{
-                K_gauss = flat_gauss;
-                
-                K_tau_dynamic = K_tau*ones(1,R_N);%R_tau_rise + (K_gauss <= R_tau_threshold)*(R_tau_decay-R_tau_rise);
-                
+                % K stim onset
                 if(~isempty(stimOnsetTimes)),
-                    
-                    % Time comparison for delta impulse must be done in
-                    % time steps, not continous time, otherwise we it will
-                    % almost surely miss delta(0)
-                    precedingTimeStep = t-1;
                     
                     delta = (precedingTimeStep - stimOnset_comparison_matrix - K_delay_comparison_matrix);
                     delta_sum = sum(delta == 0, 1);
                     yes_delta_event = (delta_sum > 0);
-                    no_delta_event = ~yes_delta_event;
-
-                    % Update neurons with delta event
-                    K(yes_delta_event) = K_old(yes_delta_event) + K_psi*K_gauss(yes_delta_event); % dirac delta case, +K_psi*delta_sum(yes_delta_event).*flat_gauss(yes_delta_event)
-
-                    % Update neurons without delta event: standard FE
-                    K(no_delta_event) = K_old(no_delta_event) + (dt./K_tau_dynamic(no_delta_event)).*(-K(no_delta_event)); % + K_gauss(no_delta_event), continous case when there is no dirac delta event
-                else
                     
-                    % Do all neuron at ones
-                    K = K_old + (dt./K_tau_dynamic).*(-K_old); % K_gauss
+                    K_onset_spike = K_psi*flat_gauss(yes_delta_event);
+                else
+                    K_onset_spike = 0;
                 end
-                %}
                 
+                % K saccade onset
+                if(~isempty(saccade_times) && any(saccade_times==saccade_times)),
+                    K_sacc_supression = K_psi;
+                else
+                    K_sacc_supression = 0;
+                end
+                
+                % K dynamics
+                K_tau_dynamic = R_tau_rise + (flat_gauss <= R_tau_threshold)*(R_tau_decay-R_tau_rise);
+                K = K_old + (dt./K_tau_dynamic).*(-K + R_psi*flat_gauss) + K_onset_spike - K_sacc_supression;
+                
+                % R dynamics
+                R_inhibition = R_w_INHB*sum(R_firingrate);
+                C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate')';
+                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation - R_inhibition + K - R_background);
+                
+                % Old
+                %{
                 R_attractor = 0;%R_attractor_psi*(R_to_R_weights*R_firingrate')';
                 R_inhibition = R_w_INHB*sum(R_firingrate);
                 C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate')';
@@ -347,6 +353,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     % Do all neuron at ones
                     R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation - R_inhibition + R_psi*flat_gauss + R_attractor - R_background);
                 end
+                %}
             
                 % C =======================================
                 

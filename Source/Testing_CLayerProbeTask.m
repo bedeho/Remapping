@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Testing_CLayerProbeTask(Name)
+function Testing_CLayerProbeTask(Name, dt)
 
     % Import global variables
     declareGlobalVars();
@@ -21,8 +21,8 @@ function Testing_CLayerProbeTask(Name)
     stimulitype = 'CLayerProbe';
     
     % Params
-    dt                          = 0.010; %(s)
-    seed                        = 77;
+    %dt                          = 0.010;
+    seed                        = 77; 
     S_eccentricity              = 30;
     S_density                   = 4;
     R_eccentricity              = 45;

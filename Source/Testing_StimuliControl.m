@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Testing_StimuliControl(Name)
+function Testing_StimuliControl(Name, dt)
 
     % Import global variables
     declareGlobalVars();
@@ -17,7 +17,7 @@ function Testing_StimuliControl(Name)
     stimulitype = 'StimuliControl';
     
     % Params
-    dt                          = 0.010; %(s)
+    %dt                          = 0.010; %(s)
     seed                        = 77;
     R_eccentricity              = 45;
     R_density                   = 1; % should be 1, we test everyones latency

@@ -8,7 +8,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Testing_DuhamelTruncation(Name)
+function Testing_DuhamelTruncation(Name, dt)
 
     % Import global variables
     declareGlobalVars();
@@ -18,7 +18,7 @@ function Testing_DuhamelTruncation(Name)
     stimulitype = 'DuhamelTruncation';
     
     % Technical
-    dt                              = 0.010; % (s)
+    %dt                          = 0.010;
     seed                            = 77;
     rng(seed);
     

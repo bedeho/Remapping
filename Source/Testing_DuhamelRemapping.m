@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Testing_DuhamelRemapping(Name, stimulitype, saccadeOnset, stimuliDuration, stimuliOnset, postSaccadefixationPeriod)
+function Testing_DuhamelRemapping(Name, dt, stimulitype, saccadeOnset, stimuliDuration, stimuliOnset, postSaccadefixationPeriod)
 
     % Import global variables
     declareGlobalVars();
@@ -16,7 +16,7 @@ function Testing_DuhamelRemapping(Name, stimulitype, saccadeOnset, stimuliDurati
     %% Parameters
     
     % Technical
-    dt                              = 0.010; % (s)
+    %dt                          = 0.010;
     seed                            = 77;
     rng(seed);
     
@@ -29,7 +29,7 @@ function Testing_DuhamelRemapping(Name, stimulitype, saccadeOnset, stimuliDurati
     saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!
     
     % Temporal
-    if nargin<6,
+    if nargin<7,
         stimulitype                     = 'DuhamelRemapping';
         saccadeOnset                    = 0.300; % (s) w.r.t start of task
         stimuliDuration                 = 0.100; % (s)

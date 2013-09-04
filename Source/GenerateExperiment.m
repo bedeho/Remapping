@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function GenerateExperiment()
+function GenerateExperiment(dt)
 
     % Import global variables
     declareGlobalVars();
@@ -37,7 +37,7 @@ function GenerateExperiment()
     parameterCombinations = containers.Map;
     
     % Simulations Paramters
-    dt = 0.010; % (s)
+     % (s)
     numTrainingEpochs = 1;
     outputSavingRate = 1; % Period of time step saving during testing.
     assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
@@ -48,7 +48,7 @@ function GenerateExperiment()
     
     % R
     parameterCombinations('R_eccentricity') = [45];
-    parameterCombinations('R_tau')          = [0.100]; % (s)
+    parameterCombinations('R_tau')          = [0.050]; % (s)
     parameterCombinations('R_w_INHB')       = [20/91]; % works = 5/91
     parameterCombinations('R_slope')        = [2.0]; % classic = 0.4
     parameterCombinations('R_threshold')    = [2.0];

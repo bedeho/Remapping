@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Testing_SaccadeControl(Name)
+function Testing_SaccadeControl(Name, dt)
 
     % Import global variables
     declareGlobalVars();
@@ -17,7 +17,7 @@ function Testing_SaccadeControl(Name)
     stimulitype = 'SaccadeControl';
     
     % Params
-    dt                          = 0.010; %(s)
+    %dt                          = 0.010;
     seed                        = 77;
     S_eccentricity              = 30;
     S_density                   = 1; % should be 1, we test everyones response

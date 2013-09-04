@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Testing_Kusonoki(Name)
+function Testing_Kusonoki(Name, dt)
 
     % Import global variables
     declareGlobalVars();
@@ -19,7 +19,7 @@ function Testing_Kusonoki(Name)
     %% Parameters
     
     % Technical
-    dt                              = 0.010; % (s)
+    %dt                          = 0.010;
     seed                            = 77;
     rng(seed);
     
