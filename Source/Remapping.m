@@ -107,12 +107,16 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     K_psi           = parameters.simulation('K_psi');
     K_delays        = parameters.simulation('K_delays');
     
+    %{
     if(maxNumberOfVisibleTargets > 0),
         K = zeros(maxNumberOfVisibleTargets, R_N);
     else
         K = 0;
     end
-
+    %}
+    
+    K                = zeros(1, R_N);
+    
     K_delaysTimeSteps = timeToTimeStep(K_delays, dt);
     
     % E  =======================================
@@ -152,7 +156,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     S_activation    = zeros(1,S_N);
     S_firingrate    = zeros(1,S_N);
     
-    S_delay_sigma   = parameters.simulation('S_delay_sigma');
+    %S_delay_sigma   = parameters.simulation('S_delay_sigma');
     S_presaccadicOffset = parameters.simulation('S_presaccadicOffset'); %
     S_tau           = parameters.simulation('S_tau'); % (s)
     S_to_C_psi      = parameters.simulation('S_to_C_psi');
@@ -187,6 +191,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     S_activation_history = zeros(S_N, numSavedTimeSteps, numPeriods, numEpochs);
     C_activation_history = zeros(C_N, numSavedTimeSteps, numPeriods, numEpochs);
     
+    extra_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
+    
     % Flat buffers
     C_firing_history_flat     = zeros(C_N, numPeriods, numEpochs);
     C_activation_history_flat = zeros(C_N, numPeriods, numEpochs);
@@ -213,7 +219,9 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             saccadeTimes        = stimuli.stimuli{period}.saccadeTimes;
             saccadeTargets      = stimuli.stimuli{period}.saccadeTargets;
             stimOnsetTimes      = stimuli.stimuli{period}.stimOnsetTimes;
+            
             stimOnsetTimeSteps  = timeToTimeStep(stimOnsetTimes,dt);
+            saccOnsetTimeSteps  = timeToTimeStep(saccadeTimes,dt);
 
             numSaccades         = length(stimuli.stimuli{period}.saccadeTimes);
             numStimOnsetTimes   = length(stimOnsetTimes);
@@ -300,13 +308,14 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     delta_sum = sum(delta == 0, 1);
                     yes_delta_event = (delta_sum > 0);
                     
-                    K_onset_spike = K_psi*flat_gauss(yes_delta_event);
+                    K_onset_spike = zeros(1, R_N); %% fix later
+                    K_onset_spike(yes_delta_event) = K_psi*flat_gauss(yes_delta_event);
                 else
                     K_onset_spike = 0;
                 end
                 
                 % K saccade onset
-                if(~isempty(saccade_times) && any(saccade_times==saccade_times)),
+                if(~isempty(saccOnsetTimeSteps) && any(precedingTimeStep==saccOnsetTimeSteps)),
                     K_sacc_supression = K_psi;
                 else
                     K_sacc_supression = 0;
@@ -314,7 +323,10 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 
                 % K dynamics
                 K_tau_dynamic = R_tau_rise + (flat_gauss <= R_tau_threshold)*(R_tau_decay-R_tau_rise);
-                K = K_old + (dt./K_tau_dynamic).*(-K + R_psi*flat_gauss) + K_onset_spike - K_sacc_supression;
+                
+                %K = K_old + (dt./K_tau_dynamic).*(-K_old + R_psi*flat_gauss) + K_onset_spike - K_sacc_supression;
+                
+                K = K_old + (dt/K_tau)*(-K_old + R_psi*flat_gauss) + K_onset_spike - K_sacc_supression;
                 
                 % R dynamics
                 R_inhibition = R_w_INHB*sum(R_firingrate);
@@ -411,7 +423,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 %% Save activity                
                 if (~isTraining || isTraining && parameters.saveActivityInTraining) % && mod(t, outputSavingRate) == 0,
                     
-                    E_firing_history(:, periodSaveCounter, period, epoch) = K;%E;
+                    E_firing_history(:, periodSaveCounter, period, epoch) = E;
                     V_firing_history(:, periodSaveCounter, period, epoch) = V_firingrate;
                     R_firing_history(:, periodSaveCounter, period, epoch) = R_firingrate;
                     S_firing_history(:, periodSaveCounter, period, epoch) = S_firingrate;
@@ -422,6 +434,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     R_activation_history(:, periodSaveCounter, period, epoch) = R_activation;
                     S_activation_history(:, periodSaveCounter, period, epoch) = S_activation;
                     C_activation_history(:, periodSaveCounter, period, epoch) = C_activation;
+                    
+                    extra_history(:, periodSaveCounter, period, epoch) = K;
                     
                     % Count one more dt
                     periodSaveCounter = periodSaveCounter + 1;
@@ -495,6 +509,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                                                                             , 'C_activation_history' ...
                                                                             , 'C_firing_history_flat' ...
                                                                             , 'C_activation_history_flat' ...
+                                                                            , 'extra_history' ...
                                                                             , 'E');
                                                                         
     disp('Done...');

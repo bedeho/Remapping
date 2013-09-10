@@ -7,14 +7,14 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function GenerateExperiment(dt)
+function GenerateExperiment(Name,dt)
 
     % Import global variables
     declareGlobalVars();
     global EXPERIMENTS_FOLDER;
     
     % Experiment parameters
-    Name = 'prewired'; 
+    %Name = 'prewired'; 
     
     % first-training
     % kusonokireal-prewired-tuning
@@ -46,16 +46,18 @@ function GenerateExperiment(dt)
     saveNetworksAtEpochMultiples = 333; % Save network at this resolution
     seed = 13;
     
+    rng(seed);
+    
     % R
     parameterCombinations('R_eccentricity') = [45];
     parameterCombinations('R_tau')          = [0.050]; % (s)
-    parameterCombinations('R_w_INHB')       = [20/91]; % works = 5/91
-    parameterCombinations('R_slope')        = [2.0]; % classic = 0.4
-    parameterCombinations('R_threshold')    = [2.0];
+    parameterCombinations('R_w_INHB')       = [0]; % works = 5/91,20/91
+    parameterCombinations('R_slope')        = [2]; % classic = 0.4
+    parameterCombinations('R_threshold')    = [0.6];
     %parameterCombinations('R_to_C_alpha')  = [0.1]; % learning rate
     %parameterCombinations('R_to_C_psi')    = [1];
-    parameterCombinations('R_psi')          = [2];
-    parameterCombinations('R_attractor_psi')= [0.46 0.5 0.6]; % 0.34=perfect,300ms tail,0.3=dies just a little to quick, 0.4=eq ,classic under SOM=1.3
+    parameterCombinations('R_psi')          = [1];
+    parameterCombinations('R_attractor_psi')= [0.46]; % 0.34=perfect,300ms tail,0.3=dies just a little to quick, 0.4=eq ,classic under SOM=1.3
     parameterCombinations('R_background')   = [0]; % 4.0 when we do SOM
     
     parameterCombinations('R_tau_rise')     = [0.100];
@@ -64,8 +66,8 @@ function GenerateExperiment(dt)
     parameterCombinations('R_tau_threshold')= [0.4];
     
     % K
-    parameterCombinations('K_tau')          = [0.100];% 0.700
-    parameterCombinations('K_psi')          = [5];
+    parameterCombinations('K_tau')          = [0.500];% 0.700
+    parameterCombinations('K_psi')          = [1];
     parameterCombinations('K_delay_sigma')  = [0.05];    
     
     % E
@@ -105,7 +107,7 @@ function GenerateExperiment(dt)
     parameterCombinations('C_w_INHB')       = [1/5000]; %10/5000 50/5000 100/5000  C_N = 5400
     parameterCombinations('C_slope')        = [1000000]; % classic= 500
     parameterCombinations('C_threshold')    = [0.45]; % 0.3 works well, old 0.45
-    parameterCombinations('C_to_R_psi')     = [0.4]; % classic: 0.4
+    parameterCombinations('C_to_R_psi')     = [0.2 0.4]; % classic: 0.4
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
     
     % Save the experiment params

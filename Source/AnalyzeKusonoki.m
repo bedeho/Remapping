@@ -66,12 +66,10 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
         % Get task type, and save appripriately
         if(stimuli.stimuli{p}.trialType == 1),
             
-            truncator_neuronIndex = R_eccentricity + (RF_location  - stimuli.stimuli{p}.saccadeTargets) + 1;
+            %{
+            truncator_neuronIndex = R_eccentricity + (RF_location - stimuli.stimuli{p}.saccadeTargets) + 1;
             truncator_responseVector  = R_firing_history(truncator_neuronIndex, :, p, 1);
-            
-            stim_buffer{1,stimOnsetNr} = [stim_buffer{1,stimOnsetNr} stimulionset_response];
-            sacc_buffer{1,stimOnsetNr} = [sacc_buffer{1,stimOnsetNr} saccadeonset_response];
-                       
+                   
             t_start = timeToTimeStep(stimuliOnset + stim_responseWindowStart, dt);
             t_end = timeToTimeStep(stimuliOnset + stim_responseWindowStart + responseWindowDuration, dt);
             t_sacc = timeToTimeStep(saccadeOnset, dt);
@@ -90,7 +88,12 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
             plot([t_sacc t_sacc],[0 1],'k');
             plot([0 (len-1)],[stimulionset_response stimulionset_response],'g-');
             title(['Onset: ' num2str(100*stimuliOnset) 'ms']);
+            axis tight
             
+            %}
+            
+            stim_buffer{1,stimOnsetNr} = [stim_buffer{1,stimOnsetNr} stimulionset_response];
+            sacc_buffer{1,stimOnsetNr} = [sacc_buffer{1,stimOnsetNr} saccadeonset_response];
             
         else
             stim_buffer{2,stimOnsetNr} = [stim_buffer{2,stimOnsetNr} stimulionset_response];

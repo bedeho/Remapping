@@ -41,34 +41,36 @@ function Testing_Kusonoki(Name, dt)
     Duration                        = max(stimulusOnsetTimes(end),saccadeOnset + saccadeDelayTime) + 0.400; % (s), make sure we have enough time after last stim onset time to have
     % space for response window!
     
-    k = 1;
-    for z=1:2,
-        
-        % z=1: Current RF trials
-        % z=2: Future RF trials
+    
 
-        % ITerate location where rf will be, current or future.
-        for i = 1:length(screen_locations),
-            
-            % Get rf location
-            RF_location = screen_locations(i);
+    % z=1: Current RF trials
+    % z=2: Future RF trials
 
-            % Pick a first random saccade
+    % ITerate location where rf will be, current or future.
+    trialNr = 1;
+    for i = 1:length(screen_locations),
+
+        % Get rf location
+        RF_location = screen_locations(i);
+
+        % Pick a first random saccade
+        s = randi(length(saccades));
+
+        % Make sure this saccade is big enough, and that future RF is
+        % on retina
+        while((abs(saccades(s)) < saccade_threshold) || ~(-R_eccentricity <= RF_location+saccades(s) && RF_location+saccades(s) <=R_eccentricity))
             s = randi(length(saccades));
-            
-            % Make sure this saccade is big enough, and that future RF is
-            % on retina
-            while((abs(saccades(s)) < saccade_threshold) || ~(-R_eccentricity <= RF_location+saccades(s) && RF_location+saccades(s) <=R_eccentricity))
-                s = randi(length(saccades));
-            end
-            
+        end
+
+        for z=1:2,
+
             % Where to put stimuli prior to saccade
             if(z==1), %current rf trial
                 stim_location = RF_location;
             else
                 stim_location = RF_location + saccades(s);
             end
-            
+
             % Iterate different stimulus onset times
             for t = 1:length(stimulusOnsetTimes),
 
@@ -77,24 +79,25 @@ function Testing_Kusonoki(Name, dt)
                 targetOffIntervals{1}                   = [0 onsetTime;offsetTime Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
 
                 % Generate trace
-                stimuli{k}.headCenteredTargetLocations  = stim_location;
-                stimuli{k}.saccadeTargets               = saccades(s);
-                stimuli{k}.saccadeTimes                 = saccadeOnset;
-                stimuli{k}.targetOffIntervals           = targetOffIntervals;
-                [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, stimuli{k}.targetOffIntervals, 0, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
-                stimuli{k}.eyePositionTrace             = eyePositionTrace;
-                stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
-                stimuli{k}.stimOnsetTimes               = onsetTime;
+                stimuli{trialNr}.headCenteredTargetLocations  = stim_location;
+                stimuli{trialNr}.saccadeTargets               = saccades(s);
+                stimuli{trialNr}.saccadeTimes                 = saccadeOnset;
+                stimuli{trialNr}.targetOffIntervals           = targetOffIntervals;
+                [eyePositionTrace, retinalTargetTraces]       = GenerateTrace(Duration, dt, stimuli{trialNr}.headCenteredTargetLocations, stimuli{trialNr}.targetOffIntervals, 0, stimuli{trialNr}.saccadeTimes, stimuli{trialNr}.saccadeTargets);
+                stimuli{trialNr}.eyePositionTrace             = eyePositionTrace;
+                stimuli{trialNr}.retinalTargetTraces          = retinalTargetTraces;
+                stimuli{trialNr}.stimOnsetTimes               = onsetTime;
 
                 % Add simple information
-                stimuli{k}.RF_location                  = RF_location;
-                stimuli{k}.trialType                    = z;
-                stimuli{k}.targetNr                     = i;
-                stimuli{k}.saccadeNr                    = s;
-                stimuli{k}.stimOnsetNr                  = t;
+                stimuli{trialNr}.RF_location                  = RF_location;
+                stimuli{trialNr}.trialType                    = z;
+                stimuli{trialNr}.targetNr                     = i;
+                stimuli{trialNr}.saccadeNr                    = s;
+                stimuli{trialNr}.stimOnsetNr                  = t;
 
-                k = k + 1;
+                trialNr = trialNr + 1;
             end
+
         end
     end
     

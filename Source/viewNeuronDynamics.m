@@ -112,6 +112,8 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile)
         R_activation = activity.R_activation_history(:, :, period, epoch);
         S_activation = activity.S_activation_history(:, :, period, epoch);
         
+        extra = activity.extra_history(:, :, period, epoch);
+        
         % If C is empty, just fill with blank
         if ~isempty(activity.C_firing_history),
             C_firingrate = activity.C_firing_history(:, :, period, epoch);
@@ -135,10 +137,10 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile)
         numTimeSteps = length(stimuli.stimuli{period}.eyePositionTrace);
 
         subplot(numRows,2,1);
-        imagesc(E_firingrate);
+        imagesc(extra);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
-        title('E Firing');
+        title('Extra');
 
         %{
         subplot(numRows,2,2);
