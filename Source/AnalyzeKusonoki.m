@@ -45,14 +45,14 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
     for p=1:numPeriods,
         
         % Rf where stim is located
-        RF_location = stimuli.stimuli{p}.RF_location;
+        neuron_RF_location = stimuli.stimuli{p}.neuron_RF_location;
         
         % Get stim onset
         stimOnsetNr  = stimuli.stimuli{p}.stimOnsetNr;
         stimuliOnset = stimuli.stimulusOnsetTimes(stimOnsetNr);
         
         % Get neuron index of neuron
-        neuronIndex = R_eccentricity + RF_location + 1;
+        neuronIndex = R_eccentricity + neuron_RF_location + 1;
         
         % Get data for best period of each neuron
         responseVector  = R_firing_history(neuronIndex, :, p, 1);
@@ -65,9 +65,14 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
         
         % Get task type, and save appripriately
         if(stimuli.stimuli{p}.trialType == 1),
+
+            stim_buffer{1,stimOnsetNr} = [stim_buffer{1,stimOnsetNr} stimulionset_response];
+            sacc_buffer{1,stimOnsetNr} = [sacc_buffer{1,stimOnsetNr} saccadeonset_response];
+            
+        else
             
             %{
-            truncator_neuronIndex = R_eccentricity + (RF_location - stimuli.stimuli{p}.saccadeTargets) + 1;
+            truncator_neuronIndex = R_eccentricity + (neuron_RF_location - stimuli.stimuli{p}.saccadeTargets) + 1;
             truncator_responseVector  = R_firing_history(truncator_neuronIndex, :, p, 1);
                    
             t_start = timeToTimeStep(stimuliOnset + stim_responseWindowStart, dt);
@@ -89,13 +94,8 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
             plot([0 (len-1)],[stimulionset_response stimulionset_response],'g-');
             title(['Onset: ' num2str(100*stimuliOnset) 'ms']);
             axis tight
-            
             %}
             
-            stim_buffer{1,stimOnsetNr} = [stim_buffer{1,stimOnsetNr} stimulionset_response];
-            sacc_buffer{1,stimOnsetNr} = [sacc_buffer{1,stimOnsetNr} saccadeonset_response];
-            
-        else
             stim_buffer{2,stimOnsetNr} = [stim_buffer{2,stimOnsetNr} stimulionset_response];
             sacc_buffer{2,stimOnsetNr} = [sacc_buffer{2,stimOnsetNr} saccadeonset_response];
             

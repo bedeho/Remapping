@@ -42,7 +42,7 @@ function Testing_DuhamelRemapping(Name, dt, stimulitype, saccadeOnset, stimuliDu
     saccades                        = -S_eccentricity:1:S_eccentricity; % Pick among these saccades
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed) + 0.05,-1); % round to nearest hundred above
     Duration                        = saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
-    targetOffIntervals{1}           = [0 stimuliOnset; (stimuliOnset+stimuliDuration) Duration];
+    targetOffIntervals{1}           = [0 (stimuliOnset-dt); (stimuliOnset+stimuliDuration) Duration];
     
     %% Generate stimuli
     for i = 1:length(currentRF);

@@ -2,7 +2,7 @@
 %dt = 0.005;
 dt = 0.010;
 
-if false,
+if true,
     Testing_StimuliControl('basic', dt);
     Testing_SaccadeControl('basic', dt);
     Testing_Kusonoki('basic', dt);

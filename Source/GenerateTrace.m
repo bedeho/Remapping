@@ -9,7 +9,7 @@
 
 function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, headCenteredTargetLocations, targetOffIntervals, initialEyePosition, saccadeTimes, saccadeTargets)
 
-    numTimeSteps = timeToTimeStep(Duration);
+    numTimeSteps = timeToTimeStep(Duration,dt);
     
     % Visual
     maxNumberOfVisibleTargets = length(headCenteredTargetLocations);
@@ -34,7 +34,7 @@ function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, h
     numCompletedSaccades = 0;
     for t=2:numTimeSteps,
         
-        presentTime = stepToTime(t);
+        presentTime = stepToTime(t,dt);
         
         % Have we completed all saccades beginning before time timestep t?
         if numCompletedSaccades == numSaccades || presentTime <= saccadeTimes(numCompletedSaccades+1),
@@ -47,7 +47,7 @@ function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, h
             % timestep t
             
             % was this the first step across this saccade onset time?
-            previousTimeSteptime = stepToTime(t-1);
+            previousTimeSteptime = stepToTime(t-1,dt);
             timeOffset = abs(previousTimeSteptime - saccadeTimes(numCompletedSaccades+1));
             
             if(timeOffset < dt),
@@ -109,18 +109,10 @@ function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, h
             interval = offIntervals(i,:);
             
             % Translate from time to timesteps
-            timeStepInterval = timeToTimeStep(interval);
+            timeStepInterval = timeToTimeStep(interval,dt);
             
             % Cancel out, i.e. not visible
             retinalTargetTraces(h, timeStepInterval(1):timeStepInterval(2)) = nan;
         end
-    end
-    
-    function r = stepToTime(i)
-        r = (i-1)*dt;
-    end
-    
-    function i = timeToTimeStep(t)
-        i = floor(t/dt) + 1;
     end
 end

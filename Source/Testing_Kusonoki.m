@@ -30,9 +30,9 @@ function Testing_Kusonoki(Name, dt)
     
     % Temporal
     saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!
-    saccadeOnset                    = 0.500; % w.r.t start of task    
+    saccadeOnset                    = 0.600; % w.r.t start of task    
     stimulusDuration                = 0.100;
-    stimulusOnsetTimes              = saccadeOnset + (-0.400:0.050:0.200); % w.r.t start of trial
+    stimulusOnsetTimes              = saccadeOnset + ((-(0.400+stimulusDuration)):0.050:0.100); % w.r.t start of trial
 
     % Utilities - derived
     screen_locations                = [-10];% -5 0 5 10];%-R_eccentricity:1:R_eccentricity; %-7
@@ -41,8 +41,6 @@ function Testing_Kusonoki(Name, dt)
     Duration                        = max(stimulusOnsetTimes(end),saccadeOnset + saccadeDelayTime) + 0.400; % (s), make sure we have enough time after last stim onset time to have
     % space for response window!
     
-    
-
     % z=1: Current RF trials
     % z=2: Future RF trials
 
@@ -76,7 +74,7 @@ function Testing_Kusonoki(Name, dt)
 
                 onsetTime                               = stimulusOnsetTimes(t);
                 offsetTime                              = onsetTime + stimulusDuration;
-                targetOffIntervals{1}                   = [0 onsetTime;offsetTime Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
+                targetOffIntervals{1}                   = [0 (onsetTime-dt);offsetTime Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
 
                 % Generate trace
                 stimuli{trialNr}.headCenteredTargetLocations  = stim_location;
@@ -89,7 +87,7 @@ function Testing_Kusonoki(Name, dt)
                 stimuli{trialNr}.stimOnsetTimes               = onsetTime;
 
                 % Add simple information
-                stimuli{trialNr}.RF_location                  = RF_location;
+                stimuli{trialNr}.neuron_RF_location           = RF_location;
                 stimuli{trialNr}.trialType                    = z;
                 stimuli{trialNr}.targetNr                     = i;
                 stimuli{trialNr}.saccadeNr                    = s;

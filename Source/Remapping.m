@@ -104,8 +104,11 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     
     % K  =======================================
     K_tau           = parameters.simulation('K_tau');
+    K_supress       = parameters.simulation('K_supress');
     K_psi           = parameters.simulation('K_psi');
     K_delays        = parameters.simulation('K_delays');
+    K_supression_delay = parameters.simulation('K_supression_delay');
+    
     
     %{
     if(maxNumberOfVisibleTargets > 0),
@@ -117,8 +120,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     
     K                = zeros(1, R_N);
     
-    K_delaysTimeSteps = timeToTimeStep(K_delays, dt);
-    
+    K_delaysTimeSteps = durationToSteps(K_delays, dt);
+    K_supression_delayTimeSteps = durationToSteps(K_supression_delay, dt);
     % E  =======================================
     
     E_sigma      = parameters.simulation('E_sigma');
@@ -315,8 +318,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 end
                 
                 % K saccade onset
-                if(~isempty(saccOnsetTimeSteps) && any(precedingTimeStep==saccOnsetTimeSteps)),
-                    K_sacc_supression = K_psi;
+                if(~isempty(saccOnsetTimeSteps) && any(precedingTimeStep==saccOnsetTimeSteps+K_supression_delayTimeSteps)),
+                    K_sacc_supression = K_supress;
                 else
                     K_sacc_supression = 0;
                 end
@@ -326,7 +329,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 
                 %K = K_old + (dt./K_tau_dynamic).*(-K_old + R_psi*flat_gauss) + K_onset_spike - K_sacc_supression;
                 
-                K = K_old + (dt/K_tau)*(-K_old + R_psi*flat_gauss) + K_onset_spike - K_sacc_supression;
+                K = K_old + (dt/K_tau)*(-K_old + R_psi*flat_gauss) + K_onset_spike - K_old*K_sacc_supression;
                 
                 % R dynamics
                 R_inhibition = R_w_INHB*sum(R_firingrate);

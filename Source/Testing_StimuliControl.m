@@ -31,7 +31,7 @@ function Testing_StimuliControl(Name, dt)
     rng(seed);
     Duration                    = stimuliOnset+stimuliDuration+stimuliOffsetPeriod; % (s)
     headCenteredTargetLocation  = -R_eccentricity:R_density:R_eccentricity;
-    targetOffIntervals{1}       = [0 stimuliOnset;(stimuliOnset+stimuliDuration) Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
+    targetOffIntervals{1}       = [0 (stimuliOnset-dt);(stimuliOnset+stimuliDuration) Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
     for i = 1:length(headCenteredTargetLocation);
         

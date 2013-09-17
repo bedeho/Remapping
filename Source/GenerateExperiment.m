@@ -66,9 +66,11 @@ function GenerateExperiment(Name,dt)
     parameterCombinations('R_tau_threshold')= [0.4];
     
     % K
-    parameterCombinations('K_tau')          = [0.500];% 0.700
+    parameterCombinations('K_tau')          = [0.200];% 0.500
     parameterCombinations('K_psi')          = [1];
-    parameterCombinations('K_delay_sigma')  = [0.05];    
+    parameterCombinations('K_supress')      = [0.2 0.5];
+    parameterCombinations('K_delay_sigma')  = [0.05];
+    parameterCombinations('K_supression_delay') = [0.05]; %D= Duhamle suggests even shorter, an effect begins quite early if you look PSTH
     
     % E
     parameterCombinations('E_sigma')        = [5]; % (deg) receptive field size
@@ -107,7 +109,7 @@ function GenerateExperiment(Name,dt)
     parameterCombinations('C_w_INHB')       = [1/5000]; %10/5000 50/5000 100/5000  C_N = 5400
     parameterCombinations('C_slope')        = [1000000]; % classic= 500
     parameterCombinations('C_threshold')    = [0.45]; % 0.3 works well, old 0.45
-    parameterCombinations('C_to_R_psi')     = [0.2 0.4]; % classic: 0.4
+    parameterCombinations('C_to_R_psi')     = [0.05 ]; % 0.1 works well, classic: 0.4
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
     
     % Save the experiment params
@@ -186,7 +188,7 @@ function GenerateExperiment(Name,dt)
             K_delays = randn(1, R_N); % Sample normal distribution
             K_delays(K_delays < 0) = -K_delays(K_delays < 0); % flip negative delays to be positive
             K_delays = 0.00 + simulation('K_delay_sigma')*K_delays; % change mean and std
-            K_delays(K_delays > 0.1) = 0.1; % clip delays that are to long
+            K_delays(K_delays > 0.08) = 0.08; % clip delays that are to long
             simulation('K_delays') = K_delays; 
             
             % Sigma for decays, they are derived from thresholds
