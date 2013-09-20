@@ -42,7 +42,7 @@ function GenerateExperiment(Name,dt)
     outputSavingRate = 1; % Period of time step saving during testing.
     assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
     
-    saveActivityInTraining = false;
+    saveActivityInTraining = true;
     saveNetworksAtEpochMultiples = 333; % Save network at this resolution
     seed = 13;
     
@@ -68,9 +68,9 @@ function GenerateExperiment(Name,dt)
     % K
     parameterCombinations('K_tau')          = [0.200];% 0.500
     parameterCombinations('K_psi')          = [1];
-    parameterCombinations('K_supress')      = [0.2 0.5];
+    parameterCombinations('K_supress')      = [0.5];
     parameterCombinations('K_delay_sigma')  = [0.05];
-    parameterCombinations('K_supression_delay') = [0.05]; %D= Duhamle suggests even shorter, an effect begins quite early if you look PSTH
+    parameterCombinations('K_supression_delay') = [0]; %.05,D= Duhamle suggests even shorter, an effect begins quite early if you look PSTH
     
     % E
     parameterCombinations('E_sigma')        = [5]; % (deg) receptive field size
@@ -86,10 +86,10 @@ function GenerateExperiment(Name,dt)
     parameterCombinations('V_slope')        = [100000000000];
     parameterCombinations('V_threshold')    = [0.4];
     
-    parameterCombinations('V_to_R_psi')     = [6]; % 5 works
+    parameterCombinations('V_to_R_psi')     = [6]; % prewired=6,5 works
     parameterCombinations('V_to_R_alpha')   = [0.1];
     
-    parameterCombinations('V_to_C_psi')     = [1];
+    parameterCombinations('V_to_C_psi')     = [1]; % prewired=1
     parameterCombinations('V_to_C_alpha')   = [0.1];
 
     % S
@@ -108,7 +108,7 @@ function GenerateExperiment(Name,dt)
     parameterCombinations('C_tau')          = [0.050]; % (s)
     parameterCombinations('C_w_INHB')       = [1/5000]; %10/5000 50/5000 100/5000  C_N = 5400
     parameterCombinations('C_slope')        = [1000000]; % classic= 500
-    parameterCombinations('C_threshold')    = [0.45]; % 0.3 works well, old 0.45
+    parameterCombinations('C_threshold')    = [0.35]; % 0.45 prewired, old 0.45
     parameterCombinations('C_to_R_psi')     = [0.05 ]; % 0.1 works well, classic: 0.4
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
     
@@ -200,7 +200,7 @@ function GenerateExperiment(Name,dt)
             parameterfile = [simulationFolder filesep 'Parameters.mat'];
             save(parameterfile, 'simulation', 'dt', 'numTrainingEpochs', 'outputSavingRate', 'saveActivityInTraining', 'saveNetworksAtEpochMultiples', 'seed');
             
-            %{
+            
             % Create simulation blank network
             disp('Creating blank network...');
             CreateBlankNetwork([simulationFolder filesep 'BlankNetwork.mat'], length(simulation('R_preferences')), length(simulation('S_preferences')));
@@ -208,9 +208,9 @@ function GenerateExperiment(Name,dt)
             % Training
             disp('Training...');
             Remapping(simulationFolder, 'basic-Training', true);
-            %}
             
             % Create prewired network
+            %{
             disp('Create prewired network...');
             
             hardwired_pref_R = simulation('R_preferences'); % 0*ones(1,R_N);, simulation('R_preferences')
@@ -222,6 +222,7 @@ function GenerateExperiment(Name,dt)
             R_to_R_sigma = simulation('E_sigma');
             
             CreatePrewiredNetwork([simulationFolder filesep 'PrewiredNetwork.mat'], hardwired_pref_R, hardwired_pref_S, C_to_R_sigma, V_to_C_sigma, S_to_C_sigma, R_to_R_sigma);
+            %}
             
             % Move each network to new folder & test
             listing = dir(simulationFolder); 

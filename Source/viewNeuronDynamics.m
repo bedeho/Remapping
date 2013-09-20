@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function viewNeuronDynamics(activityFile, stimuliName, networkFile)
+function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, networkFile)
 
     % Import global variables
     declareGlobalVars();
@@ -19,8 +19,8 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile)
     end
 
     % CLayerProbe
-    [pathstr, name, ext] = fileparts(activityFile);
-    CLayerProbleFile = [pathstr filesep 'analysis-basic-CLayerProbe.mat']
+    %[pathstr, name, ext] = fileparts(activityFile);
+    %CLayerProbleFile = [pathstr filesep 'analysis-basic-CLayerProbe.mat']
     
     % Load input files
     disp('Loading input files...');
@@ -379,15 +379,28 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile)
                     %responseTrace = activity.S_firing_history(neuron, :, period, epoch);
                 elseif(strcmp(region,'C')),
                     
-                    %% START plotting!
-                    
-                    C_to_R_weights = network.C_to_R_weights;
-                    
-                    weightvector = C_to_R_weights(:, neuron);
+                    C_to_R_weightvector = network.C_to_R_weights(:, neuron);
+                    S_to_C_afferents =  network.S_to_C_weights(neuron, :);
+                    V_to_C_afferents = network.V_to_C_weights(neuron, :);
                     
                     figure;
+                    subplot(1,3,1);
+                    plot(C_to_R_weightvector);
+                    axis tight
+                    ylim([0 0.5]);
                     
-                    plot(weightvector);
+                    title('C->R');
+                    subplot(1,3,2);
+                    plot(S_to_C_afferents);
+                    axis tight
+                    ylim([0 0.5]);
+                    
+                    title('S->C');
+                    subplot(1,3,3);
+                    plot(V_to_C_afferents);
+                    axis tight
+                    ylim([0 0.5]);
+                    title('V->C');
                 end
 
             end

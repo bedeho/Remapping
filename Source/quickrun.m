@@ -3,6 +3,8 @@
 dt = 0.010;
 
 if true,
+    Training_Basic('basic', dt);
+
     Testing_StimuliControl('basic', dt);
     Testing_SaccadeControl('basic', dt);
     Testing_Kusonoki('basic', dt);

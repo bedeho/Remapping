@@ -140,14 +140,20 @@ function analysisSummary = Analyze(netDir, stimulinames)
     
     %% Kusonoki
     f = figure;
+    
+    arr_stim = kusonokiSTIMAlignedAnalysis;
+    subplot(2,1,1);
     hold on;
+    errorbar([arr_stim(:).current_mean], [arr_stim(:).current_std],'-or');
+    errorbar([arr_stim(:).future_mean], [arr_stim(:).future_std],'-ob');
+    legend('Current RF Trials','Future RF Trials');
+    ylim([0 1]);
     
-    arr = kusonokiSTIMAlignedAnalysis;
-    %arr = kusonokiSACCAlignedAnalysis;
-    
-    errorbar([arr(:).current_mean], [arr(:).current_std],'-or');
-    errorbar([arr(:).future_mean], [arr(:).future_std],'-ob');
-    
+    arr_sacc = kusonokiSACCAlignedAnalysis;
+    subplot(2,1,2);
+    hold on;
+    errorbar([arr_sacc(:).current_mean], [arr_sacc(:).current_std],'-or');
+    errorbar([arr_sacc(:).future_mean], [arr_sacc(:).future_std],'-ob');
     legend('Current RF Trials','Future RF Trials');
     ylim([0 1]);
 

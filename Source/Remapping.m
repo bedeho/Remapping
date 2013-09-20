@@ -71,9 +71,9 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     S_to_C_weights = network.S_to_C_weights;
     V_to_C_weights = network.V_to_C_weights;
     %V_to_R_weights = network.V_to_R_weights;
-    R_to_R_weights = network.R_to_R_weights;
-    R_to_R_excitatory_weights = network.R_to_R_excitatory_weights;
-    R_to_R_inhibitory_weights = network.R_to_R_inhibitory_weights;
+    %R_to_R_weights = network.R_to_R_weights;
+    %R_to_R_excitatory_weights = network.R_to_R_excitatory_weights;
+    %R_to_R_inhibitory_weights = network.R_to_R_inhibitory_weights;
     
 
     %% Load dynamical parameters
@@ -447,7 +447,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             
             % HACK to save C for C Probe Task, we dont have space to do
             % this properly
-            if numSaccades > 0,
+            if numSaccades > 0 && ~isTraining,
 
                 %hacked solution to get rate during C probing task,
                 %despte all data not being savable.
@@ -477,7 +477,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     % Output final network
     if isTraining,
         disp('Saving trained network to disk...');
-        save([simulationFolder filesep 'TrainedNetwork.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'V_to_R_weights', 'R_N', 'S_N', 'C_N');
+        save([simulationFolder filesep 'TrainedNetwork.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'R_N', 'S_N', 'C_N'); %'V_to_R_weights'
     end
     
     

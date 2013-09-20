@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Training_Basic(Name)
+function Training_Basic(Name,dt)
 
     % Import global variables
     declareGlobalVars();
@@ -17,7 +17,7 @@ function Training_Basic(Name)
     stimulitype = 'Training';
     
     % Params
-    dt                              = 0.010; % (s)
+    %dt                              = 0.010; % (s)
     seed                            = 77;
     S_eccentricity                  = 30;
     S_density                       = 10;
@@ -32,8 +32,8 @@ function Training_Basic(Name)
     % Generate stimuli
     rng(seed);
     Duration                        = saccadeOnset + (2*S_eccentricity/saccadeSpeed) + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
-    saccadeTargets                  = -S_eccentricity:S_density:S_eccentricity;
-    headCenteredTargetLocations     = -R_eccentricity:R_density:R_eccentricity;
+    saccadeTargets                  = [-10]%-S_eccentricity:S_density:S_eccentricity;
+    headCenteredTargetLocations     = [-15]%-R_eccentricity:R_density:R_eccentricity;
 
     k = 1;
     for i = 1:length(headCenteredTargetLocations);
@@ -59,7 +59,8 @@ function Training_Basic(Name)
             [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, stimuli{k}.targetOffIntervals, stimuli{k}.initialEyePosition, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
             stimuli{k}.eyePositionTrace             = eyePositionTrace;
             stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
-
+            stimuli{k}.stimOnsetTimes               = 0;
+            
             k = k + 1;
             
         end
