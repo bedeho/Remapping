@@ -109,7 +109,7 @@ function GenerateExperiment(Name,dt)
     parameterCombinations('C_w_INHB')       = [1/5000]; %10/5000 50/5000 100/5000  C_N = 5400
     parameterCombinations('C_slope')        = [1000000]; % classic= 500
     parameterCombinations('C_threshold')    = [0.35]; % 0.45 prewired, old 0.45
-    parameterCombinations('C_to_R_psi')     = [0.05 ]; % 0.1 works well, classic: 0.4
+    parameterCombinations('C_to_R_psi')     = [0.05 0]; % 0.1 works well, classic: 0.4
     parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
     
     % Save the experiment params
