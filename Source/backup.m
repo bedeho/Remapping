@@ -1,4 +1,35 @@
-  
+%{
+
+%
+%  GenerateExperiment.m
+%  Remapping
+%
+%  Created by Bedeho Mender on 19/05/13.
+%  Copyright 2013 OFTNAI. All rights reserved.
+%
+
+                    disp('Kusonoki ...');
+                    Remapping(subsim_dir, 'basic-Kusonoki', false, [name ext]);
+                    
+                    disp('Duhamel Remapping ...');
+                    Remapping(subsim_dir, 'basic-DuhamelRemapping', false, [name ext]);
+                    
+                    disp('Duhamel Remapping Trace ...');
+                    Remapping(subsim_dir, 'basic-DuhamelRemappingTrace', false, [name ext]);
+                    
+                    disp('Duhamel Truncation ...');
+                    Remapping(subsim_dir, 'basic-DuhamelTruncation', false, [name ext]);
+                    
+                    disp('Saccade Control ...');
+                    Remapping(subsim_dir, 'basic-SaccadeControl', false, [name ext]);
+                    
+                    disp('Stimulus Control ...');
+                    Remapping(subsim_dir, 'basic-StimuliControl', false, [name ext]);
+                    
+                    disp('C Layer Probe ...');
+                    Remapping(subsim_dir, 'basic-CLayerProbe', false, [name ext]);
+%}
+
 %
 %  Remapping.m
 %  Remapping

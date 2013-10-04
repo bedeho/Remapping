@@ -1,6 +1,7 @@
 
-%dt = 0.005;
-dt = 0.010;
+%% DO NOT CHANGE, basic2 has fixed dt
+%dt = 0.010; 
+dt = 0.005;
 
 if true,
     Training_Basic('basic', dt);
@@ -14,4 +15,4 @@ if true,
     Testing_CLayerProbeTask('basic', dt);
 end
 
-GenerateExperiment('prewired',dt);
+GenerateExperiment('learning13',dt);

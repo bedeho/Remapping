@@ -20,9 +20,9 @@ function Training_Basic(Name,dt)
     %dt                              = 0.010; % (s)
     seed                            = 77;
     S_eccentricity                  = 30;
-    S_density                       = 10;
+    S_density                       = 5;
     R_eccentricity                  = 45;
-    R_density                       = 10;
+    R_density                       = 5;
     
     % Dynamical quantities
     saccadeSpeed                    = 300; %if changed, then change in GenerateEyeTrace.m as well!
@@ -32,8 +32,8 @@ function Training_Basic(Name,dt)
     % Generate stimuli
     rng(seed);
     Duration                        = saccadeOnset + (2*S_eccentricity/saccadeSpeed) + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
-    saccadeTargets                  = [-10]%-S_eccentricity:S_density:S_eccentricity;
-    headCenteredTargetLocations     = [-15]%-R_eccentricity:R_density:R_eccentricity;
+    saccadeTargets                  = -S_eccentricity:S_density:S_eccentricity; %[-20]%
+    headCenteredTargetLocations     = -R_eccentricity:R_density:R_eccentricity;
 
     k = 1;
     for i = 1:length(headCenteredTargetLocations);
@@ -42,7 +42,7 @@ function Training_Basic(Name,dt)
         h = headCenteredTargetLocations(i);
         
         % Deduce all valid saccades keeping this target on retina
-        sTargets = saccadeTargets(-R_eccentricity + h <= saccadeTargets <= h + R_eccentricity);
+        sTargets = saccadeTargets((-R_eccentricity + h <= saccadeTargets) & (saccadeTargets <= h + R_eccentricity));
         
         for j = 1:length(sTargets),
             

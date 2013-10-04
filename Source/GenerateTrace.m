@@ -37,7 +37,7 @@ function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, h
         presentTime = stepToTime(t,dt);
         
         % Have we completed all saccades beginning before time timestep t?
-        if numCompletedSaccades == numSaccades || presentTime <= saccadeTimes(numCompletedSaccades+1),
+        if numCompletedSaccades == numSaccades || presentTime < saccadeTimes(numCompletedSaccades+1),
 
             % yes, so lets just continue fixating
             eyePositionTrace(t) = eyePositionTrace(t-1);
@@ -47,10 +47,10 @@ function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, h
             % timestep t
             
             % was this the first step across this saccade onset time?
-            previousTimeSteptime = stepToTime(t-1,dt);
-            timeOffset = abs(previousTimeSteptime - saccadeTimes(numCompletedSaccades+1));
+            %previousTimeSteptime = stepToTime(t-1,dt);
+            timeOffset = abs(presentTime - saccadeTimes(numCompletedSaccades+1));
             
-            if(timeOffset < dt),
+            if(timeOffset <= dt),
                 
                 % yes it was, so mini saccade starting
                 % point needs to correct for delay between prior time step
@@ -68,13 +68,13 @@ function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, h
                 reduceSaccadeTimeInPresentTimeStepWith = 0;
             end
             
-            % Will one more stime step saccading from
-            % miniSaccadeStartPosition take us past saccade target?
+            % Will one more time step moving eyes from
+            % eyePositionTrace(t-1) take us past saccade target?
             
             remainingEyePositionOffset = newEyePosition - eyePositionTrace(t-1);
             timeStepSaccadeMagnitude = (dt - reduceSaccadeTimeInPresentTimeStepWith)*saccadeSpeed;
             
-            if (timeStepSaccadeMagnitude > remainingEyePositionOffset),
+            if (timeStepSaccadeMagnitude > abs(remainingEyePositionOffset)),
                 
                 % yes, so lets not do the whole thing
                 eyePositionTrace(t) = newEyePosition;

@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function GenerateExperiment(Name,dt)
+function GenerateExperiment(Name, dt)
 
     % Import global variables
     declareGlobalVars();
@@ -33,12 +33,23 @@ function GenerateExperiment(Name,dt)
     
     mkdir(experimentFolderPath);
     
+    %% Stimuli to test with
+    stimulinames = {'basic-StimuliControl', ...
+                    'basic2-StimuliControl', ... % dt=0.01
+                    'basic-SaccadeControl', ...
+                    'basic2-SaccadeControl', ... % dt=0.01
+                    'basic-DuhamelRemapping', ...
+                    'basic-DuhamelRemappingTrace', ... 
+                    'basic-DuhamelTruncation', ...
+                    'basic-CLayerProbe', ...
+                    'basic-Kusonoki'};
+    
     %% Specify main paramters
     parameterCombinations = containers.Map;
     
     % Simulations Paramters
      % (s)
-    numTrainingEpochs = 1;
+    numTrainingEpochs = 5 %0;
     outputSavingRate = 1; % Period of time step saving during testing.
     assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
     
@@ -50,14 +61,17 @@ function GenerateExperiment(Name,dt)
     
     % R
     parameterCombinations('R_eccentricity') = [45];
-    parameterCombinations('R_tau')          = [0.050]; % (s)
-    parameterCombinations('R_w_INHB')       = [0]; % works = 5/91,20/91
-    parameterCombinations('R_slope')        = [2]; % classic = 0.4
-    parameterCombinations('R_threshold')    = [0.6];
+    parameterCombinations('R_tau')          = [0.040]; % (s), 0.050 0.100
+    parameterCombinations('R_w_INHB')       = [0]; % 20/91 15/91 10/91 ,prewwired=0 works = 5/91,20/91
+    parameterCombinations('R_slope')        = [0.002]; %0.002 prewired=2, classic = 0.4, 0.0005
+    parameterCombinations('R_threshold')    = [700]; %700, prewired 0.6
     %parameterCombinations('R_to_C_alpha')  = [0.1]; % learning rate
     %parameterCombinations('R_to_C_psi')    = [1];
-    parameterCombinations('R_psi')          = [1];
-    parameterCombinations('R_attractor_psi')= [0.46]; % 0.34=perfect,300ms tail,0.3=dies just a little to quick, 0.4=eq ,classic under SOM=1.3
+    
+    parameterCombinations('R_psi')          = [2000]; %700 prewired = 0.5
+    
+    parameterCombinations('R_attractor_psi')     = [570]; %105, 1.5 ,0.34=perfect,300ms tail,0.3=dies just a little to quick, 0.4=eq ,classic under SOM=1.3
+    parameterCombinations('R_neg_attractor_psi') = [0.1]; %105, 1.5 ,0.34=perfect,300ms tail,0.3=dies just a little to quick, 0.4=eq ,classic under SOM=1.3
     parameterCombinations('R_background')   = [0]; % 4.0 when we do SOM
     
     parameterCombinations('R_tau_rise')     = [0.100];
@@ -67,50 +81,58 @@ function GenerateExperiment(Name,dt)
     
     % K
     parameterCombinations('K_tau')          = [0.200];% 0.500
-    parameterCombinations('K_psi')          = [1];
+    parameterCombinations('K_psi')          = [1000]; %16
     parameterCombinations('K_supress')      = [0.5];
     parameterCombinations('K_delay_sigma')  = [0.05];
-    parameterCombinations('K_supression_delay') = [0]; %.05,D= Duhamle suggests even shorter, an effect begins quite early if you look PSTH
+    parameterCombinations('K_supression_delay') = [0.050]; %.05,D= Duhamle suggests even shorter, an effect begins quite early if you look PSTH
     
     % E
-    parameterCombinations('E_sigma')        = [5]; % (deg) receptive field size
-    parameterCombinations('E_tau_rise')     = [0.05];
+    parameterCombinations('E_sigma')        = [2]; % (deg) receptive field size
+    parameterCombinations('E_tau_rise')     = [0.050];
     parameterCombinations('E_tau_decay')    = [0.7];
     parameterCombinations('E_to_V_psi')     = [1];
     parameterCombinations('E_to_R_psi')     = [6];
+    parameterCombinations('E_tau')          = [6];
     
     % V
     %parameterCombinations('V_sigma')        = [5]; % (deg) receptive field size
-    parameterCombinations('V_tau')           = [0.050]; % (s)
+    parameterCombinations('V_tau')           = [2.000]; % (s)
     %parameterCombinations('V_psi')          = [1];
     parameterCombinations('V_slope')        = [100000000000];
     parameterCombinations('V_threshold')    = [0.4];
     
+    parameterCombinations('V_supression_delay') = [0.500];
+    
     parameterCombinations('V_to_R_psi')     = [6]; % prewired=6,5 works
     parameterCombinations('V_to_R_alpha')   = [0.1];
     
-    parameterCombinations('V_to_C_psi')     = [1]; % prewired=1
-    parameterCombinations('V_to_C_alpha')   = [0.1];
+    parameterCombinations('V_to_C_psi')     = [10]; % prewired=1
+    parameterCombinations('V_to_C_alpha')   = [0.001]; %0.5
 
     % S
     parameterCombinations('S_eccentricity') = [30];
-    parameterCombinations('S_delay_sigma')  = [0.050]; % (s)
-    parameterCombinations('S_tau')          = [0.020]; % (s)
+    parameterCombinations('S_delay_sigma')  = [0.100]; % (s)
+    parameterCombinations('S_tau')          = [0.010]; % (s)
     parameterCombinations('S_sigma')        = parameterCombinations('E_sigma'); % (deg) receptive field size
-    %parameterCombinations('S_psi')          = [1];
+    parameterCombinations('S_psi')          = [1];
     parameterCombinations('S_slope')        = [10];
     parameterCombinations('S_threshold')    = [0.5];
     
-    parameterCombinations('S_to_C_psi')     = [2.3];
-    parameterCombinations('S_to_C_alpha')   = [0.1]; % learning rate
+    parameterCombinations('S_presaccadic_onset')  = [0.050]; % 0.100 is classic
+    parameterCombinations('S_trace_length')       = [0.490];
+    
+    
+    parameterCombinations('S_to_C_psi')     = [10];
+    parameterCombinations('S_to_C_alpha')   = [0.001]; %0.003, learning rate
     
     % C
-    parameterCombinations('C_tau')          = [0.050]; % (s)
-    parameterCombinations('C_w_INHB')       = [1/5000]; %10/5000 50/5000 100/5000  C_N = 5400
-    parameterCombinations('C_slope')        = [1000000]; % classic= 500
-    parameterCombinations('C_threshold')    = [0.35]; % 0.45 prewired, old 0.45
-    parameterCombinations('C_to_R_psi')     = [0.05 0]; % 0.1 works well, classic: 0.4
-    parameterCombinations('C_to_R_alpha')   = [0.1]; % learning rate
+    parameterCombinations('C_tau')          = [0.010]; % (s)
+    parameterCombinations('C_w_INHB')       = [10/5000]; %10/5000 50/5000 100/5000  C_N = 5400
+    parameterCombinations('C_slope')        = [10]; % prewired 100, classic= 500
+    parameterCombinations('C_threshold')    = [3]; %5.6 0.45 prewired, old 0.45
+    parameterCombinations('C_to_R_psi')     = [30]; % 15, prewwired=0.05,0.1 works well, classic: 0.4
+    parameterCombinations('C_to_R_psi_neg') = [0]; %0.005, 0.1 0.01 0.001 0.0001, 1, 3.5 prewwired=1 works well, classic: 0.4
+    parameterCombinations('C_to_R_alpha')   = [1]; % 0.1 to small? learning rate
     
     % Save the experiment params
     save([experimentFolderPath filesep 'GenerateExperiment.mat'], 'parameterCombinations');
@@ -182,6 +204,7 @@ function GenerateExperiment(Name,dt)
             S_delay = randn(1, S_N);
             S_delay = 0.06 + simulation('S_delay_sigma')*S_delay; % change mean and std
             S_delay(S_delay < 0) = -S_delay(S_delay < 0); % flip negative delays to be positive
+            S_delay = simulation('S_delay_sigma')*ones(1, S_N);
             simulation('S_presaccadicOffset') = S_delay;
             
             % K delays
@@ -200,17 +223,7 @@ function GenerateExperiment(Name,dt)
             parameterfile = [simulationFolder filesep 'Parameters.mat'];
             save(parameterfile, 'simulation', 'dt', 'numTrainingEpochs', 'outputSavingRate', 'saveActivityInTraining', 'saveNetworksAtEpochMultiples', 'seed');
             
-            
-            % Create simulation blank network
-            disp('Creating blank network...');
-            CreateBlankNetwork([simulationFolder filesep 'BlankNetwork.mat'], length(simulation('R_preferences')), length(simulation('S_preferences')));
-                        
-            % Training
-            disp('Training...');
-            Remapping(simulationFolder, 'basic-Training', true);
-            
             % Create prewired network
-            %{
             disp('Create prewired network...');
             
             hardwired_pref_R = simulation('R_preferences'); % 0*ones(1,R_N);, simulation('R_preferences')
@@ -221,8 +234,15 @@ function GenerateExperiment(Name,dt)
             S_to_C_sigma = simulation('E_sigma');
             R_to_R_sigma = simulation('E_sigma');
             
-            CreatePrewiredNetwork([simulationFolder filesep 'PrewiredNetwork.mat'], hardwired_pref_R, hardwired_pref_S, C_to_R_sigma, V_to_C_sigma, S_to_C_sigma, R_to_R_sigma);
-            %}
+            %CreatePrewiredNetwork([simulationFolder filesep 'PrewiredNetwork.mat'], hardwired_pref_R, hardwired_pref_S, C_to_R_sigma, V_to_C_sigma, S_to_C_sigma, R_to_R_sigma);
+            
+            % Create simulation blank network
+            disp('Creating blank network...');
+            CreateBlankNetwork([simulationFolder filesep 'BlankNetwork.mat'], hardwired_pref_R, length(simulation('R_preferences')), length(simulation('S_preferences')), R_to_R_sigma);
+                        
+            % Training
+            disp('Training...');
+            Remapping(simulationFolder, 'basic-Training', true);
             
             % Move each network to new folder & test
             listing = dir(simulationFolder); 
@@ -244,32 +264,17 @@ function GenerateExperiment(Name,dt)
                     copyfile(parameterfile, subsim_dir);
                     
                     % Testing network
-                    disp('Kusonoki ...');
-                    Remapping(subsim_dir, 'basic-Kusonoki', false, [name ext]);
-                    
-                    disp('Duhamel Remapping ...');
-                    Remapping(subsim_dir, 'basic-DuhamelRemapping', false, [name ext]);
-                    
-                    disp('Duhamel Remapping Trace ...');
-                    Remapping(subsim_dir, 'basic-DuhamelRemappingTrace', false, [name ext]);
-                    
-                    disp('Duhamel Truncation ...');
-                    Remapping(subsim_dir, 'basic-DuhamelTruncation', false, [name ext]);
-                    
-                    disp('Saccade Control ...');
-                    Remapping(subsim_dir, 'basic-SaccadeControl', false, [name ext]);
-                    
-                    disp('Stimulus Control ...');
-                    Remapping(subsim_dir, 'basic-StimuliControl', false, [name ext]);
-                    
-                    disp('C Layer Probe ...');
-                    Remapping(subsim_dir, 'basic-CLayerProbe', false, [name ext]);
+                    for s=1:length(stimulinames),
+                        
+                        disp(['Testing Stimuli: ' stimulinames{s}]);
+                        Remapping(subsim_dir, stimulinames{s}, false, [name ext]);                       
+                    end
 
                 end
             end
         end
     end
 
-    AnalyzeExperiment(Name)
+    AnalyzeExperiment(Name,stimulinames)
     
 end

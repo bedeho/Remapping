@@ -7,23 +7,17 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function AnalyzeExperiment(experiment)
+function AnalyzeExperiment(experiment, stimulinames)
 
     % Experiment name 
     if nargin < 1,
-        experiment = 'prewired';
+        experiment = 'learning13';%'prewired';
     end
     
     % Stimuli names
-    %{
-    stimulinames = {'basic-DuhamelRemapping', ...
-                    'basic-DuhamelRemappingTrace', ...
-                    'basic-DuhamelTruncation', ...
-                    'basic-SaccadeControl', ...
-                    'basic-StimuliControl'}; %'basic-Kusonoki', ...
-    %}
-    
-    stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemapping', 'basic-DuhamelRemappingTrace', 'basic-DuhamelTruncation', 'basic-CLayerProbe','basic-Kusonoki'};
+    if(nargin < 2)
+        stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemapping', 'basic-DuhamelRemappingTrace', 'basic-DuhamelTruncation', 'basic-CLayerProbe','basic-Kusonoki'};
+    end
     
     % Import global variables
     declareGlobalVars();

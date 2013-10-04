@@ -48,8 +48,8 @@ function CreatePrewiredNetwork(outputfile, R_preferences, S_preferences, C_to_R_
     % MAKE INTO MEXICAN HAT
     R_to_R_excitatory_weights = gauss;
     R_to_R_inhibitory_weights = gauss - 1;
-    %R_to_R_weights  = gauss*3 - 0.1;
     R_to_R_weights  = gauss;
+    %R_to_R_weights  = gauss*3 - 0.1;
     
     % S_to_C_weights
     [X Y Z]         = meshgrid(R_preferences, S_preferences, S_preferences);

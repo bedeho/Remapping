@@ -76,7 +76,7 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         %% STIM - CONTROL
         
         % Index of R neuron which has RF over stim location before saccade: futureRF
-        futureRF_neuronIndex = R_eccentricity + stimuli.stimuli{p}.stim_screen_location + 1;
+        futureRF_neuronIndex = R_eccentricity + stimuli.stimuli{p}.futureRF + 1;
         
         % Stim response of remapped neuron when stim is in future RF
         stim_responseVector = stim_control_activity(remappedInto_neuronIndex, :, futureRF_neuronIndex);
@@ -184,7 +184,7 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         %% Save
         DuhamelRemappin_Result(p).index                   = remappedInto_neuronIndex;
         DuhamelRemappin_Result(p).currentRF               = stimuli.stimuli{p}.currentRF;
-        DuhamelRemappin_Result(p).futureRF                = stimuli.stimuli{p}.stim_screen_location;
+        DuhamelRemappin_Result(p).futureRF                = stimuli.stimuli{p}.futureRF;
         DuhamelRemappin_Result(p).saccade                 = stimuli.stimuli{p}.saccadeTargets;
         DuhamelRemappin_Result(p).remappingLatency        = (latencyTimeStep - timeToTimeStep(saccadeOnset,dt))*dt;
         DuhamelRemappin_Result(p).stimLatency             = (stim_latencyTimeStep - timeToTimeStep(stim_stimuliOnset, dt))*dt;

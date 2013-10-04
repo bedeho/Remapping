@@ -135,12 +135,18 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
         % Plot
         s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes, dt);
         numTimeSteps = length(stimuli.stimuli{period}.eyePositionTrace);
-
+        
+        ticks = 0:(0.100/dt):numTimeSteps;
+        for l=1:length(ticks),
+            tickLabels{l} = num2str((l-1)*0.100);
+        end
+        
         subplot(numRows,2,1);
         imagesc(extra);
-        hold on;colorbar
+        hold on;colorbar;
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('Extra');
+        set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
 
         %{
         subplot(numRows,2,2);
@@ -157,7 +163,7 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('V Firing');
         set(imgV, 'ButtonDownFcn', {@singleUnitCallBack, 'V'}); % Setup callback
-
+        set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
         
         subplot(numRows,2,4);
         imagesc(V_activation);
@@ -165,7 +171,7 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('V Activation');
-        
+        set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
         
         subplot(numRows,2,5);
         imgR = imagesc(R_firingrate);
@@ -174,14 +180,16 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
         colorbar
         title('R Firing');
         set(imgR, 'ButtonDownFcn', {@singleUnitCallBack, 'R'}); % Setup callback
-
+        set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
+        
         subplot(numRows,2,6);
         imagesc(R_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('R Activation');
-
+        set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
+        
         subplot(numRows,2,7);
         imgS = imagesc(S_firingrate);
         colorbar
@@ -189,14 +197,16 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('S Firing');
         set(imgS, 'ButtonDownFcn', {@singleUnitCallBack, 'S'}); % Setup callback
-
+        set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
+        
         subplot(numRows,2,8);
         imagesc(S_activation);
         hold on;colorbar
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         colorbar
         title('S Activation');
-
+        set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
+        
         %if(includeC_layer),
             subplot(numRows,2,[9 11]);
             imgC = imagesc(C_firingrate);
@@ -205,13 +215,15 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
             colorbar
             title('C Firing');
             set(imgC, 'ButtonDownFcn', {@singleUnitCallBack, 'C'}); % Setup callback
-
+            set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
+            
             subplot(numRows,2,[10 12]);
             imagesc(C_activation);
-            hold on;colorbar
+            hold on;colorbar; caxis([min(min(C_activation)) max(max(C_activation))]);
             if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
             colorbar
             title('C Actiation');
+            set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
             
             nextplot = 13;
         %else
@@ -236,11 +248,11 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
             legend({'Eye Position'});            
         end
         
-        xlabel(['Time step (dt =' num2str(dt) ')']);
+        xlabel(['Time step (s)']);
         ylim([-45 45]); % we hard code limit since not all stimuli has stimuli.R_eccentricity
         xlim([0 (numTimeSteps-1)]);
         set(gca,'YDir','reverse');
-        
+        set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
         %{
         subplot(numRows,2,nextplot+1);
         cla
@@ -261,7 +273,7 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
 
             % Pick neuron
             x = inputdlg('Neuron #:', 'Sample', [1 50]);
-            neuron = str2num(cell2mat(x));
+            neuron = str2num(cell2mat(x))
 
             % single left  click => 'SelectionType' = 'normal'
             % single right click => 'SelectionType' = 'alt'
@@ -303,7 +315,7 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
                     else
                         % plot rectangle
                         stimDuration = targetOffIntervals(t,1)-lastStimOnsetTime;
-                        rectangle('Position', [timeToTimeStep(lastStimOnsetTime,dt), 0.001, timeToTimeStep(stimDuration,dt),  1],'FaceColor',[0.9 0.9 0.9],'EdgeColor',[0.9 0.9 0.9]);
+                        rectangle('Position', [timeToTimeStep(lastStimOnsetTime, dt), 0.001, timeToTimeStep(stimDuration, dt),  1],'FaceColor',[0.9 0.9 0.9],'EdgeColor',[0.9 0.9 0.9]);
 
                         lastStimOnsetTime = [];
                     end
@@ -314,26 +326,30 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
                 end
 
                 plot(0:(numTimeSteps-1), responseTrace, 'b');
-                if ~isempty(s), plot([s s],[0 1],'r'); end % Saccade times
+                if ~isempty(s), plot([s s],[-0.05 1],'r'); end % Saccade times
                 hXLabel = xlabel('Time (s)');
                 hYLabel = ylabel('Firing Rate');
-                ylim([0 1.1]);
+                ylim([-0.05 1]);
+                xlim([0 (numTimeSteps-1)]);
 
-                xTick = 11:10:numTimeSteps;
+                %xTick = 11:10:numTimeSteps;
 
-                for i=1:length(xTick),
-                    xTickLabels{i} = [num2str(stepToTime(xTick(i), dt))];
-                end
+                %for i=1:length(xTick),
+                %    xTickLabels{i} = [num2str(stepToTime(xTick(i), dt))];
+                %end
 
-                set(gca,'XTick', xTick);
-                set(gca,'XTickLabel', xTickLabels);
+                %set(gca,'XTick', xTick);
+                %set(gca,'XTickLabel', xTickLabels);
+                set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
                 set(gca,'YTick', [0 1]);
 
-                set([hYLabel hXLabel], 'FontSize', 20);
-                set([gca], 'FontSize', 18);
+                set([hYLabel hXLabel], 'FontSize', 18);
+                set([gca], 'FontSize', 16);
                 daspect([40 1 1]);
 
-                box on;
+                %box on;
+                
+                set( gca, 'TickDir', 'out' );
                 
             else % weight vectors!
                 
@@ -372,7 +388,7 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
                     hYLabel = ylabel('Saccade Target (deg)');
                     set([hYLabel hXLabel], 'FontSize', 20);
                     set([gca], 'FontSize', 18);
-                   
+                    
                 %elseif(strcmp(region,'R')),
                 %    
                 elseif(strcmp(region,'S')),
@@ -384,23 +400,24 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
                     V_to_C_afferents = network.V_to_C_weights(neuron, :);
                     
                     figure;
+
                     subplot(1,3,1);
-                    plot(C_to_R_weightvector);
-                    axis tight
-                    ylim([0 0.5]);
-                    
-                    title('C->R');
-                    subplot(1,3,2);
                     plot(S_to_C_afferents);
-                    axis tight
-                    ylim([0 0.5]);
-                    
+                    axis tight;
+                    ylim([0 0.1]);
                     title('S->C');
-                    subplot(1,3,3);
+                    
+                    subplot(1,3,2);
                     plot(V_to_C_afferents);
-                    axis tight
-                    ylim([0 0.5]);
+                    axis tight;
+                    ylim([0 0.1]);
                     title('V->C');
+                    
+                    subplot(1,3,3);
+                    plot(C_to_R_weightvector);
+                    axis tight;
+                    ylim([0 0.4]);
+                    title('C->R');
                 end
 
             end

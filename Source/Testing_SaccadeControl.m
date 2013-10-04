@@ -14,7 +14,7 @@ function Testing_SaccadeControl(Name, dt)
     global base;
 
     filename = [Name '-SaccadeControl'];
-    stimulitype = 'SaccadeControl';
+    stimulitype = 'SaccadeControl';%2
     
     % Params
     %dt                          = 0.010;
@@ -23,7 +23,7 @@ function Testing_SaccadeControl(Name, dt)
     S_density                   = 1; % should be 1, we test everyones response
     
     % Dynamical quantities
-    saccadeOnset                = 0.1; %(s) w.r.t start of task
+    saccadeOnset                = 0.150; %(s) w.r.t start of task
     postSaccadefixationPeriod   = 0.4; %(s)
     saccadeSpeed                = 300; %(deg/s)
 

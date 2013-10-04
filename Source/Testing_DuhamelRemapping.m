@@ -38,8 +38,8 @@ function Testing_DuhamelRemapping(Name, dt, stimulitype, saccadeOnset, stimuliDu
     end
     
     % Utilities - derived
-    currentRF                       = 8; %[-10 -5 0 5 10];%-R_eccentricity:1:R_eccentricity; % 10; Remapping TARGET, i.e. postsaccadic (-R_eccentricity+R_edge_effect_buffer):1:(R_eccentricity+R_edge_effect_buffer)
-    saccades                        = -S_eccentricity:1:S_eccentricity; % Pick among these saccades
+    currentRF                       = 20%0%8; %[-10 -5 0 5 10];%-R_eccentricity:1:R_eccentricity; % 10; Remapping TARGET, i.e. postsaccadic (-R_eccentricity+R_edge_effect_buffer):1:(R_eccentricity+R_edge_effect_buffer)
+    saccades                        = -20%-S_eccentricity:1:S_eccentricity; % Pick among these saccades
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed) + 0.05,-1); % round to nearest hundred above
     Duration                        = saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
     targetOffIntervals{1}           = [0 (stimuliOnset-dt); (stimuliOnset+stimuliDuration) Duration];
@@ -59,10 +59,10 @@ function Testing_DuhamelRemapping(Name, dt, stimulitype, saccadeOnset, stimuliDu
         end
         
         % Screen location of stimulus
-        stim_screen_location = r+saccades(s);
+        futureRF = r+saccades(s);
         
         % Generate trace
-        stimuli{i}.headCenteredTargetLocations  = stim_screen_location;
+        stimuli{i}.headCenteredTargetLocations  = futureRF;
         stimuli{i}.saccadeTargets               = saccades(s);
         stimuli{i}.saccadeTimes                 = saccadeOnset;
         stimuli{i}.targetOffIntervals           = targetOffIntervals;
@@ -72,8 +72,8 @@ function Testing_DuhamelRemapping(Name, dt, stimulitype, saccadeOnset, stimuliDu
         stimuli{i}.stimOnsetTimes               = stimuliOnset;
         
         % Add simple information
-        stimuli{i}.currentRF             = r;
-        stimuli{i}.stim_screen_location  = stim_screen_location;
+        stimuli{i}.futureRF  = futureRF;
+        stimuli{i}.currentRF = r;
     end
     
     % Save params

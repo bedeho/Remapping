@@ -23,9 +23,9 @@ function Testing_StimuliControl(Name, dt)
     R_density                   = 1; % should be 1, we test everyones latency
     
     % Dynamical quantities
-    stimuliOnset           = 0.100; %(s)
+    stimuliOnset                = 0.100; %(s)
     stimuliDuration             = 0.300; %(s)
-    stimuliOffsetPeriod         = 0.300; %(s)
+    stimuliOffsetPeriod         = 0.400; %(s)
 
     % Generate stimuli
     rng(seed);

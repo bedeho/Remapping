@@ -71,17 +71,16 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     S_to_C_weights = network.S_to_C_weights;
     V_to_C_weights = network.V_to_C_weights;
     %V_to_R_weights = network.V_to_R_weights;
-    %R_to_R_weights = network.R_to_R_weights;
-    %R_to_R_excitatory_weights = network.R_to_R_excitatory_weights;
-    %R_to_R_inhibitory_weights = network.R_to_R_inhibitory_weights;
-    
+    R_to_R_weights = network.R_to_R_weights;
+    R_to_R_excitatory_weights = network.R_to_R_excitatory_weights;
+    R_to_R_inhibitory_weights = network.R_to_R_inhibitory_weights;
 
     %% Load dynamical parameters
     
     % R  =======================================
     R_eccentricity  = parameters.simulation('R_eccentricity');
     R_preferences   = parameters.simulation('R_preferences');
-    R_N             = length(R_preferences);
+    R_N             = size(C_to_R_weights,1); %length(R_preferences);
     R_activation    = zeros(1,R_N);
     R_firingrate    = zeros(1,R_N);
     
@@ -93,6 +92,9 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     %R_to_C_psi      = parameters.simulation('R_to_C_psi'); % 4
     R_psi           = parameters.simulation('R_psi');
     R_attractor_psi = parameters.simulation('R_attractor_psi');
+    
+    R_neg_attractor_psi = parameters.simulation('R_neg_attractor_psi');
+    
     R_background    = parameters.simulation('R_background');
     
     R_tau_rise      = parameters.simulation('R_tau_rise');
@@ -151,10 +153,13 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     %V_tau_decay     = parameters.simulation('V_tau_decay');
     %V_tau_sigma     = parameters.simulation('V_tau_sigma');
     
+    V_supression_delay = parameters.simulation('V_supression_delay');
+    V_supression_delayTimeSteps = durationToSteps(V_supression_delay, dt);
+    
     % S  =======================================
     S_eccentricity  = parameters.simulation('S_eccentricity');
     S_preferences   = parameters.simulation('S_preferences');
-    S_N             = length(S_preferences);
+    S_N             = size(S_to_C_weights, 2);%length(S_preferences);
     
     S_activation    = zeros(1,S_N);
     S_firingrate    = zeros(1,S_N);
@@ -163,20 +168,24 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     S_presaccadicOffset = parameters.simulation('S_presaccadicOffset'); %
     S_tau           = parameters.simulation('S_tau'); % (s)
     S_to_C_psi      = parameters.simulation('S_to_C_psi');
-    %S_psi           = parameters.simulation('S_psi');
+    S_psi           = parameters.simulation('S_psi');
     S_slope         = parameters.simulation('S_slope');
     S_threshold     = parameters.simulation('S_threshold');
     S_to_C_alpha    = parameters.simulation('S_to_C_alpha'); % learning rate
-    S_sigma         = parameters.simulation('S_sigma');; % (deg) receptive field size
+    S_sigma         = parameters.simulation('S_sigma'); % (deg) receptive field size
+    
+    S_presaccadic_onset = parameters.simulation('S_presaccadic_onset')*ones(1,S_N);
+    S_trace_length      = parameters.simulation('S_trace_length')*ones(1,S_N);
 
     % C  =======================================
-    C_N             = S_N*R_N;
+    C_N             = size(S_to_C_weights, 1); % S_N*R_N;
     C_activation    = zeros(1,C_N);
     C_firingrate    = zeros(1,C_N);
     
     C_tau           = parameters.simulation('C_tau'); % (s)
     C_to_R_alpha    = parameters.simulation('C_to_R_alpha');
     C_to_R_psi      = parameters.simulation('C_to_R_psi');
+    C_to_R_psi_neg  = parameters.simulation('C_to_R_psi_neg');
     C_w_INHB        = parameters.simulation('C_w_INHB');
     C_slope         = parameters.simulation('C_slope');
     C_threshold     = parameters.simulation('C_threshold');
@@ -242,8 +251,15 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             if(numSaccades > 0),
                 saccade_times = repmat(saccadeTimes,S_N,1); % Used to get F
                 saccade_time_offset = saccade_times - repmat(S_presaccadicOffset',1,numSaccades); % Used to get F
-                saccade_time_pos_offset = saccade_times + repmat(S_presaccadicOffset',1,numSaccades); % Used to get F
-                saccade_time_neg_offset = saccade_times - repmat(S_presaccadicOffset',1,numSaccades); % Used to get F
+                
+                % classic
+                %saccade_time_pos_offset = saccade_times + repmat(S_presaccadicOffset',1,numSaccades); % Used to get F
+                %saccade_time_neg_offset = saccade_times - repmat(S_presaccadicOffset',1,numSaccades); % Used to get F
+                
+                % assymmetry
+                saccade_time_pos_offset = saccade_times + repmat(S_trace_length',1,numSaccades);
+                saccade_time_neg_offset = saccade_times - repmat(S_presaccadic_onset',1,numSaccades);
+                
                 saccade_target_offset = exp(-((repmat(S_preferences', 1, numSaccades) - repmat(saccadeTargets, S_N, 1)).^2)./(2*S_sigma^2)); % term multiplied by F
             end
             
@@ -294,15 +310,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 
                 flat_gauss = sum(gauss,1); % collapse stimulus dimension, so that each neuron has one driving sum of exponentials, one exponential per stimulus
                 
-                % E & V =======================================
-                
-                E_tau_dynamic = E_tau_rise + exp(-(flat_gauss.^2)/(2*E_tau_sigma^2))*(E_tau_decay-E_tau_rise);
-                
-                E = E_old + (dt./E_tau_dynamic).*(-E_old + flat_gauss);
-                
-                V = V_old + (dt/V_tau)*(-V_old + E_to_V_psi*E_old);
-                
-                % R =======================================
+                % K ======================================= 
                 
                 % K stim onset
                 if(~isempty(stimOnsetTimes)),
@@ -324,17 +332,68 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     K_sacc_supression = 0;
                 end
                 
-                % K dynamics
-                K_tau_dynamic = R_tau_rise + (flat_gauss <= R_tau_threshold)*(R_tau_decay-R_tau_rise);
-                
+                %K_tau_dynamic = R_tau_rise + (flat_gauss <= R_tau_threshold)*(R_tau_decay-R_tau_rise);
                 %K = K_old + (dt./K_tau_dynamic).*(-K_old + R_psi*flat_gauss) + K_onset_spike - K_sacc_supression;
                 
                 K = K_old + (dt/K_tau)*(-K_old + R_psi*flat_gauss) + K_onset_spike - K_old*K_sacc_supression;
                 
-                % R dynamics
-                R_inhibition = R_w_INHB*sum(R_firingrate);
+                % V =======================================
+                
+                % E & 
+                %E_tau_dynamic = E_tau_rise + exp(-(flat_gauss.^2)/(2*E_tau_sigma^2))*(E_tau_decay-E_tau_rise);
+                %E = E_old + (dt./E_tau_dynamic).*(-E_old + flat_gauss);
+                %V = V_old + (dt/V_tau)*(-V_old + E_to_V_psi*E_old) - V_old*K_sacc_supression;
+                
+                if(~isempty(stimOnsetTimeSteps) && any(precedingTimeStep==stimOnsetTimeSteps)),
+                    V_onset = flat_gauss;
+                else
+                    V_onset = 0;
+                end
+                
+                if(~isempty(saccOnsetTimeSteps) && any(precedingTimeStep==saccOnsetTimeSteps+V_supression_delayTimeSteps)),
+                    V_sacc_supression = V_old;
+                    V_sacc_excitation = flat_gauss;
+                else
+                    V_sacc_supression = 0;
+                    V_sacc_excitation = 0;
+                end
+                
+                V = V_old + (dt/V_tau)*(-V_old) + V_onset - V_sacc_supression + V_sacc_excitation;
+                
+                % R =======================================
+                
+                R_inhibition_scaling = R_activation;
+                %R_inhibition_scaling(R_inhibition_scaling > 1) = 1; % do linear rectified function of R scaling.
+                R_global_inhibition = R_inhibition_scaling*R_w_INHB*sum(R_firingrate);
+                
+                R_SOM_inhibition = R_inhibition_scaling.*(R_neg_attractor_psi*(R_to_R_inhibitory_weights*R_firingrate')');
+                
+                R_attractor = R_attractor_psi*(R_to_R_weights*R_firingrate')';
                 C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate')';
-                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation - R_inhibition + K - R_background);
+                C_to_R_inhibition = R_inhibition_scaling*C_to_R_psi_neg*sum(C_firingrate);
+                R_visual = R_psi*flat_gauss;
+                
+                %{
+                if(strcmp(stimuliName,'basic-Training')),
+                    
+                    t
+                    subplot(3,1,1);
+                    plot(C_to_R_inhibition);
+                    title('Inhibition');
+
+                    subplot(3,1,2);
+                    plot(R_activation);
+                    title('Activation');
+                    
+                    subplot(3,1,3);
+                    plot(R_activation);
+                    title('Activation');
+                    
+                end
+                %}
+                
+                
+                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation - C_to_R_inhibition - R_global_inhibition + R_SOM_inhibition + R_visual + R_attractor - R_background) + K_onset_spike;%; - R_activation*K_sacc_supression;
                 
                 % Old
                 %{
@@ -383,7 +442,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     F = (saccade_time_neg_offset <= time_precedingdt) & (time_precedingdt <= saccade_time_pos_offset); % check both conditions: y-z <= x <= y
                     %F = (saccade_time_offset <= time_precedingdt) & (time_precedingdt <= saccade_times); % check both conditions: y-z <= x <= y
                     %S_driver = S_psi*sum(bsxfun(@times, F, saccade_target_offset),2); % cannot be done with matrix mult since exponential depends on i
-                    S_driver = sum(bsxfun(@times, F, saccade_target_offset),2); % cannot be done with matrix mult since exponential depends on i
+                    S_driver = S_psi*sum(bsxfun(@times, F, saccade_target_offset),2); % cannot be done with matrix mult since exponential depends on i
                     S_activation = S_activation + (dt/S_tau)*(-S_activation + S_driver');
                 else
                     S_activation = S_activation + (dt/S_tau)*(-S_activation); 
@@ -398,6 +457,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     V_to_C_weights = V_to_C_weights + dt*V_to_C_alpha*(C_firingrate'*V_firingrate);
                     %V_to_R_weights = V_to_R_weights + dt*V_to_R_alpha*(R_firingrate'*V_firingrate);
 
+                    
                     % Normalize
                     C_to_R_norm = 1./sqrt(squeeze(sum(C_to_R_weights.^2))); 
                     C_to_R_weights = bsxfun(@times,C_to_R_weights, C_to_R_norm);
@@ -414,6 +474,46 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     %V_to_R_norm = 1./sqrt(squeeze(sum(V_to_R_weights.^2))); 
                     %V_to_R_weights = bsxfun(@times,V_to_R_weights, V_to_R_norm);
                     
+                    %{
+                    if(strcmp(stimuliName,'basic-Training') && t==140), % ),%
+                        
+                        figure;
+                        
+                        n=182;
+                        
+                        subplot(3,3,1);
+                        plot(S_to_C_weights(n,:));
+                        axis tight;
+                        ylim([0 0.1]);
+                        title('S->C');
+
+                        subplot(3,3,2);
+                        plot(V_to_C_weights(n,:));
+                        axis tight;
+                        ylim([0 0.1]);
+                        title('V->C');
+
+                        subplot(3,3,3);
+                        plot(C_to_R_weights(:, n));
+                        axis tight;
+                        ylim([0 0.4]);
+                        title('C->R');
+                        
+                        subplot(3,3,[4 5 6]);
+                        imagesc(R_firing_history(:, :, period, epoch));
+                        hold on;
+                        if ~isempty(saccOnsetTimeSteps), plot([saccOnsetTimeSteps saccOnsetTimeSteps],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
+                        title('R');
+                        
+                        subplot(3,3,[7 8 9]);
+                        hold on
+                        plot(C_firing_history(n, :, period, epoch));
+                        if ~isempty(saccOnsetTimeSteps), plot([saccOnsetTimeSteps saccOnsetTimeSteps],[0 1],'r'); end
+                        title('C Firing of neuron n');
+                        
+                    end
+                    %}
+                    
                 end
 
                 %% Compute firing rates
@@ -421,15 +521,16 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 %S_firingrate = 1./(1 + exp(-2*S_slope*(S_activation - S_threshold)));
                 S_firingrate = S_activation;
                 C_firingrate = 1./(1 + exp(-2*C_slope*(C_activation - C_threshold)));
-                V_firingrate = 1./(1 + exp(-2*C_slope*(V - V_threshold))); 
-
+                %V_firingrate = 1./(1 + exp(-2*C_slope*(V - V_threshold))); 
+                V_firingrate = V; 
+                
                 %% Save activity                
                 if (~isTraining || isTraining && parameters.saveActivityInTraining) % && mod(t, outputSavingRate) == 0,
                     
                     E_firing_history(:, periodSaveCounter, period, epoch) = E;
                     V_firing_history(:, periodSaveCounter, period, epoch) = V_firingrate;
                     R_firing_history(:, periodSaveCounter, period, epoch) = R_firingrate;
-                    S_firing_history(:, periodSaveCounter, period, epoch) = S_firingrate;
+                    S_firing_history(:, periodSaveCounter, period, epoch) = S_firingrate; % S_activation;
                     C_firing_history(:, periodSaveCounter, period, epoch) = C_firingrate;
 
                     E_activation_history(:, periodSaveCounter, period, epoch) = E;
@@ -438,7 +539,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     S_activation_history(:, periodSaveCounter, period, epoch) = S_activation;
                     C_activation_history(:, periodSaveCounter, period, epoch) = C_activation;
                     
-                    extra_history(:, periodSaveCounter, period, epoch) = K;
+                    extra_history(:, periodSaveCounter, period, epoch) = C_to_R_excitation;%C_to_R_excitation;%K;
                     
                     % Count one more dt
                     periodSaveCounter = periodSaveCounter + 1;
@@ -477,7 +578,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     % Output final network
     if isTraining,
         disp('Saving trained network to disk...');
-        save([simulationFolder filesep 'TrainedNetwork.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'R_N', 'S_N', 'C_N'); %'V_to_R_weights'
+        save([simulationFolder filesep 'TrainedNetwork.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'R_to_R_weights', 'R_to_R_excitatory_weights', 'R_to_R_inhibitory_weights', 'R_N', 'S_N', 'C_N'); %'V_to_R_weights'
     end
     
     
