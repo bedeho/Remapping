@@ -77,7 +77,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     parameterCombinations('R_psi')          = [2000]; %700 prewired = 0.5
     
     parameterCombinations('R_attractor_psi')     = [570]; %105, 1.5 ,0.34=perfect,300ms tail,0.3=dies just a little to quick, 0.4=eq ,classic under SOM=1.3
-    parameterCombinations('R_neg_attractor_psi') = [0.1]; %105, 1.5 ,0.34=perfect,300ms tail,0.3=dies just a little to quick, 0.4=eq ,classic under SOM=1.3
+    parameterCombinations('R_neg_attractor_psi') = [0.1]; %0.1, 1.5 ,0.34=perfect,300ms tail,0.3=dies just a little to quick, 0.4=eq ,classic under SOM=1.3
     parameterCombinations('R_background')   = [0]; % 4.0 when we do SOM
     
     parameterCombinations('R_tau_rise')     = [0.100];
@@ -124,7 +124,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     parameterCombinations('S_slope')        = [10];
     parameterCombinations('S_threshold')    = [0.5];
     
-    parameterCombinations('S_presaccadic_onset')  = [0.050]; % 0.100 is classic
+    parameterCombinations('S_presaccadic_onset')  = [0.100]; % 0.100 is classic
     parameterCombinations('S_trace_length')       = [0.490];
     
     
