@@ -7,16 +7,21 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function AnalyzeExperiment(experiment, stimulinames)
+function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
 
     % Experiment name 
     if nargin < 1,
-        experiment = 'learning13';%'prewired';
+        experiment = 'learning14';%'prewired';
     end
     
     % Stimuli names
-    if(nargin < 2)
-        stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemapping', 'basic-DuhamelRemappingTrace', 'basic-DuhamelTruncation', 'basic-CLayerProbe','basic-Kusonoki'};
+    if(nargin < 3)
+        
+        trainingStimuli = 'basic-Training';
+        
+        if(nargin < 2)
+            stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemapping', 'basic-DuhamelRemappingTrace', 'basic-DuhamelTruncation', 'basic-CLayerProbe','basic-Kusonoki'};
+        end
     end
     
     % Import global variables
@@ -140,7 +145,7 @@ function AnalyzeExperiment(experiment, stimulinames)
                     % Summary
                     fprintf(fileID, '<td>');
                     %fprintf(fileID, '<img src="%s" width="350px" height="350px"/>\n', [netDir filesep 'summary.png']);
-                    outputButton('Training', ['matlab:viewNeuronDynamics(\\''' simulationFolder filesep 'activity-basic-Training.mat\\'',\\''' netDir filesep 'analysis-basic-CLayerProbe.mat\\'',\\''basic-Training\\'',\\''' [netDir filesep network '.mat'] '\\'')']);
+                    outputButton('Training', ['matlab:viewNeuronDynamics(\\''' simulationFolder filesep 'activity-' trainingStimuli '.mat\\'',\\''' netDir filesep 'analysis-basic-CLayerProbe.mat\\'',\\''' trainingStimuli '\\'',\\''' [netDir filesep network '.mat'] '\\'')']);
                     fprintf(fileID, '</td>');
                     
                     % Stimuli

@@ -39,7 +39,17 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
     
     % Adding controls
     if activity.numEpochs > 1
-        uicontrol('Style', 'slider', 'Min', 1, 'Max', activity.numEpochs, 'Value', 1, 'Position', [20 850 120 20], 'Callback', {@epoch_callback});
+        
+        menu = '1';
+        
+        for e=2:activity.numEpochs,
+            menu = [menu '|' num2str(e)];
+        end
+        
+        %uicontrol('Style', 'slider', 'Min', 1, 'Max', activity.numEpochs, 'Value', 1, 'Position', [20 850 120 20], 'Callback', {@epoch_callback});
+        
+        uicontrol('Style', 'text', 'String', 'Epoch', 'Position', [20 865 120 20]);
+        uicontrol('Style', 'popup', 'String', menu, 'Position', [20 850 120 20], 'Callback', @epoch_callback);
     end
     
     if activity.numPeriods > 1
@@ -51,6 +61,7 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
             menu = [menu '|' num2str(p)];
         end
         
+        uicontrol('Style', 'text', 'String', 'Period', 'Position', [20 355 100 50]);
         uicontrol('Style', 'popup', 'String', menu, 'Position', [20 340 100 50], 'Callback', @period_callback);
     end
     

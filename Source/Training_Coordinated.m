@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [Training_RF_Locations, Training_Saccades] = Training_Coordinated(Name, dt)
+function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordinated(Name, dt)
 
     % Import global variables
     declareGlobalVars();
@@ -49,7 +49,7 @@ function [Training_RF_Locations, Training_Saccades] = Training_Coordinated(Name,
         % 1) saccade is big enough
         % 2) FRF is on retina
         % 3) CRF is kept on retina after saccade
-        while((abs(saccades(s)) < minimum_Saccade_Amplitude) || ~(-R_eccentricity <= r+saccades(s) && r+saccades(s) <= R_eccentricity) || ~(-R_eccentricity <= r-saccades(s) && r-saccades(s) <= R_eccentricity))
+        while((abs(saccades(s)) < minimum_Saccade_Amplitude) || ~(-R_eccentricity <= h+saccades(s) && h+saccades(s) <= R_eccentricity) || ~(-R_eccentricity <= h-saccades(s) && h-saccades(s) <= R_eccentricity))
             s = randi(length(saccades));
         end
         
@@ -73,7 +73,7 @@ function [Training_RF_Locations, Training_Saccades] = Training_Coordinated(Name,
         
         % CRF Trial
         stimuli{k}.initialEyePosition           = 0;
-        stimuli{k}.headCenteredTargetLocations  = h-Training_Saccades(i);
+        stimuli{k}.headCenteredTargetLocations  = h;%-Training_Saccades(i);
         stimuli{k}.saccadeTimes                 = saccadeOnset;
         stimuli{k}.saccadeTargets               = Training_Saccades(i);
         stimuli{k}.numSaccades                  = length(stimuli{k}.saccadeTargets);

@@ -8,7 +8,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Testing_DuhamelTruncation(Name, dt)
+function Testing_DuhamelTruncation(Name, dt, Training_RF_Locations, Training_Saccades)
 
     % Import global variables
     declareGlobalVars();
@@ -34,8 +34,17 @@ function Testing_DuhamelTruncation(Name, dt)
     %stimuliOffset                  = saccadeOnset;%(s) - turn off stimuli when saccade i
     
     % Utilities - derived
-    currentRF                       = 12;%[-10 -5 0 5 10];%-R_eccentricity:1:R_eccentricity;% 15
-    saccades                        = -S_eccentricity:1:S_eccentricity;
+    
+    if nargin < 4,
+        
+        currentRF = 12;%[-10 -5 0 5 10];%-R_eccentricity:1:R_eccentricity;% 15
+        saccades  = -S_eccentricity:1:S_eccentricity;
+    else
+        
+        currentRF = Training_RF_Locations;
+        saccades = Training_Saccades;
+    end
+    
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1); % round to nearest hundred above
     Duration                        = saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
     targetOffIntervals{1}           = [];%[stimuliOffset Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
@@ -45,17 +54,26 @@ function Testing_DuhamelTruncation(Name, dt)
         % Rf that will have stim in it, but loose it with saccade
         r = currentRF(i);
         
-        % Pick saccade
-        s = randi(length(saccades));
-        
-        % Make sure this saccade is big enough, and has current_ref on retina
-        while((abs(saccades(s)) < saccade_threshold) || ~(-R_eccentricity <= r+saccades(s) && r+saccades(s) <=R_eccentricity))
+        if nargin < 4,
+                
+            % Pick saccade
             s = randi(length(saccades));
+
+            % Make sure this saccade is big enough, and has current_ref on retina
+            while((abs(saccades(s)) < saccade_threshold) || ~(-R_eccentricity <= r+saccades(s) && r+saccades(s) <=R_eccentricity))
+                s = randi(length(saccades));
+            end
+            
+            saccade = saccades(s);
+        
+        else
+            
+            saccade = Training_Saccades(i);
         end
         
         % Generate trace
         stimuli{i}.headCenteredTargetLocations  = r;
-        stimuli{i}.saccadeTargets               = saccades(s);
+        stimuli{i}.saccadeTargets               = saccade;
         stimuli{i}.saccadeTimes                 = saccadeOnset;
         stimuli{i}.targetOffIntervals           = targetOffIntervals;
         [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{i}.headCenteredTargetLocations, targetOffIntervals, 0, saccadeOnset, stimuli{i}.saccadeTargets);

@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function GenerateExperiment(Name, dt)
+function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
 
     % Import global variables
     declareGlobalVars();
@@ -34,15 +34,21 @@ function GenerateExperiment(Name, dt)
     mkdir(experimentFolderPath);
     
     %% Stimuli to test with
-    stimulinames = {'basic-StimuliControl', ...
-                    'basic2-StimuliControl', ... % dt=0.01
-                    'basic-SaccadeControl', ...
-                    'basic2-SaccadeControl', ... % dt=0.01
-                    'basic-DuhamelRemapping', ...
-                    'basic-DuhamelRemappingTrace', ... 
-                    'basic-DuhamelTruncation', ...
-                    'basic-CLayerProbe', ...
-                    'basic-Kusonoki'};
+    if nargin < 4
+        
+        trainingStimuli = 'Training_Coordinated'; %basic-Training';
+
+        if nargin < 3,
+            
+            stimulinames = {'basic-StimuliControl', ...
+                            'basic-SaccadeControl', ...
+                            'basic-DuhamelRemapping', ...
+                            'basic-DuhamelRemappingTrace', ... 
+                            'basic-DuhamelTruncation', ...
+                            'basic-CLayerProbe', ...
+                            'basic-Kusonoki'};
+        end
+    end
     
     %% Specify main paramters
     parameterCombinations = containers.Map;
@@ -242,7 +248,7 @@ function GenerateExperiment(Name, dt)
                         
             % Training
             disp('Training...');
-            Remapping(simulationFolder, 'basic-Training', true);
+            Remapping(simulationFolder, trainingStimuli, true);
             
             % Move each network to new folder & test
             listing = dir(simulationFolder); 
@@ -275,6 +281,6 @@ function GenerateExperiment(Name, dt)
         end
     end
 
-    AnalyzeExperiment(Name,stimulinames)
+    AnalyzeExperiment(Name, stimulinames, trainingStimuli);
     
 end

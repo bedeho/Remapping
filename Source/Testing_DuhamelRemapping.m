@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Testing_DuhamelRemapping(Name, dt, stimulitype, saccadeOnset, stimuliDuration, stimuliOnset, postSaccadefixationPeriod, Training_RF_Locations, Training_Saccades)
+function Testing_DuhamelRemapping(Name, dt, Training_RF_Locations, Training_Saccades, stimulitype, saccadeOnset, stimuliDuration, stimuliOnset, postSaccadefixationPeriod)
 
     % Import global variables
     declareGlobalVars();
@@ -28,19 +28,24 @@ function Testing_DuhamelRemapping(Name, dt, stimulitype, saccadeOnset, stimuliDu
     % Dynamical
     saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!
     
+    % Training_RF_Locations, Training_Saccades
+    
     if nargin < 9,
         
-        % Utilities - derived
-        currentRF = 20%0%8; %[-10 -5 0 5 10];%-R_eccentricity:1:R_eccentricity; % 10; Remapping TARGET, i.e. postsaccadic (-R_eccentricity+R_edge_effect_buffer):1:(R_eccentricity+R_edge_effect_buffer)
-        saccades  = -20%-S_eccentricity:1:S_eccentricity; % Pick among these saccades
-
         % Temporal
-        if nargin<7,
-            stimulitype                     = 'DuhamelRemapping';
-            saccadeOnset                    = 0.300; % (s) w.r.t start of task
-            stimuliDuration                 = 0.100; % (s)
-            stimuliOnset                    = saccadeOnset - 2*stimuliDuration; % (s) w.r.t start of task
-            postSaccadefixationPeriod       = 0.300; % (s) time from saccade COMPLETION ESTIMATE "saccadeDelayTime" below.
+        stimulitype                     = 'DuhamelRemapping';
+        saccadeOnset                    = 0.300; % (s) w.r.t start of task
+        stimuliDuration                 = 0.100; % (s)
+        stimuliOnset                    = saccadeOnset - 2*stimuliDuration; % (s) w.r.t start of task
+        postSaccadefixationPeriod       = 0.300; % (s) time from saccade COMPLETION ESTIMATE "saccadeDelayTime" below.
+            
+        if nargin < 4,
+            
+            % Utilities - derived
+            currentRF = 20%0%8; %[-10 -5 0 5 10];%-R_eccentricity:1:R_eccentricity; % 10; Remapping TARGET, i.e. postsaccadic (-R_eccentricity+R_edge_effect_buffer):1:(R_eccentricity+R_edge_effect_buffer)
+            saccades  = -20%-S_eccentricity:1:S_eccentricity; % Pick among these saccades
+        else
+            currentRF = Training_RF_Locations;
         end
 
     else
@@ -57,7 +62,7 @@ function Testing_DuhamelRemapping(Name, dt, stimulitype, saccadeOnset, stimuliDu
         % Rf that will get remapping activity INTO it
         r = currentRF(i);
         
-        if nargin < 9,
+        if nargin < 4,
             
             % Pick saccade
             s = randi(length(saccades));

@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Testing_Kusonoki(Name, dt)
+function Testing_Kusonoki(Name, dt, Training_RF_Locations, Training_Saccades)
 
     % Import global variables
     declareGlobalVars();
@@ -35,7 +35,7 @@ function Testing_Kusonoki(Name, dt)
     stimulusOnsetTimes              = saccadeOnset + ((-(0.400+stimulusDuration)):0.050:0.100); % w.r.t start of trial
 
     % Utilities - derived
-    screen_locations                = 0%[-5 0 5 10]; %[ -5 0 5 10];%-R_eccentricity:1:R_eccentricity; %-7
+    screen_locations                = Training_RF_Locations%[-5 0 5 10]; %[ -5 0 5 10];%-R_eccentricity:1:R_eccentricity; %-7
     saccades                        = -20%-S_eccentricity:1:S_eccentricity; %-20%-S_eccentricity:1:S_eccentricity;
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1); % round to nearest hundred above
     Duration                        = max(stimulusOnsetTimes(end),saccadeOnset + saccadeDelayTime) + 0.400; % (s), make sure we have enough time after last stim onset time to have
@@ -50,14 +50,23 @@ function Testing_Kusonoki(Name, dt)
 
         % Get rf location
         RF_location = screen_locations(i);
+        
+        if nargin < 4,
 
-        % Pick a first random saccade
-        s = randi(length(saccades));
-
-        % Make sure this saccade is big enough, and that future RF is
-        % on retina
-        while((abs(saccades(s)) < saccade_threshold) || ~(-R_eccentricity <= RF_location+saccades(s) && RF_location+saccades(s) <=R_eccentricity))
+            % Pick a first random saccade
             s = randi(length(saccades));
+
+            % Make sure this saccade is big enough, and that future RF is
+            % on retina
+            while((abs(saccades(s)) < saccade_threshold) || ~(-R_eccentricity <= RF_location+saccades(s) && RF_location+saccades(s) <=R_eccentricity))
+                s = randi(length(saccades));
+            end
+            
+            saccade = saccades(s);
+        
+        else
+            
+            saccade = Training_Saccades(i);
         end
 
         for z=1:2,
@@ -66,7 +75,7 @@ function Testing_Kusonoki(Name, dt)
             if(z==1), %current rf trial
                 stim_location = RF_location;
             else
-                stim_location = RF_location + saccades(s);
+                stim_location = RF_location + saccade;
             end
 
             % Iterate different stimulus onset times
@@ -78,7 +87,7 @@ function Testing_Kusonoki(Name, dt)
 
                 % Generate trace
                 stimuli{trialNr}.headCenteredTargetLocations  = stim_location;
-                stimuli{trialNr}.saccadeTargets               = saccades(s);
+                stimuli{trialNr}.saccadeTargets               = saccade;
                 stimuli{trialNr}.saccadeTimes                 = saccadeOnset;
                 stimuli{trialNr}.targetOffIntervals           = targetOffIntervals;
                 [eyePositionTrace, retinalTargetTraces]       = GenerateTrace(Duration, dt, stimuli{trialNr}.headCenteredTargetLocations, stimuli{trialNr}.targetOffIntervals, 0, stimuli{trialNr}.saccadeTimes, stimuli{trialNr}.saccadeTargets);
@@ -90,7 +99,7 @@ function Testing_Kusonoki(Name, dt)
                 stimuli{trialNr}.neuron_RF_location           = RF_location;
                 stimuli{trialNr}.trialType                    = z;
                 stimuli{trialNr}.targetNr                     = i;
-                stimuli{trialNr}.saccadeNr                    = s;
+                %stimuli{trialNr}.saccadeNr                    = inf; %s or
                 stimuli{trialNr}.stimOnsetNr                  = t;
 
                 trialNr = trialNr + 1;
