@@ -406,7 +406,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 R_visual_onset = K_psi*visual_onset;
                 R_global_inhibition = R_w_INHB*sum(R_firingrate); % R_activation.*
                 C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate')';
-                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation - R_global_inhibition + K - R_background + P_old) - R_sacc_supression; % + R_visual_onset
+                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation - R_global_inhibition + K - R_background + P_old); % + R_visual_onset
                 
                 %{
                 % CLASSIC - SOM based
@@ -551,11 +551,11 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     periodSaveCounter = periodSaveCounter + 1;
                 end 
                 
-                % Visualize
                 %{
-                if(strcmp(stimuliName,'basic-Training_Coordinated') && epoch >= 0 && t >= 100), % , , period == 6, period == numPeriods
+                % Visualize
+                if(strcmp(stimuliName,'basic-Training_Coordinated') && epoch >= 0 && t == 141), % , , period == 6, period == numPeriods
 
-                    n=70;
+                    n=481;
 
                     subplot(6,3,1);
                     plot(S_to_C_weights(n,:));

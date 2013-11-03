@@ -48,7 +48,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     % R
     parameterCombinations('R_eccentricity')         = [45];
     parameterCombinations('R_tau')                  = [0.040]; % NEW=0.050, (s), 0.050 0.100
-    parameterCombinations('R_w_INHB')               = [0.100]; % NEW=0.1, 20/91 15/91 10/91 ,prewwired=0 works = 5/91,20/91
+    parameterCombinations('R_w_INHB')               = [0.6]; % NEW=0.1, 20/91 15/91 10/91 ,prewwired=0 works = 5/91,20/91
     
     parameterCombinations('R_slope')                = [0.5]; %CHANGE BACK: 0.002 prewired=2, classic = 0.4, 0.0005
     parameterCombinations('R_threshold')            = [3]; %CHANGE BACK: 700, prewired 0.6
@@ -100,7 +100,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     
     
     parameterCombinations('V_to_C_psi')             = [10]; % prewired=1
-    parameterCombinations('V_to_C_alpha')           = [1]; %____0.5, NEW=0.001
+    parameterCombinations('V_to_C_alpha')           = [0.5]; %____0.5, NEW=0.001
     parameterCombinations('V_to_C_connectivity')    = [0.05]; % [0 1]
 
     % S
@@ -112,24 +112,24 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     parameterCombinations('S_slope')                = [10];
     parameterCombinations('S_threshold')            = [0.5];
     
-    parameterCombinations('S_presaccadic_onset')    = [0]; %0.050,   0.100 is classic
-    parameterCombinations('S_trace_length')         = [0.300-20];
+    parameterCombinations('S_presaccadic_onset')    = [0.050]; %0.050,   0.100 is classic
+    parameterCombinations('S_trace_length')         = [0.300-0.020]; % stop saccade sooner so that you dont get FRF imprinted in V->C weights due to S and C delay and V speed
     
     
     parameterCombinations('S_to_C_psi')             = [10];
-    parameterCombinations('S_to_C_alpha')           = [1]; %_____0.2 NEW=0.001 %0.003, learning rate
-    parameterCombinations('S_to_C_connectivity')    = [0.1]; % [0 1]
+    parameterCombinations('S_to_C_alpha')           = [0.5]; %_____0.2 NEW=0.001 %0.003, learning rate
+    parameterCombinations('S_to_C_connectivity')    = [0.05]; % [0 1]
     
     % C
-    parameterCombinations('C_tau')                  = [0.040]; % (s)
-    parameterCombinations('C_w_INHB')               = [0]; %1.0, 2.8 worked, NEW: 10/5000, classic=[10/5000, 10/5000 50/5000 100/5000  C_N = 5400
+    parameterCombinations('C_tau')                  = [0.020]; % (s)
+    parameterCombinations('C_w_INHB')               = [1]; %1.0, 2.8 worked, NEW: 10/5000, classic=[10/5000, 10/5000 50/5000 100/5000  C_N = 5400
     
     parameterCombinations('C_threshold')            = [14]; %, 16, NEW = 4, CHANGE BACK = 3, prewired, old 0.45
     
     parameterCombinations('C_slope')                = [16]; % prewired 100, classic= 500
-    parameterCombinations('C_to_R_psi')             = [2.5]; %NEW: 0.09 or? 0.19, CHANGE BACK: 30, 15, prewwired=0.05,0.1 works well, classic: 0.4
+    parameterCombinations('C_to_R_psi')             = [15]; %NEW: 0.09 or? 0.19, CHANGE BACK: 30, 15, prewwired=0.05,0.1 works well, classic: 0.4
     parameterCombinations('C_to_R_psi_neg')         = [0]; %0.005, 0.1 0.01 0.001 0.0001, 1, 3.5 prewwired=1 works well, classic: 0.4
-    parameterCombinations('C_to_R_alpha')           = [1]; % 0.1 to small? learning rate
+    parameterCombinations('C_to_R_alpha')           = [0.2]; % 0.1 to small? learning rate
     parameterCombinations('C_to_R_connectivity')    = [1]; % [0 1]
     
     parameterCombinations('C_percentile')           = [90];

@@ -9,7 +9,7 @@
 
 function CreateBlankNetwork(outputfile, R_preferences, R_N, S_N, R_to_R_pos_sigma, R_to_R_neg_sigma, S_to_C_connectivity, V_to_C_connectivity, C_to_R_connectivity)
 
-    C_N = ceil(S_N*R_N*0.05);
+    C_N = ceil(S_N*R_N*0.1);
 
     % Dilution map
     C_to_R_weights_dilutionmap = createDilutionMap(R_N, C_N, C_to_R_connectivity);

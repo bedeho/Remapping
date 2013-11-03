@@ -420,13 +420,13 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
                     subplot(1,3,1);
                     plot(S_to_C_afferents);
                     axis tight;
-                    ylim([0 0.5]);
+                    ylim([0 1]);
                     title('S->C');
                     
                     subplot(1,3,2);
                     plot(V_to_C_afferents);
                     axis tight;
-                    ylim([0 0.5]);
+                    ylim([0 1]);
                     title('V->C');
                     
                     subplot(1,3,3);

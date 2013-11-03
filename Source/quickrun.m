@@ -5,7 +5,7 @@
     global STIMULI_FOLDER;
     global EXPERIMENTS_FOLDER;
     
-    experimentName = 'noCRF-sparse0.2';
+    experimentName = 'noCRF-sparse';
     
     experimentFolder = [EXPERIMENTS_FOLDER experimentName filesep];
     
