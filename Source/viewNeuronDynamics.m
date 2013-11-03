@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, networkFile)
+function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProbleFile)
 
     % Import global variables
     declareGlobalVars();
@@ -27,7 +27,10 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
     activity = load(activityFile);
     stimuli  = load([STIMULI_FOLDER stimuliName filesep 'stim.mat']);
     network = load(networkFile);
-    CLayerProbleFileAnalysis = load(CLayerProbleFile);
+    
+    if nargin == 4 && exist(CLayerProbleFile), %% HACK
+        CLayerProbleFileAnalysis = load(CLayerProbleFile);
+    end
     
     % Set parameters
     R_N = activity.R_N;
@@ -129,6 +132,8 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
         if ~isempty(activity.C_firing_history),
             C_firingrate = activity.C_firing_history(:, :, period, epoch);
             C_activation = activity.C_activation_history(:, :, period, epoch);
+            
+            max(max(C_activation))
             
             includeC_layer = 1;
             %numRows = 2+5;
@@ -340,7 +345,7 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
                 if ~isempty(s), plot([s s],[-0.05 1],'r'); end % Saccade times
                 hXLabel = xlabel('Time (s)');
                 hYLabel = ylabel('Firing Rate');
-                ylim([-0.05 1]);
+                ylim([-0.05 max(1, max(responseTrace))]);
                 xlim([0 (numTimeSteps-1)]);
 
                 %xTick = 11:10:numTimeSteps;
@@ -415,19 +420,19 @@ function viewNeuronDynamics(activityFile, CLayerProbleFile, stimuliName, network
                     subplot(1,3,1);
                     plot(S_to_C_afferents);
                     axis tight;
-                    ylim([0 0.1]);
+                    ylim([0 0.5]);
                     title('S->C');
                     
                     subplot(1,3,2);
                     plot(V_to_C_afferents);
                     axis tight;
-                    ylim([0 0.1]);
+                    ylim([0 0.5]);
                     title('V->C');
                     
                     subplot(1,3,3);
                     plot(C_to_R_weightvector);
                     axis tight;
-                    ylim([0 0.4]);
+                   % ylim([0 0.4]);
                     title('C->R');
                 end
 

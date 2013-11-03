@@ -7,20 +7,26 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Testing_SaccadeControl(Name, dt)
+function Testing_SaccadeControl(Name, dt, saccadeTargets)
 
     % Import global variables
     declareGlobalVars();
     global base;
-
-    filename = [Name '-SaccadeControl'];
-    stimulitype = 'SaccadeControl';%2
     
     % Params
     %dt                          = 0.010;
     seed                        = 77;
     S_eccentricity              = 30;
     S_density                   = 1; % should be 1, we test everyones response
+    
+    if nargin<3,
+        filename       = [Name '-SaccadeControl'];
+        stimulitype    = 'SaccadeControl';
+        saccadeTargets = -S_eccentricity:S_density:S_eccentricity;
+    else
+        filename       = [Name '-SaccadeControl'];
+        stimulitype    = 'SaccadeControl2';
+    end
     
     % Dynamical quantities
     saccadeOnset                = 0.150; %(s) w.r.t start of task
@@ -30,7 +36,7 @@ function Testing_SaccadeControl(Name, dt)
     % Generate stimuli
     rng(seed);
     Duration                    = saccadeOnset + postSaccadefixationPeriod; % (s)
-    saccadeTargets              = -S_eccentricity:S_density:S_eccentricity;
+    
     targetOffIntervals{1}       = [0 Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
     for i = 1:length(saccadeTargets);

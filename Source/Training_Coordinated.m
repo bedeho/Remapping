@@ -34,8 +34,18 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
     rng(seed);
     Duration                        = saccadeOnset + (2*S_eccentricity/saccadeSpeed) + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
     saccades                        = -S_eccentricity:S_density:S_eccentricity;
-    Training_RF_Locations           = 0;%(-R_eccentricity+minimum_Saccade_Amplitude):R_density:(R_eccentricity-minimum_Saccade_Amplitude);
     
+    %Training_RF_Locations           = (-R_eccentricity+minimum_Saccade_Amplitude):R_density:(R_eccentricity-minimum_Saccade_Amplitude);
+    
+    %Training_RF_Locations           = [-20 -15  -10 -5 0  5  10 15 20];
+    
+    %Training_RF_Locations           = [-20 -17 -15 -12 -10 -7 -5 -2 0 2 5 7 10 12 15 17 20];
+    
+    Training_RF_Locations           = [0];
+    
+    %figure;
+    %hold on;
+
     k = 1;
     for i = 1:length(Training_RF_Locations);
         
@@ -68,9 +78,12 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
         stimuli{k}.eyePositionTrace             = eyePositionTrace;
         stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
         stimuli{k}.stimOnsetTimes               = 0;
+        
+        %plot(stimuli{k}.headCenteredTargetLocations, stimuli{k}.saccadeTargets, 'or');
 
         k = k + 1;
         
+        %{
         % CRF Trial
         stimuli{k}.initialEyePosition           = 0;
         stimuli{k}.headCenteredTargetLocations  = h;%-Training_Saccades(i);
@@ -84,9 +97,20 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
         stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
         stimuli{k}.stimOnsetTimes               = 0;
         
+        plot(stimuli{k}.headCenteredTargetLocations, stimuli{k}.saccadeTargets, 'ob');
+        
         k = k + 1;
+        %}
         
     end
+    
+    %{
+    plot(Training_RF_Locations, Training_Saccades, 'or');
+    xlabel('RF Location (deg)');
+    xlim([-R_eccentricity R_eccentricity]);
+    ylabel('Saccade (deg)');
+    ylim([-S_eccentricity S_eccentricity]);
+    %}
     
     % Save params
     stimuliFolder = [base 'Stimuli' filesep filename];
@@ -110,4 +134,7 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
                                     'saccadeSpeed', ...
                                     'dt', ...
                                     'seed');
+                                
+                                
+
 end

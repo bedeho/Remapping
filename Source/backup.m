@@ -1,3 +1,92 @@
+            
+            %{
+            on_off_time_pairs = zeros(numStimOnsetTimes, 2);
+            for j=1:numStimOnsetTimes,
+                
+                % on time step
+                on_off_timestep_pairs(j, 1) = timeToTimeStep(stimOnsetTimes(j), dt);
+                
+                % off time step
+                offset_pair = stimuli.stimuli{period}.targetOffIntervals{1}; % we use the same on off for all stim! I dont even give an *ff at this point
+                
+                if(~isempty(offset_pair)),
+                    
+                    
+                    
+                    if(offset_pair(1,1) > 0), % stimuli was immediately turned off
+                        
+                        % if so
+                    
+                    else
+                        
+                    end
+                    
+                    
+                    on_off_timestep_pairs(j, 2) = timeToTimeStep(offset_pair(1,2), dt);
+                else
+                    on_off_timestep_pairs(j, 2) = numTimeSteps;
+                end
+            end
+            %}
+
+
+%
+%  GenerateExperiment.m
+%  Remapping
+%
+%  Created by Bedeho Mender on 19/05/13.
+%  Copyright 2013 OFTNAI. All rights reserved.
+
+
+                
+                %{
+                R_SOM_inhibition        = R_neg_attractor_psi*((R_to_R_inhibitory_weights*R_activation')');
+                R_attractor             = R_attractor_psi*(R_to_R_weights*R_activation')';
+                C_to_R_excitation       = C_to_R_psi*(C_to_R_weights*C_firingrate')';
+                R_visual                = R_psi*flat_gauss;
+                
+                R_net_input = C_to_R_excitation + R_SOM_inhibition + R_visual + R_attractor;
+                R_sig = 1./(1 + exp(-2*R_slope*(R_net_input - R_threshold)));
+                
+                R_activation = R_activation + (dt/R_tau)*(-R_activation + R_sig);%; - R_activation*K_sacc_supression;
+                %}
+
+                %R_inhibition_scaling = R_activation;
+                %R_inhibition_scaling(R_inhibition_scaling > 1) = 1; % do linear rectified function of R scaling.
+
+
+                %C_to_R_inhibition = 0;%R_inhibition_scaling*C_to_R_psi_neg*sum(C_firingrate);
+
+                %
+                %R_SOM_inhibition = R_inhibition_scaling.*(R_neg_attractor_psi*(R_to_R_inhibitory_weights*R_firingrate')');
+                
+                %R_attractor = R_attractor_psi*(R_to_R_excitatory_weights*R_firingrate')';
+
+
+                %K_tau_dynamic = R_tau_rise + (flat_gauss <= R_tau_threshold)*(R_tau_decay-R_tau_rise);
+                %K = K_old + (dt./K_tau_dynamic).*(-K_old + R_psi*flat_gauss) + K_onset_spike - K_sacc_supression;
+                
+                %K = K_old + (dt/K_tau)*(-K_old) + K_onset_spike - K_old*K_sacc_supression;
+                
+                % V =======================================
+                
+                % E & 
+                %E_tau_dynamic = E_tau_rise + exp(-(flat_gauss.^2)/(2*E_tau_sigma^2))*(E_tau_decay-E_tau_rise);
+                %E = E_old + (dt./E_tau_dynamic).*(-E_old + flat_gauss);
+                %V = V_old + (dt/V_tau)*(-V_old + E_to_V_psi*E_old) - V_old*K_sacc_supression;
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
 %{
 
 %

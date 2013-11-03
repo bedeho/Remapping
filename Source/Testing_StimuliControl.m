@@ -7,20 +7,26 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Testing_StimuliControl(Name, dt)
+function Testing_StimuliControl(Name, dt, headCenteredTargetLocation)
 
     % Import global variables
     declareGlobalVars();
     global base;
 
-    filename = [Name '-StimuliControl'];
-    stimulitype = 'StimuliControl';
-    
     % Params
     %dt                          = 0.010; %(s)
     seed                        = 77;
     R_eccentricity              = 45;
     R_density                   = 1; % should be 1, we test everyones latency
+    
+    if nargin < 3,
+        filename = [Name '-StimuliControl'];
+        stimulitype = 'StimuliControl';
+        headCenteredTargetLocation  = -R_eccentricity:R_density:R_eccentricity;
+    else
+        filename = [Name '-StimuliControl'];
+        stimulitype = 'StimuliControl2';
+    end
     
     % Dynamical quantities
     stimuliOnset                = 0.100; %(s)
@@ -30,7 +36,7 @@ function Testing_StimuliControl(Name, dt)
     % Generate stimuli
     rng(seed);
     Duration                    = stimuliOnset+stimuliDuration+stimuliOffsetPeriod; % (s)
-    headCenteredTargetLocation  = -R_eccentricity:R_density:R_eccentricity;
+    
     targetOffIntervals{1}       = [0 (stimuliOnset-dt);(stimuliOnset+stimuliDuration) Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
     for i = 1:length(headCenteredTargetLocation);

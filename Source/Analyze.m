@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function analysisSummary = Analyze(netDir, stimulinames)
+function Analyze(netDir, stimulinames)
 
     % Import global variables
     declareGlobalVars();
@@ -109,7 +109,10 @@ function analysisSummary = Analyze(netDir, stimulinames)
         x = minLatency:dh:maxLatency;
     end
     
-    bar(x,hist(latency,x));
+    % test in case experiment fails, analysis crashed
+    if ~isnan(x),
+        bar(x,hist(latency,x));
+    end
     
     xlabel('Time (s)');
     ylabel('Frequency');
@@ -117,6 +120,8 @@ function analysisSummary = Analyze(netDir, stimulinames)
     saveas(f,[netDir filesep 'StimuliControl-summary.png']);
     close(f);
     
+    %{
+    %}
     
     %% Duhamel remapping analysis plotting
     remappingAnalysis(DuhamelRemapping_Result, 'DuhamelRemapping');
@@ -138,6 +143,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
     saveas(f,[netDir filesep 'DuhamelTruncation-summary.png']);
     close(f);
     
+    %{
     %% Kusonoki
     f = figure;
     
@@ -169,8 +175,7 @@ function analysisSummary = Analyze(netDir, stimulinames)
     saveas(f,[netDir filesep 'CLayerProbe-summary.png']);
     
     close(f);
-    
-    analysisSummary = 0;
+    %}
     
     function remappingAnalysis(remapping_result, name)
         
@@ -220,5 +225,4 @@ function analysisSummary = Analyze(netDir, stimulinames)
         close(f);
         
     end
-
 end

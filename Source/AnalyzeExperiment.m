@@ -124,7 +124,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                     trDir = [experimentFolder simulation filesep 'Training'];
                     
                     % Do analysis
-                    analysisSummary = Analyze(netDir, stimulinames);
+                    Analyze(netDir, stimulinames);
 
                     % Start row
                     fprintf(fileID, '<tr>');
@@ -145,7 +145,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                     % Summary
                     fprintf(fileID, '<td>');
                     %fprintf(fileID, '<img src="%s" width="350px" height="350px"/>\n', [netDir filesep 'summary.png']);
-                    outputButton('Training', ['matlab:viewNeuronDynamics(\\''' simulationFolder filesep 'activity-' trainingStimuli '.mat\\'',\\''' netDir filesep 'analysis-basic-CLayerProbe.mat\\'',\\''' trainingStimuli '\\'',\\''' [netDir filesep network '.mat'] '\\'')']);
+                    outputButton('Training', ['matlab:viewNeuronDynamics(\\''' simulationFolder filesep 'activity-' trainingStimuli '.mat\\'',\\''' trainingStimuli '\\'',\\''' [netDir filesep network '.mat'] '\\'',\\''' netDir filesep 'analysis-basic-CLayerProbe.mat\\'')']);
                     fprintf(fileID, '</td>');
                     
                     % Stimuli
@@ -161,7 +161,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                         end
                         
                         % Button
-                        outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'',\\''' netDir filesep 'analysis-basic-CLayerProbe.mat\\'',\\''' stimulinames{i} '\\'',\\''' [netDir filesep network '.mat'] '\\'')']);
+                        outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'',\\''' stimulinames{i} '\\'',\\''' [netDir filesep network '.mat'] '\\'',\\''' netDir filesep 'analysis-basic-CLayerProbe.mat\\'')']);
                         
                         fprintf(fileID, '</td>');
                     end
