@@ -34,7 +34,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     parameterCombinations = containers.Map;
     
     % Simulations Paramters
-    numTrainingEpochs = 5;%5;%10;
+    numTrainingEpochs = 5;%10;
     doTrain = (nargin == 4) && (numTrainingEpochs > 0);
     outputSavingRate = 1; % Period of time step saving during testing.
     assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
@@ -69,8 +69,8 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     
     % K
     parameterCombinations('K_tau')                  = [0.040];% 0.500
-    parameterCombinations('P_tau')                  = [0.700];
-    parameterCombinations('P_psi')                  = [5];
+    parameterCombinations('P_tau')                  = [0.400];
+    parameterCombinations('P_psi')                  = [0.8];
     
     parameterCombinations('K_I_psi')                = [8]; %NEW:4, CHANGE BACK: 1000, 16
     parameterCombinations('K_psi')                  = [6]; %CHANGE BACK: 1000, 16
@@ -124,13 +124,13 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     parameterCombinations('C_tau')                  = [0.020]; % (s)
     parameterCombinations('C_w_INHB')               = [1]; %1.0, 2.8 worked, NEW: 10/5000, classic=[10/5000, 10/5000 50/5000 100/5000  C_N = 5400
     
-    parameterCombinations('C_threshold')            = [14]; %, 16, NEW = 4, CHANGE BACK = 3, prewired, old 0.45
+    parameterCombinations('C_threshold')            = [15]; %, 16, NEW = 4, CHANGE BACK = 3, prewired, old 0.45
     
     parameterCombinations('C_slope')                = [16]; % prewired 100, classic= 500
     parameterCombinations('C_to_R_psi')             = [15]; %NEW: 0.09 or? 0.19, CHANGE BACK: 30, 15, prewwired=0.05,0.1 works well, classic: 0.4
     parameterCombinations('C_to_R_psi_neg')         = [0]; %0.005, 0.1 0.01 0.001 0.0001, 1, 3.5 prewwired=1 works well, classic: 0.4
-    parameterCombinations('C_to_R_alpha')           = [0.2]; % 0.1 to small? learning rate
-    parameterCombinations('C_to_R_connectivity')    = [1]; % [0 1]
+    parameterCombinations('C_to_R_alpha')           = [1]; % 0.1 to small? learning rate
+    parameterCombinations('C_to_R_connectivity')    = [1]; %0.5 [0 1]
     
     parameterCombinations('C_percentile')           = [90];
     

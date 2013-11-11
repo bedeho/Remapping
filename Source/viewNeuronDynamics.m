@@ -158,10 +158,11 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
         end
         
         subplot(numRows,2,1);
-        imagesc(extra);
+        imgR = imagesc(extra);
         hold on;colorbar;
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('Extra');
+        set(imgR, 'ButtonDownFcn', {@singleUnitCallBack, 'E'}); % Setup callback
         set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
 
         %{
@@ -299,6 +300,8 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
             % Check which pool we are looking atr
             if(strcmp(region,'V')),
                 responseTrace = activity.V_firing_history(neuron, :, period, epoch);
+            elseif(strcmp(region,'E')),
+                responseTrace = activity.extra_history(neuron, :, period, epoch);
             elseif(strcmp(region,'R')),
                 responseTrace = activity.R_firing_history(neuron, :, period, epoch);
             elseif(strcmp(region,'S')),
@@ -405,8 +408,12 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
                     set([hYLabel hXLabel], 'FontSize', 20);
                     set([gca], 'FontSize', 18);
                     
-                %elseif(strcmp(region,'R')),
-                %    
+                elseif(strcmp(region,'R')),
+                    
+                    figure;
+                    R_weightvector = network.C_to_R_weights(neuron,:);
+                    plot(R_weightvector);
+                    
                 elseif(strcmp(region,'S')),
                     %responseTrace = activity.S_firing_history(neuron, :, period, epoch);
                 elseif(strcmp(region,'C')),

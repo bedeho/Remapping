@@ -375,7 +375,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 
                 % P
                 if(~isempty(stimOnsetTimeSteps) && any(precedingTimeStep==off_time_steps)),
-                    offset_decay = R_activation;% P_psi*flat_gauss;
+                    offset_decay = P_psi*K_old;
                 else
                     offset_decay = 0;
                 end
@@ -384,14 +384,14 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     P_sacc_supression = P_old; %* K_supress
                     K_sacc_supression = K_old;
                     
-                    R_sacc_supression = R_activation;
+                    %R_sacc_supression = R_activation;
                     
-                    %offset_decay = 0; %phenomenological trick in case both happen at the same time, could rewrite system, but why bother?
+                    offset_decay = 0; %phenomenological trick in case both happen at the same time, could rewrite system, but why bother?
                 else
                     P_sacc_supression = 0;
                     K_sacc_supression = 0;
                     
-                    R_sacc_supression = 0;
+                    %R_sacc_supression = 0;
                 end
                 
                 %P_visual_input = K_I_psi*K_feed_forward;
@@ -400,42 +400,13 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 % K
                 K_visual_onset = K_I_psi*visual_onset;
                 K_visual_input = K_I_psi*K_feed_forward;
-                K = K_old + (dt/K_tau)*(-K_old + K_visual_input ) + K_visual_onset  - K_sacc_supression; %
+                K = K_old + (dt/K_tau)*(-K_old + K_visual_input + P_old) + K_visual_onset - K_sacc_supression; %
                 
                 % R
-                R_visual_onset = K_psi*visual_onset;
+                %R_visual_onset = K_psi*visual_onset;
                 R_global_inhibition = R_w_INHB*sum(R_firingrate); % R_activation.*
                 C_to_R_excitation = C_to_R_psi*(C_to_R_weights*C_firingrate')';
-                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation - R_global_inhibition + K - R_background + P_old); % + R_visual_onset
-                
-                %{
-                % CLASSIC - SOM based
-                if(~isempty(stimOnsetTimes)),
-                    
-                    delta = (precedingTimeStep - stimOnset_comparison_matrix - K_delay_comparison_matrix);
-                    delta_sum = sum(delta == 0, 1);
-                    yes_delta_event = (delta_sum > 0);
-                    
-                    visual_onset = zeros(1, R_N);
-                    visual_onset(yes_delta_event) = K_psi*flat_gauss(yes_delta_event);
-                else
-                    visual_onset = 0;
-                end
-                
-                K_visual_input = K_I_psi*K_feed_forward;
-                K = K_old + (dt/K_tau)*(-K_old + K_visual_input);
-                
-                
-                C_to_R_excitation       = C_to_R_psi*(C_to_R_weights*C_firingrate')';
-                
-                R_SOM_inhibition        = R_neg_attractor_psi*(R_to_R_inhibitory_weights*R_firingrate')';
-                
-                R_global_inhibition     = R_w_INHB*sum(R_firingrate);
-                
-                R_attractor             = R_attractor_psi*(R_to_R_excitatory_weights*R_firingrate')';
-                
-                R_activation            = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation - R_global_inhibition + K_visual_input + R_attractor + R_SOM_inhibition) + visual_onset;
-                %}
+                R_activation = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation - R_global_inhibition + K - R_background); % + R_visual_onset
 
                 % V =======================================
                 
@@ -545,7 +516,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     S_activation_history(:, periodSaveCounter, period, epoch) = S_activation;
                     C_activation_history(:, periodSaveCounter, period, epoch) = C_activation;
                     
-                    extra_history(:, periodSaveCounter, period, epoch) = K;%ones(size(P))*C_dynamic_threshold;
+                    extra_history(:, periodSaveCounter, period, epoch) = P;%ones(size(P))*C_dynamic_threshold;
                     
                     % Count one more dt
                     periodSaveCounter = periodSaveCounter + 1;
@@ -553,10 +524,17 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 
                 %{
                 % Visualize
-                if(strcmp(stimuliName,'basic-Training_Coordinated') && epoch >= 0 && t == 141), % , , period == 6, period == numPeriods
+                if(strcmp(stimuliName,'basic-Training_Coordinated') && epoch >= 0 && t >= 50 && t==141), % period == 6, period == numPeriods, && 
 
-                    n=481;
+                    
+                    n=1713;
 
+                    figure;
+                    plot(C_to_R_weights(40, :));
+                    axis tight
+                    
+                    figure;
+                    
                     subplot(6,3,1);
                     plot(S_to_C_weights(n,:));
                     axis tight;

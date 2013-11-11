@@ -157,7 +157,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                         imageFile = [netDir filesep stimuli_types{i} '-summary.png'];
                         
                         if exist(imageFile, 'file'),                        
-                            fprintf(fileID, '<img src="%s" width="250px" height="400px"/></br>\n', imageFile);
+                            fprintf(fileID, '<img src="%s" width="250px" height="250px"/></br>\n', imageFile); %400
                         end
                         
                         % Button

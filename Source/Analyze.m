@@ -143,7 +143,7 @@ function Analyze(netDir, stimulinames)
     saveas(f,[netDir filesep 'DuhamelTruncation-summary.png']);
     close(f);
     
-    %{
+    
     %% Kusonoki
     f = figure;
     
@@ -165,7 +165,8 @@ function Analyze(netDir, stimulinames)
 
     saveas(f,[netDir filesep 'Kusonoki-summary.png']);
     close(f);
-
+    
+    
     %% C PRobe
     f = figure;
     plot(CLabeProbe_Neurons_V, CLabeProbe_Neurons_S, 'or');
@@ -175,7 +176,7 @@ function Analyze(netDir, stimulinames)
     saveas(f,[netDir filesep 'CLayerProbe-summary.png']);
     
     close(f);
-    %}
+    
     
     function remappingAnalysis(remapping_result, name)
         

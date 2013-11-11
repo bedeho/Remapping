@@ -1,4 +1,33 @@
-            
+                %{
+                % CLASSIC - SOM based
+                if(~isempty(stimOnsetTimes)),
+                    
+                    delta = (precedingTimeStep - stimOnset_comparison_matrix - K_delay_comparison_matrix);
+                    delta_sum = sum(delta == 0, 1);
+                    yes_delta_event = (delta_sum > 0);
+                    
+                    visual_onset = zeros(1, R_N);
+                    visual_onset(yes_delta_event) = K_psi*flat_gauss(yes_delta_event);
+                else
+                    visual_onset = 0;
+                end
+                
+                K_visual_input = K_I_psi*K_feed_forward;
+                K = K_old + (dt/K_tau)*(-K_old + K_visual_input);
+                
+                
+                C_to_R_excitation       = C_to_R_psi*(C_to_R_weights*C_firingrate')';
+                
+                R_SOM_inhibition        = R_neg_attractor_psi*(R_to_R_inhibitory_weights*R_firingrate')';
+                
+                R_global_inhibition     = R_w_INHB*sum(R_firingrate);
+                
+                R_attractor             = R_attractor_psi*(R_to_R_excitatory_weights*R_firingrate')';
+                
+                R_activation            = R_activation + (dt/R_tau)*(-R_activation + C_to_R_excitation - R_global_inhibition + K_visual_input + R_attractor + R_SOM_inhibition) + visual_onset;
+                %}
+
+
             %{
             on_off_time_pairs = zeros(numStimOnsetTimes, 2);
             for j=1:numStimOnsetTimes,

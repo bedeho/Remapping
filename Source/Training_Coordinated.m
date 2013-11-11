@@ -35,13 +35,18 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
     Duration                        = saccadeOnset + (2*S_eccentricity/saccadeSpeed) + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
     saccades                        = -S_eccentricity:S_density:S_eccentricity;
     
-    Training_RF_Locations           = (-R_eccentricity+minimum_Saccade_Amplitude):R_density:(R_eccentricity-minimum_Saccade_Amplitude);
+    %Training_RF_Locations           = (-R_eccentricity+minimum_Saccade_Amplitude):R_density:(R_eccentricity-minimum_Saccade_Amplitude);
     
     %Training_RF_Locations           = [-20 -17 -15 -12 -10 -7 -5 -2 0 2 5 7 10 12 15 17 20];
     
-    %Training_RF_Locations           = [-20 -15 -10 -5 0 5 10 15 20];
+    Training_RF_Locations           = [-20 -15 -10 -5 0 5 10 15 20];
     
     %Training_RF_Locations           = [0];
+    
+    %Training_RF_Locations           = [-15 (-15 + 9)]; % (-15 + 9) 
+    %Training_Saccades               = [9 -16]; % (-16)
+    
+    hardcoded = (exists(Training_Saccades));
     
     %figure;
     %hold on;
@@ -52,19 +57,22 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
         % Receptive field of neuron to be trained
         h = Training_RF_Locations(i);
         
-        % Pick random saccade
-        s = randi(length(saccades));
+        if(~hardcoded),
         
-        % Make sure 
-        % 1) saccade is big enough
-        % 2) FRF is on retina
-        % 3) CRF is kept on retina after saccade
-        while((abs(saccades(s)) < minimum_Saccade_Amplitude) || ~(-R_eccentricity <= h+saccades(s) && h+saccades(s) <= R_eccentricity) || ~(-R_eccentricity <= h-saccades(s) && h-saccades(s) <= R_eccentricity))
+            % Pick random saccade
             s = randi(length(saccades));
+
+            % Make sure 
+            % 1) saccade is big enough
+            % 2) FRF is on retina
+            % 3) CRF is kept on retina after saccade
+            while((abs(saccades(s)) < minimum_Saccade_Amplitude) || ~(-R_eccentricity <= h+saccades(s) && h+saccades(s) <= R_eccentricity) || ~(-R_eccentricity <= h-saccades(s) && h-saccades(s) <= R_eccentricity))
+                s = randi(length(saccades));
+            end
+
+            % Save saccade
+            Training_Saccades(i) = saccades(s);
         end
-        
-        % Save saccade
-        Training_Saccades(i) = saccades(s);
         
         % FRF Trial
         stimuli{k}.initialEyePosition           = 0;
