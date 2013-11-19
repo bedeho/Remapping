@@ -39,14 +39,18 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
     
     %Training_RF_Locations           = [-20 -17 -15 -12 -10 -7 -5 -2 0 2 5 7 10 12 15 17 20];
     
-    Training_RF_Locations           = [-20 -15 -10 -5 0 5 10 15 20];
+    %Training_RF_Locations           = [-20 -15 -10 -5 0 5 10 15 20];
     
-    %Training_RF_Locations           = [0];
+    %Training_RF_Locations           = [-20 -10 0 10 20];
+    
+    %Training_RF_Locations           = [-20 20];
+    
+    Training_RF_Locations           = [0];
+    
+    hardcoded = false;
     
     %Training_RF_Locations           = [-15 (-15 + 9)]; % (-15 + 9) 
     %Training_Saccades               = [9 -16]; % (-16)
-    
-    hardcoded = (exists(Training_Saccades));
     
     %figure;
     %hold on;

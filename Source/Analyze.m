@@ -145,26 +145,29 @@ function Analyze(netDir, stimulinames)
     
     
     %% Kusonoki
-    f = figure;
-    
-    arr_stim = kusonokiSTIMAlignedAnalysis;
-    subplot(2,1,1);
-    hold on;
-    errorbar([arr_stim(:).current_mean], [arr_stim(:).current_std],'-or');
-    errorbar([arr_stim(:).future_mean], [arr_stim(:).future_std],'-ob');
-    legend('Current RF Trials','Future RF Trials');
-    ylim([0 1]);
-    
-    arr_sacc = kusonokiSACCAlignedAnalysis;
-    subplot(2,1,2);
-    hold on;
-    errorbar([arr_sacc(:).current_mean], [arr_sacc(:).current_std],'-or');
-    errorbar([arr_sacc(:).future_mean], [arr_sacc(:).future_std],'-ob');
-    legend('Current RF Trials','Future RF Trials');
-    ylim([0 1]);
+    if(exist('kusonokiSTIMAlignedAnalysis') && exist('kusonokiSACCAlignedAnalysis')),
+        
+        f = figure;
 
-    saveas(f,[netDir filesep 'Kusonoki-summary.png']);
-    close(f);
+        arr_stim = kusonokiSTIMAlignedAnalysis;
+        subplot(2,1,1);
+        hold on;
+        errorbar([arr_stim(:).current_mean], [arr_stim(:).current_std],'-or');
+        errorbar([arr_stim(:).future_mean], [arr_stim(:).future_std],'-ob');
+        legend('Current RF Trials','Future RF Trials');
+        ylim([0 1]);
+
+        arr_sacc = kusonokiSACCAlignedAnalysis;
+        subplot(2,1,2);
+        hold on;
+        errorbar([arr_sacc(:).current_mean], [arr_sacc(:).current_std],'-or');
+        errorbar([arr_sacc(:).future_mean], [arr_sacc(:).future_std],'-ob');
+        legend('Current RF Trials','Future RF Trials');
+        ylim([0 1]);
+
+        saveas(f,[netDir filesep 'Kusonoki-summary.png']);
+        close(f);
+    end
     
     
     %% C PRobe
@@ -192,7 +195,7 @@ function Analyze(netDir, stimulinames)
         ylim([-0.2 0.2]);
         axis square;
 
-        saveas(f,[netDir filesep name '-summary-1.png']);
+        saveas(f,[netDir filesep name '-summary.png']);
         close(f);
 
         % 2. scatter stim index. vs sacc index.
@@ -208,7 +211,7 @@ function Analyze(netDir, stimulinames)
         ylim([-1 1]);
         axis square;
 
-        saveas(f,[netDir filesep name '-summary.png']);
+        saveas(f,[netDir filesep name '-summary-0.png']);
         close(f);
 
 

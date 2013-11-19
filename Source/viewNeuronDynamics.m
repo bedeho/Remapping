@@ -116,12 +116,9 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
         stimuli.stimuli{period}
         
         % Load
-        E_firingrate = activity.E_firing_history(:, :, period, epoch);
         V_firingrate = activity.V_firing_history(:, :, period, epoch);
         R_firingrate = activity.R_firing_history(:, :, period, epoch);
         S_firingrate = activity.S_firing_history(:, :, period, epoch);
-        
-        E_activation = activity.E_activation_history(:, :, period, epoch);
         V_activation = activity.V_activation_history(:, :, period, epoch);
         R_activation = activity.R_activation_history(:, :, period, epoch);
         S_activation = activity.S_activation_history(:, :, period, epoch);
