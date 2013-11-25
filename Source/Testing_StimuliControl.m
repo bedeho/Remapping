@@ -35,9 +35,10 @@ function Testing_StimuliControl(Name, dt, headCenteredTargetLocation)
 
     % Generate stimuli
     rng(seed);
-    Duration                    = stimuliOnset+stimuliDuration+stimuliOffsetPeriod; % (s)
+    Duration                    = dtRoundUpPeriod(stimuliOnset+stimuliDuration+stimuliOffsetPeriod, dt); % (s)
     
     targetOffIntervals{1}       = [0 (stimuliOnset-dt);(stimuliOnset+stimuliDuration) Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
+    %%targetOffIntervals{1}       = [0 (stimuliOnset);(stimuliOnset+stimuliDuration) Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
     for i = 1:length(headCenteredTargetLocation);
         

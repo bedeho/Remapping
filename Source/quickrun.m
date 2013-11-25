@@ -5,15 +5,15 @@
     global STIMULI_FOLDER;
     global EXPERIMENTS_FOLDER;
     
-    experimentName = 'baseline'; % indexvariability
+    experimentName = 'test'; % baseline-multiRF3-tuneC-to-Rpsi
     
     experimentFolder = [EXPERIMENTS_FOLDER experimentName filesep];
     
     %% DO NOT CHANGE, basic2 has fixed dt
     %dt = 0.010; 
-    dt = 0.005;
+    %dt = 0.005;
     %dt = 0.004;
-    %%dt = 0.002;
+    dt = 0.002;
     %dt = 0.001;
     
     %% Setup stimuli
@@ -76,6 +76,9 @@
         stimuliFolder = [STIMULI_FOLDER stimName];
         
         % Compress stimuli folder
-        system(['tar -cjvPf ' experimentFolder stimName '.tbz ' stimuliFolder]);
+        %system(['tar -cjvPf ' experimentFolder stimName '.tbz ' stimuliFolder]);
+        
+        % Copy stimuli folder
+        copyfile(stimuliFolder,[experimentFolder 'STIM-' stimName]);
     
     end

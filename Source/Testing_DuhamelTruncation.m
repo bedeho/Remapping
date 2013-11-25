@@ -45,8 +45,8 @@ function Testing_DuhamelTruncation(Name, dt, Training_RF_Locations, Training_Sac
         saccades = Training_Saccades;
     end
     
-    saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1); % round to nearest hundred above
-    Duration                        = saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
+    saccadeDelayTime                = (2*S_eccentricity/saccadeSpeed)+0.05; % round to nearest hundred above
+    Duration                        = dtRoundUpPeriod(saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod, dt); % (s), the middle part of sum is to account for maximum saccade times
     targetOffIntervals{1}           = [];%[stimuliOffset Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
     for i = 1:length(currentRF);

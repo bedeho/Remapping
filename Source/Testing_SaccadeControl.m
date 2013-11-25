@@ -30,12 +30,12 @@ function Testing_SaccadeControl(Name, dt, saccadeTargets)
     
     % Dynamical quantities
     saccadeOnset                = 0.150; %(s) w.r.t start of task
-    postSaccadefixationPeriod   = 0.4; %(s)
+    postSaccadefixationPeriod   = 0.400; %(s)
     saccadeSpeed                = 300; %(deg/s)
 
     % Generate stimuli
     rng(seed);
-    Duration                    = saccadeOnset + postSaccadefixationPeriod; % (s)
+    Duration                    = dtRoundUpPeriod(saccadeOnset + postSaccadefixationPeriod, dt); % (s)
     
     targetOffIntervals{1}       = [0 Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     

@@ -31,7 +31,7 @@ function Training_Basic(Name,dt)
 
     % Generate stimuli
     rng(seed);
-    Duration                        = saccadeOnset + (2*S_eccentricity/saccadeSpeed) + fixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
+    Duration                        = dtRoundUpPeriod(saccadeOnset + (2*S_eccentricity/saccadeSpeed) + fixationPeriod, dt); % (s), the middle part of sum is to account for maximum saccade times
     saccadeTargets                  = -S_eccentricity:S_density:S_eccentricity; %[-20]%
     headCenteredTargetLocations     = -R_eccentricity:R_density:R_eccentricity;
 

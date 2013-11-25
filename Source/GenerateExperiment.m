@@ -34,12 +34,12 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     parameterCombinations = containers.Map;
     
     % Simulations Paramters
-    numTrainingEpochs = 5;%10;
+    numTrainingEpochs = 1;%10;
     doTrain = (nargin == 4) && (numTrainingEpochs > 0);
     outputSavingRate = 1; % Period of time step saving during testing.
     assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
     
-    saveActivityInTraining = false;
+    saveActivityInTraining = true;
     saveNetworksAtEpochMultiples = 333; % Save network at this resolution
     seed = 13;
     
@@ -47,21 +47,21 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     
     % R
     parameterCombinations('R_eccentricity')         = [45];
-    parameterCombinations('R_tau')                  = [0.050]; % NEW=0.050, (s), 0.050 0.100
+    parameterCombinations('R_tau')                  = [0.020]; % NEW=0.050, (s), 0.050 0.100
     parameterCombinations('R_w_INHB')               = [0.6]; %WORKS: 1.8 , classic = 0.6 NEW=0.1, 20/91 15/91 10/91 ,prewwired=0 works = 5/91,20/91
     parameterCombinations('R_slope')                = [0.5]; %CHANGE BACK: 0.002 prewired=2, classic = 0.4, 0.0005
     parameterCombinations('R_threshold')            = [3]; %CHANGE BACK: 700, prewired 0.6
     parameterCombinations('R_psi')                  = [0]; % CHANGE BACK: 2000, prewired = 0.5
-    parameterCombinations('R_covariance_threshold') = [0.4]; % 0.8 start
+    %parameterCombinations('R_covariance_threshold') = [0]; % 0.2 0.3 0.4 0.8
     
     % K
-    parameterCombinations('K_tau')                  = [0.040];% 0.500
+    parameterCombinations('K_tau')                  = [0.020];% 0.500
     parameterCombinations('K_onset_delay_sigma')    = [0.05];
     parameterCombinations('K_I_psi')                = [8]; %NEW:4, CHANGE BACK: 1000, 16
     parameterCombinations('K_supression_delay')     = [0]; %.05,D= Duhamle suggests even shorter, an effect begins quite early if you look PSTH
     parameterCombinations('P_tau')                  = [0.300];
     parameterCombinations('P_psi')                  = [0.8];
-    K_max_onset_delay = 0.080; %(s)
+    K_max_onset_delay = 0.080; %(s), 0.010
     
     % V
     DELAY = 0.300
@@ -77,7 +77,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     parameterCombinations('S_delay_sigma')          = [0.100]; % (s)
     parameterCombinations('S_tau')                  = [0.020]; % (s)
     parameterCombinations('S_psi')                  = [1];
-    parameterCombinations('S_presaccadic_onset')    = [0.100]; %0.050,   0.100 is classic
+    parameterCombinations('S_presaccadic_onset')    = [0.050]; %0.050,   0.100 is classic
     parameterCombinations('S_trace_length')         = [DELAY-0.020]; % stop saccade sooner so that you dont get FRF imprinted in V->C weights due to S and C delay and V speed
     parameterCombinations('S_to_C_psi')             = [8];
     parameterCombinations('S_to_C_alpha')           = [0.1]; %WORKS: 0.5 _____0.2 NEW=0.001 %0.003, learning rate
@@ -90,7 +90,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     parameterCombinations('C_threshold')            = [15]; % 15 WORKS.
     parameterCombinations('C_threshold_sigma')      = [0]; % dont change!
     parameterCombinations('C_slope')                = [100]; % prewired 100, classic= 500
-    parameterCombinations('C_to_R_psi')             = [25]; % NEW: 0.09 or? 0.19, CHANGE BACK: 30, 15, prewwired=0.05,0.1 works well, classic: 0.4
+    parameterCombinations('C_to_R_psi')             = [8]; %10 8 6 4, NEW: 0.09 or? 0.19, CHANGE BACK: 30, 15, prewwired=0.05,0.1 works well, classic: 0.4
     parameterCombinations('C_to_R_alpha')           = [0.1]; % WORKS (no covariance): 0.20 0.1 to small? learning rate
     parameterCombinations('C_to_R_connectivity')    = [1]; %0.5 [0 1]
     
@@ -200,7 +200,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
             
             % Create prewired network
             %disp('Creating prewired network...');
-            %CreatePrewiredNetwork([simulationFolder filesep 'PrewiredNetwork.mat'], hardwired_pref_R, hardwired_pref_S, C_to_R_sigma, V_to_C_sigma, S_to_C_sigma, R_to_R_sigma, simulation('S_to_C_connectivity'), simulation('V_to_C_connectivity'), simulation('C_to_R_connectivity'));
+            %CreatePrewiredNetwork([simulationFolder filesep 'PrewiredNetwork.mat'], hardwired_pref_R, hardwired_pref_S, C_N, C_to_R_sigma, V_to_C_sigma, S_to_C_sigma, R_to_R_sigma, simulation('S_to_C_connectivity'), simulation('V_to_C_connectivity'), simulation('C_to_R_connectivity'));
             
             % Create simulation blank network
             disp('Creating blank network...');
@@ -210,8 +210,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
             
                 % Training
                 disp('Training...');
-                Remapping(simulationFolder, trainingStimuli, true);
-            
+                Remapping(simulationFolder, trainingStimuli, true);            
             end
             
             % Move each network to new folder & test

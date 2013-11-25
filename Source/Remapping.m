@@ -87,7 +87,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     R_slope         = parameters.simulation('R_slope');
     R_threshold     = parameters.simulation('R_threshold');
 
-    R_covariance_threshold = parameters.simulation('R_covariance_threshold');
+    %R_covariance_threshold = parameters.simulation('R_covariance_threshold');
 
     % K  =======================================
     K_tau           = parameters.simulation('K_tau');
@@ -150,6 +150,13 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     C_w_INHB        = parameters.simulation('C_w_INHB');
     C_slope         = parameters.simulation('C_slope');
     C_threshold     = parameters.simulation('C_threshold');
+    
+    %{
+    if(strcmp(stimuliName,'basic-Kusonoki') && ~isTraining),
+        %C_to_R_psi = 0;
+        K_I_psi = 0;
+    end
+    %}
     
     %C_thresholds    = parameters.simulation('C_thresholds');
     
@@ -362,7 +369,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 % K
                 K_visual_onset = K_I_psi*visual_onset;
                 K_visual_input = K_I_psi*K_feed_forward;
-                K = K_old + (dt/K_tau)*(-K_old + K_visual_input + P_old) + K_visual_onset - K_sacc_supression; %
+                K = K_old + (dt/K_tau)*(-K_old + K_visual_input + P_old) + K_visual_onset - K_sacc_supression; %  
                 
                 % R
                 %R_visual_onset = K_psi*visual_onset;
@@ -375,7 +382,9 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 % stim
                 if(~isempty(stimOnsetTimeSteps)),
                     
-                    if(any(precedingTimeStep==stimOnsetTimeSteps))
+                    % turn on stim if this is onset time, and if onset time
+                    % is before saccade time!!!
+                    if(any(precedingTimeStep==stimOnsetTimeSteps) && (isempty(saccOnsetTimeSteps) || any(precedingTimeStep < saccOnsetTimeSteps))) % V comes on if stimonst == sacc ons
                         V_onset = flat_gauss;
                     else
                         V_onset = 0;
@@ -425,11 +434,11 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     %- C_to_R_weights).*(R_firingrate'*C_firingrate); % Bounded learning 
                     
                     % CLASSIC
-                    %C_to_R_weights = C_to_R_weights + dt*C_to_R_alpha*(R_firingrate'*C_firingrate);
+                    C_to_R_weights = C_to_R_weights + dt*C_to_R_alpha*(R_firingrate'*C_firingrate);
                     
                     % COVARIANCE
-                    C_to_R_weights = C_to_R_weights + dt*C_to_R_alpha*((R_firingrate' - R_covariance_threshold)*C_firingrate);
-                    C_to_R_weights(C_to_R_weights < 0) = 0;
+                    %C_to_R_weights = C_to_R_weights + dt*C_to_R_alpha*((R_firingrate' - R_covariance_threshold)*C_firingrate);
+                    %C_to_R_weights(C_to_R_weights < 0) = 0;
                     
                     S_to_C_weights = S_to_C_weights + dt*S_to_C_alpha*(C_firingrate'*S_firingrate);
                     V_to_C_weights = V_to_C_weights + dt*V_to_C_alpha*(C_firingrate'*V_firingrate);
@@ -490,7 +499,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                     S_activation_history(:, periodSaveCounter, period, epoch) = S_activation;
                     C_activation_history(:, periodSaveCounter, period, epoch) = C_activation;
                     
-                    extra_history(:, periodSaveCounter, period, epoch) = C_to_R_excitation;%ones(size(P))*C_dynamic_threshold;
+                    extra_history(:, periodSaveCounter, period, epoch) = C_to_R_excitation;%C_to_R_excitation;%;ones(size(P))*C_dynamic_threshold;
                     
                     % Count one more dt
                     periodSaveCounter = periodSaveCounter + 1;

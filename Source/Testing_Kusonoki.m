@@ -31,14 +31,14 @@ function Testing_Kusonoki(Name, dt, Training_RF_Locations, Training_Saccades)
     % Temporal
     saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!
     saccadeOnset                    = 0.600; % w.r.t start of task    
-    stimulusDuration                = 0.100;
+    stimulusDuration                = 0.100; % (s)
     stimulusOnsetTimes              = saccadeOnset + ((-(0.400+stimulusDuration)):0.050:0.100); % w.r.t start of trial
 
     % Utilities - derived
     screen_locations                = Training_RF_Locations%[-5 0 5 10]; %[ -5 0 5 10];%-R_eccentricity:1:R_eccentricity; %-7
     saccades                        = -20%-S_eccentricity:1:S_eccentricity; %-20%-S_eccentricity:1:S_eccentricity;
     saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed)+0.05,-1); % round to nearest hundred above
-    Duration                        = max(stimulusOnsetTimes(end),saccadeOnset + saccadeDelayTime) + 0.400; % (s), make sure we have enough time after last stim onset time to have
+    Duration                        = dtRoundUpPeriod(max(stimulusOnsetTimes(end),saccadeOnset + saccadeDelayTime) + 0.400, dt); % (s), make sure we have enough time after last stim onset time to have
     % space for response window!
     
     % z=1: Current RF trials
@@ -84,7 +84,8 @@ function Testing_Kusonoki(Name, dt, Training_RF_Locations, Training_Saccades)
                 onsetTime                               = stimulusOnsetTimes(t);
                 offsetTime                              = onsetTime + stimulusDuration;
                 targetOffIntervals{1}                   = [0 (onsetTime-dt);offsetTime Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
-
+                %%targetOffIntervals{1}                   = [0 (onsetTime);offsetTime Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
+                
                 % Generate trace
                 stimuli{trialNr}.headCenteredTargetLocations  = stim_location;
                 stimuli{trialNr}.saccadeTargets               = saccade;

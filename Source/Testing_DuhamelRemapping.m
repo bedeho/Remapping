@@ -35,7 +35,7 @@ function Testing_DuhamelRemapping(Name, dt, Training_RF_Locations, Training_Sacc
         % Temporal
         stimulitype                     = 'DuhamelRemapping';
         saccadeOnset                    = 0.300; % (s) w.r.t start of task
-        stimuliDuration                 = 0.100; % (s)
+        stimuliDuration                 = 0.100; % 0.100; (s)
         stimuliOnset                    = saccadeOnset - 2*stimuliDuration; % (s) w.r.t start of task
         postSaccadefixationPeriod       = 0.300; % (s) time from saccade COMPLETION ESTIMATE "saccadeDelayTime" below.
             
@@ -52,9 +52,12 @@ function Testing_DuhamelRemapping(Name, dt, Training_RF_Locations, Training_Sacc
         currentRF = Training_RF_Locations;
     end
     
-    saccadeDelayTime                = roundn((2*S_eccentricity/saccadeSpeed) + 0.05,-1); % round to nearest hundred above
-    Duration                        = saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod; % (s), the middle part of sum is to account for maximum saccade times
+    saccadeDelayTime                = (2*S_eccentricity/saccadeSpeed) + 0.05; % round to nearest hundred above
+    Duration                        = dtRoundUpPeriod(saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod, dt); % (s), the middle part of sum is to account for maximum saccade times
+    
+    % classic
     targetOffIntervals{1}           = [0 (stimuliOnset-dt); (stimuliOnset+stimuliDuration) Duration];
+    %%targetOffIntervals{1}           = [0 stimuliOnset; (stimuliOnset+stimuliDuration) Duration];
     
     %% Generate stimuli
     for i = 1:length(currentRF);

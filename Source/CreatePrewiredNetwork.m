@@ -7,11 +7,11 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function CreatePrewiredNetwork(outputfile, R_preferences, S_preferences, C_to_R_sigma, V_to_C_sigma, S_to_C_sigma, R_to_R_sigma, S_to_C_connectivity, V_to_C_connectivity, C_to_R_connectivity)
-
+function CreatePrewiredNetwork(outputfile, R_preferences, S_preferences, C_N, C_to_R_sigma, V_to_C_sigma, S_to_C_sigma, R_to_R_sigma, S_to_C_connectivity, V_to_C_connectivity, C_to_R_connectivity)
+ 
     R_N = length(R_preferences);
     S_N = length(S_preferences);
-    C_N = S_N*R_N;
+    %C_N = S_N*R_N;
 
     % Prewired
     [X Y Z] = meshgrid(R_preferences, S_preferences, R_preferences);

@@ -31,7 +31,7 @@ function Testing_CLayerProbeTask(Name, dt)
     % Generate stimuli
     rng(seed);
     saccadeOnset                    = 0.200; % (s)
-    Duration                        = saccadeOnset+0.100; % (s), recording window is 50ms after saccade, so atleast this much delay is needed,the middle part of sum is to account for maximum saccade times
+    Duration                        = dtRoundUpPeriod(saccadeOnset+0.100, dt); % (s), recording window is 50ms after saccade, so atleast this much delay is needed,the middle part of sum is to account for maximum saccade times
     saccadeTargets                  = -S_eccentricity:S_density:S_eccentricity;
     headCenteredTargetLocations     = -R_eccentricity:R_density:R_eccentricity;
 

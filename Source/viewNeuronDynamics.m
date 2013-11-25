@@ -149,9 +149,10 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
         s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes, dt);
         numTimeSteps = length(stimuli.stimuli{period}.eyePositionTrace);
         
-        ticks = 0:(0.100/dt):numTimeSteps;
+        ticks = 1:(0.100/dt):numTimeSteps;
+        %ticks(2:end) = ticks(2:end) + 1;
         for l=1:length(ticks),
-            tickLabels{l} = num2str((l-1)*0.100);
+            tickLabels{l} = num2str(stepToTime(ticks(l), dt)); % (l-1)*0.100
         end
         
         subplot(numRows,2,1);
@@ -250,12 +251,12 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
 
         subplot(numRows,2,nextplot);
         cla
-        plot(0:(numTimeSteps-1), eyePositionTrace, 'r');
+        plot(1:numTimeSteps, eyePositionTrace, 'r');
         hold on;
         
         if(~isempty(retinalTargetTraces)),
         
-            plot(0:(numTimeSteps-1), retinalTargetTraces, 'b');
+            plot(1:numTimeSteps, retinalTargetTraces, 'b');
             legend({'Eye Position','Stimuli Retinal Locations'});
         else
             
@@ -264,7 +265,7 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
         
         xlabel(['Time step (s)']);
         ylim([-45 45]); % we hard code limit since not all stimuli has stimuli.R_eccentricity
-        xlim([0 (numTimeSteps-1)]);
+        xlim([1 numTimeSteps]);
         set(gca,'YDir','reverse');
         set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
         %{
@@ -314,7 +315,7 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
             
             if(strcmp(clickType, 'normal')), % response trace
 
-                figure;
+                figure('Units','normalized','position',[.1 .1 .22 .1]);
                 hold on;
 
                 eyePositionTrace = stimuli.stimuli{period}.eyePositionTrace;
@@ -341,29 +342,20 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
                     rectangle('Position', [timeToTimeStep(lastStimOnsetTime, dt), 0.001, timeToTimeStep(numTimeSteps-lastStimOnsetTime, dt), 1],'FaceColor',[0.9 0.9 0.9],'EdgeColor',[0.9 0.9 0.9]);
                 end
 
-                plot(0:(numTimeSteps-1), responseTrace, 'b');
+                plot(1:numTimeSteps, responseTrace, 'b');
                 if ~isempty(s), plot([s s],[-0.05 1],'r'); end % Saccade times
                 hXLabel = xlabel('Time (s)');
                 hYLabel = ylabel('Firing Rate');
                 ylim([-0.05 max(1, max(responseTrace))]);
-                xlim([0 (numTimeSteps-1)]);
-
-                %xTick = 11:10:numTimeSteps;
-
-                %for i=1:length(xTick),
-                %    xTickLabels{i} = [num2str(stepToTime(xTick(i), dt))];
-                %end
-
-                %set(gca,'XTick', xTick);
-                %set(gca,'XTickLabel', xTickLabels);
+                xlim([1 numTimeSteps]);
+                
                 set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
                 set(gca,'YTick', [0 1]);
 
-                set([hYLabel hXLabel], 'FontSize', 18);
-                set([gca], 'FontSize', 16);
-                daspect([40 1 1]);
-
-                %box on;
+                set([hYLabel ], 'FontSize', 14);
+                set([hXLabel], 'FontSize', 16);
+                set([gca], 'FontSize', 14);
+                %daspect([40 1 1]);
                 
                 set( gca, 'TickDir', 'out' );
                 

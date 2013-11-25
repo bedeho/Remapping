@@ -111,7 +111,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
         % 'Filtered' directory, since it has filtered output
         simulation = listing(d).name;
 
-        if listing(d).isdir && ~any(strcmp(simulation, {'Filtered', 'Images', '.', '..'})),
+        if listing(d).isdir && ~any(strcmp(simulation, {'Filtered', 'Images', '.', '..'})) && ~strcmp(simulation(1:5), 'STIM-'),
             
             disp(['******** Simulation ' num2str(counter) ' out of ' num2str((nnz([listing(:).isdir]) - 2)) '********']); 
             counter = counter + 1;

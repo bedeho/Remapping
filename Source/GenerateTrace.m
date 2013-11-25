@@ -56,7 +56,9 @@ function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, h
                 % point needs to correct for delay between prior time step
                 % and saccade onset event to find saccade start position
                 
-                reduceSaccadeTimeInPresentTimeStepWith = timeOffset;
+                %reduceSaccadeTimeInPresentTimeStepWith = timeOffset;
+                
+                timeStepSaccadeMagnitude = timeOffset*saccadeSpeed;
                 
                 % Keep track of where we want to go
                 newEyePosition = eyePositionTrace(t-1) + saccadeTargets(numCompletedSaccades+1);
@@ -65,14 +67,16 @@ function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, h
                 % no, we passed at some previous time, so mini saccade starting
                 % point is just last eye position
                 
-                reduceSaccadeTimeInPresentTimeStepWith = 0;
+                %reduceSaccadeTimeInPresentTimeStepWith = 0;
+                
+                timeStepSaccadeMagnitude = dt*saccadeSpeed;
             end
             
             % Will one more time step moving eyes from
             % eyePositionTrace(t-1) take us past saccade target?
             
             remainingEyePositionOffset = newEyePosition - eyePositionTrace(t-1);
-            timeStepSaccadeMagnitude = (dt - reduceSaccadeTimeInPresentTimeStepWith)*saccadeSpeed;
+            %timeStepSaccadeMagnitude = (dt - reduceSaccadeTimeInPresentTimeStepWith)*saccadeSpeed;
             
             if (timeStepSaccadeMagnitude > abs(remainingEyePositionOffset)),
                 
@@ -85,7 +89,7 @@ function [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, h
             else
                 
                 % no, then lets do the full thing and keep going.
-                eyePositionTrace(t) = eyePositionTrace(t-1) + sign(remainingEyePositionOffset)*saccadeSpeed*dt;
+                eyePositionTrace(t) = eyePositionTrace(t-1) + sign(remainingEyePositionOffset)*timeStepSaccadeMagnitude; %saccadeSpeed*dt;
                 
             end
             
