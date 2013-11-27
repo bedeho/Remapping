@@ -1,0 +1,85 @@
+
+%
+%  remappingPlots.m
+%  Remapping
+%
+%  Created by Bedeho Mender on 27/11/13.
+%  Copyright 2013 OFTNAI. All rights reserved.
+%
+
+function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, FaceColors, Legends)
+
+    % Iterate data sets
+    lat_lower_limit = inf;
+    lat_upper_limit = -inf;
+    
+    for i=1:length(remapping_results),
+
+        remapping_result = remapping_results{i};
+
+        % Index data
+        X_Indx{i} = [remapping_result(:).sacc_index];
+        Y_Indx{i} = [remapping_result(:).stim_index];
+
+        % Latency data
+        X_Lat{i} = [remapping_result(:).stimLatency];
+        Y_Lat{i} = [remapping_result(:).remappingLatency];
+
+        % Fix latency plot limits
+        minStimLat = min(X_Lat{i});
+        maxStimLat = max(Y_Lat{i});
+
+        minRemLat = min(remLat);
+        maxRemLat = max(remLat);
+
+        % Limits for this data set
+        minLat = min(minStimLat, minRemLat);
+        maxLat = max(maxStimLat, maxRemLat);
+
+        % Limits for all data sets so far
+        lat_lower_limit = min(lat_lower_limit, minLat);
+        lat_upper_limit = max(lat_upper_limit, maxLat);
+
+    end
+
+    
+    % 1. scatter remap latency vs. stim control latency
+    Lim = 1.1*[lat_lower_limit lat_upper_limit];
+    
+    if(length(remapping_results) > 1),
+        [remLatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Lat, Y_Lat, 'XTitle', 'Stimulus Control Latency (s)', 'YTitle', 'Remapping Latency (s)', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'Legends', Legends);
+    else
+        [remLatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Lat, Y_Lat, 'XTitle', 'Stimulus Control Latency (s)', 'YTitle', 'Remapping Latency (s)', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim);
+    end
+    axes(scatterAxis);     
+    hold on;
+    plot(Lim,Lim,'--k'); % Add x=y diagonal
+
+    % 2. scatter stim index. vs sacc index.    
+    Lim = [-1 1];
+    
+    [remScatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X, Y, 'XTitle', 'Saccade Index', 'YTitle', 'Stimulus Index', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim);
+    
+    axes(scatterAxis);     
+    hold on;
+    plot(Lim,Lim,'--k');     % Add x=y diagonal
+    plot([0 0],[-1 1],'--g'); % x=0 bar
+    plot([-1 1],[0 0],'--g'); % y=0 bar
+    
+    % 3. remapping index distibution
+    indexFig = figure('Units','pixels','position', [1000 1000 620 300]);
+
+    index = fliplr(sort([remapping_result(:).remapping_index]));
+
+    plot(index);
+    xlim([1 length(index)]);
+    ylim([-0.1 sqrt(2)]);
+
+    hXLabel = xlabel('Neuron Rank');
+    hYLabel = ylabel('Remapping Index');
+
+    set(gca, 'TickDir', 'out', 'FontSize', 14);
+    set([hYLabel hXLabel], 'FontSize', 14);
+    pbaspect([1 0.5 1]);
+        
+end

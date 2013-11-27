@@ -19,6 +19,7 @@ function Analyze(netDir, stimulinames)
     stim_stimuli = [];
     sacc_stimuli = [];
     
+    % Iterate stimuli
     for i = 1:length(stimulinames),
         
         % Load stimuli
@@ -89,144 +90,43 @@ function Analyze(netDir, stimulinames)
             
     end
     
-    %% Stimuli Control
+    % Plots
+    [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusonokiSTIMFigure, CLayerProbeFigure] = ThesisSimulationPlot(experimentFolder);
     
-    f = figure;
-    latency = [StimuliControl_Result(:).latency];
-    maxLatency = max(latency);
-    minLatency = min(latency);
-    dh = (maxLatency - minLatency)/21;
-    
-    if(dh == 0),
-        
-        lat = latency(1);
-        
-        left_bins = fliplr(lat:-0.01:(lat-0.05));
-        right_bins = lat:0.01:(lat+0.05);
-        
-        x = [left_bins right_bins(2:end)];
-    else
-        x = minLatency:dh:maxLatency;
-    end
-    
-    % test in case experiment fails, analysis crashed
-    if ~isnan(x),
-        bar(x,hist(latency,x));
-    end
-    
-    xlabel('Time (s)');
-    ylabel('Frequency');
+    % Stimuli Control
+    saveas(stmCtrlFigure,[netDir filesep 'StimuliControl-summary.png']);
+    saveas(stmCtrlFigure,[netDir filesep 'StimuliControl.eps']);
+    close(stmCtrlFigure);
 
-    saveas(f,[netDir filesep 'StimuliControl-summary.png']);
-    close(f);
+    %saveas(f,[netDir filesep 'DuhamelTruncation-summary.png']);
+    %
+    
+    % Duhamel remapping trace
+    saveas(remTraceScatFig,[netDir filesep name 'DuhamelRemappingTrace-summary.png']);
+    saveas(remTraceScatFig,[netDir filesep name 'DuhamelRemappingTrace.eps']);
+    close(remTraceScatFig);
+    
+    % Duhamel remaping
+    saveas(remScatFig,[netDir filesep name 'DuhamelRemapping-summary.png']);
+    saveas(remScatFig,[netDir filesep name 'DuhamelRemapping.eps']);
+    close(remScatFig);
     
     %{
+    
+    % Kusonoki
+    saveas(kusonokiSACCFigure,[netDir filesep 'Kusonoki-sacc-summary.png']);
+    saveas(kusonokiSACCFigure,[netDir filesep 'Kusonoki-sacc.eps']);
+    close(kusonokiSACCFigure);
+    
+    saveas(kusonokiSTIMFigure,[netDir filesep 'Kusonoki-summary.png']);
+    saveas(kusonokiSTIMFigure,[netDir filesep 'Kusonoki.eps']);
+    close(kusonokiSTIMFigure);
+    
+    % ClayerProbe
+    
+    saveas(CLayerProbeFigure,[netDir filesep 'CLayerProbe-summary.png']);
+    saveas(CLayerProbeFigure,[netDir filesep 'CLayerProbe.eps']);
+    close(CLayerProbeFigure);
+    
     %}
-    
-    %% Duhamel remapping analysis plotting
-    remappingAnalysis(DuhamelRemapping_Result, 'DuhamelRemapping');
-    
-    %% Duhamel trace remapping analysis
-    remappingAnalysis(DuhamelRemappingTrace_Result, 'DuhamelRemappingTrace');
-    
-    %% Duhamel truncation analysis
-    f = figure;
-    hold on;
-    plot([DuhamelTruncation_Result(:).saccadeonset_response], [DuhamelTruncation_Result(:).stim_stim_offset_response], 'or');
-    plot([0 1],[0 1],'--b'); % y=x bar
-    xlabel('Truncation Saccade Onset Response');
-    ylabel('Stimulus Offset Response');
-    xlim([0 1]);
-    ylim([0 1]);
-    axis square;
-
-    saveas(f,[netDir filesep 'DuhamelTruncation-summary.png']);
-    close(f);
-    
-    
-    %% Kusonoki
-    if(exist('kusonokiSTIMAlignedAnalysis') && exist('kusonokiSACCAlignedAnalysis')),
-        
-        f = figure;
-
-        arr_stim = kusonokiSTIMAlignedAnalysis;
-        subplot(2,1,1);
-        hold on;
-        errorbar([arr_stim(:).current_mean], [arr_stim(:).current_std],'-or');
-        errorbar([arr_stim(:).future_mean], [arr_stim(:).future_std],'-ob');
-        legend('Current RF Trials','Future RF Trials');
-        ylim([0 1]);
-
-        arr_sacc = kusonokiSACCAlignedAnalysis;
-        subplot(2,1,2);
-        hold on;
-        errorbar([arr_sacc(:).current_mean], [arr_sacc(:).current_std],'-or');
-        errorbar([arr_sacc(:).future_mean], [arr_sacc(:).future_std],'-ob');
-        legend('Current RF Trials','Future RF Trials');
-        ylim([0 1]);
-
-        saveas(f,[netDir filesep 'Kusonoki-summary.png']);
-        close(f);
-    end
-    
-    
-    %% C PRobe
-    f = figure;
-    plot(CLabeProbe_Neurons_V, CLabeProbe_Neurons_S, 'or');
-    xlabel('Retinal Locaton');
-    ylabel('Saccade Location');
-    
-    saveas(f,[netDir filesep 'CLayerProbe-summary.png']);
-    
-    close(f);
-    
-    
-    function remappingAnalysis(remapping_result, name)
-        
-        % 1. scatter remap latency vs. stim control latency
-        f = figure;
-        hold on;
-        plot([remapping_result(:).stimLatency], [remapping_result(:).remappingLatency], 'or');
-        plot([-0.2 0.2],[-0.2 0.2],'--b'); % y=x bar
-
-        xlabel('Stimulus Control Latency (s)');
-        ylabel('Remapping Latency (s)');
-        xlim([-0.2 0.2]);
-        ylim([-0.2 0.2]);
-        axis square;
-
-        saveas(f,[netDir filesep name '-summary.png']);
-        close(f);
-
-        % 2. scatter stim index. vs sacc index.
-        f = figure;
-        hold on;
-        plot([remapping_result(:).sacc_index], [remapping_result(:).stim_index], 'or');
-        plot([0 0],[-1 1],'--g'); % x=0 bar
-        plot([-1 1],[0 0],'--g'); % y=0 bar
-
-        xlabel('Saccade Index');
-        ylabel('Stimulus Index');
-        xlim([-1 1]);
-        ylim([-1 1]);
-        axis square;
-
-        saveas(f,[netDir filesep name '-summary-0.png']);
-        close(f);
-
-
-        % 3. remapping index distibution
-        f = figure;
-        hold on;
-        x = 0:0.1:sqrt(2);
-        bar(x,hist([remapping_result(:).remapping_index],x));
-
-        xlabel('Remapping Index');
-        ylabel('Frequency');
-        axis square;
-
-        saveas(f,[netDir filesep name '-summary-2.png']);
-        close(f);
-        
-    end
 end

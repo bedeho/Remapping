@@ -11,10 +11,7 @@ function ThesisSingleNeuronPlot()
 
     % Import global variables
     declareGlobalVars();
-    %global STIMULI_FOLDER;
     global EXPERIMENTS_FOLDER;
-    
-    % activityFiles{1} = [EXPERIMENTS_FOLDER 'test/baseline/BlankNetwork/activity-basic-DuhamelRemapping.mat'];
     
     % Basic
     period      = 1;
@@ -27,12 +24,11 @@ function ThesisSingleNeuronPlot()
     colors      = {'-b'; '--k'};
     legends     = {'Untrained'; 'Trained'};
     
-    %%
+    % =======================================
     
     % Load input files
     disp('Loading input files...');
     
-    %stimuli  = load([STIMULI_FOLDER stimuliName filesep 'stim.mat']);
     stimuli  = load([EXPERIMENTS_FOLDER experiment filesep stimuliName filesep 'stim.mat']);
     dt = stimuli.dt;
 
@@ -76,14 +72,8 @@ function ThesisSingleNeuronPlot()
     % Saccade times 
     if ~isempty(s), plot([s s],[-0.05 1],'r'); end 
     
-    set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
-    set(gca,'YTick', [0 1]);
-
+    set(gca,'XTick', ticks, 'XTickLabel', tickLabels, 'YTick', [0 1], 'TickDir', 'out', 'FontSize', 14);
     set([hYLabel hXLabel], 'FontSize', 14);
-    
-    set([gca], 'FontSize', 14);
-    set( gca, 'TickDir', 'out' );
-    
 
     % Add bottom traces
     eyePositionTrace = stimuli.stimuli{period}.eyePositionTrace;
@@ -98,7 +88,6 @@ function ThesisSingleNeuronPlot()
     if(~isempty(retinalTargetTraces)),
         plot(0:(numTimeSteps-1), retinalTargetTraces, 'b');       
     end
-
     
     ylim([-45 45]); % we hard code limit since not all stimuli has stimuli.R_eccentricity
     xlim([1 numTimeSteps]);
