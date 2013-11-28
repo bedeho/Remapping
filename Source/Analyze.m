@@ -75,14 +75,23 @@ function Analyze(netDir, stimulinames)
             disp('Doing Kusonoki analysis...');
             [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKusonoki(activity, stimuli);
             
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'kusonokiSTIMAlignedAnalysis', 'kusonokiSACCAlignedAnalysis');
+            % We also save onset times in analysis file for convenicence
+            % uring plotting            
+            ticks = (stimuli.stimulusOnsetTimes + stimuli.stimulusDuration) - stimuli.saccadeOnset;
+            
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'kusonokiSTIMAlignedAnalysis', 'kusonokiSACCAlignedAnalysis', 'ticks');
             
         elseif strcmp(type,'CLayerProbe'),
             
             disp('Doing C Layer Probe analysis...');
             [CLabeProbe_Neurons_S, CLabeProbe_Neurons_V] = AnalyzeCLayerProbe(activity,  stimuli);
             
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'CLabeProbe_Neurons_S', 'CLabeProbe_Neurons_V');
+            % We also save limits of input to C map for convenicence
+            % uring plotting
+            R_max = stimuli.R_eccentricity;
+            S_max = stimuli.S_eccentricity;
+            
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'CLabeProbe_Neurons_S', 'CLabeProbe_Neurons_V', 'R_max', 'S_max');
             
         else
             disp(['Unkonwn stimuli: ' num2str(stimulinames{i})]);
@@ -91,7 +100,7 @@ function Analyze(netDir, stimulinames)
     end
     
     % Plots
-    [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusonokiSTIMFigure, CLayerProbeFigure] = ThesisSimulationPlot(experimentFolder);
+    [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusonokiSTIMFigure, CLayerProbeFigure] = ThesisSimulationPlot(netDir);
     
     % Stimuli Control
     saveas(stmCtrlFigure,[netDir filesep 'StimuliControl-summary.png']);
@@ -102,16 +111,14 @@ function Analyze(netDir, stimulinames)
     %
     
     % Duhamel remapping trace
-    saveas(remTraceScatFig,[netDir filesep name 'DuhamelRemappingTrace-summary.png']);
-    saveas(remTraceScatFig,[netDir filesep name 'DuhamelRemappingTrace.eps']);
+    saveas(remTraceScatFig,[netDir filesep 'DuhamelRemappingTrace-summary.png']);
+    saveas(remTraceScatFig,[netDir filesep 'DuhamelRemappingTrace.eps']);
     close(remTraceScatFig);
     
     % Duhamel remaping
-    saveas(remScatFig,[netDir filesep name 'DuhamelRemapping-summary.png']);
-    saveas(remScatFig,[netDir filesep name 'DuhamelRemapping.eps']);
+    saveas(remScatFig,[netDir filesep 'DuhamelRemapping-summary.png']);
+    saveas(remScatFig,[netDir filesep 'DuhamelRemapping.eps']);
     close(remScatFig);
-    
-    %{
     
     % Kusonoki
     saveas(kusonokiSACCFigure,[netDir filesep 'Kusonoki-sacc-summary.png']);
@@ -128,5 +135,4 @@ function Analyze(netDir, stimulinames)
     saveas(CLayerProbeFigure,[netDir filesep 'CLayerProbe.eps']);
     close(CLayerProbeFigure);
     
-    %}
 end

@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [stmCtrlFigure, remScatFig, remTraceScatFig] = ThesisSimulationPlot(experimentFolder)
+function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusonokiSTIMFigure, CLayerProbeFigure] = ThesisSimulationPlot(experimentFolder)
 
     % Import global variables
     declareGlobalVars();
@@ -85,32 +85,38 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig] = ThesisSimulationPlot(exp
     KusonokiFile = [experimentFolder filesep 'analysis-basic-Kusonoki.mat'];
     if(exist(KusonokiFile, 'file')),
         
+        % Load analysis data
         Kusonoki = load(KusonokiFile);
         kusonokiSTIMAlignedAnalysis = Kusonoki.kusonokiSTIMAlignedAnalysis;
         kusonokiSACCAlignedAnalysis = Kusonoki.kusonokiSACCAlignedAnalysis;
+        ticks = Kusonoki.ticks;
         
-        %{
-        f = figure;
+        % STIM aligned
+        kusonokiSTIMFigure = figure('Units','pixels','position', [1000 1000 620 300]);
 
         arr_stim = kusonokiSTIMAlignedAnalysis;
-        subplot(2,1,1);
         hold on;
-        errorbar([arr_stim(:).current_mean], [arr_stim(:).current_std],'-or');
-        errorbar([arr_stim(:).future_mean], [arr_stim(:).future_std],'-ob');
-        legend('Current RF Trials','Future RF Trials');
-        ylim([0 1]);
-
+        errorbar(ticks, [arr_stim(:).current_mean], [arr_stim(:).current_std],'-or');
+        errorbar(ticks, [arr_stim(:).future_mean], [arr_stim(:).future_std],'-ob');
+        hLenged = legend('Stimulus in Current RF','Stimulus in Future RF');
+        legend boxoff;
+        hXLabel = xlabel('Time from saccade onset to stimulus off (s)');
+        hYLabel = ylabel({'Average response 0-350ms';'after stimulus onset'});
+        set([hYLabel hXLabel hLenged], 'FontSize', 14);
+        ylim([-0.1 1.1]);
+        
+        % SACC aligned
+        kusonokiSACCFigure = figure('Units','pixels','position', [1000 1000 620 300]);
         arr_sacc = kusonokiSACCAlignedAnalysis;
-        subplot(2,1,2);
         hold on;
-        errorbar([arr_sacc(:).current_mean], [arr_sacc(:).current_std],'-or');
-        errorbar([arr_sacc(:).future_mean], [arr_sacc(:).future_std],'-ob');
-        legend('Current RF Trials','Future RF Trials');
-        ylim([0 1]);
-
-        saveas(f,[netDir filesep 'Kusonoki-summary.png']);
-        close(f);
-        %}
+        errorbar(ticks, [arr_sacc(:).current_mean], [arr_sacc(:).current_std],'-or');
+        errorbar(ticks, [arr_sacc(:).future_mean], [arr_sacc(:).future_std],'-ob');
+        hLenged = legend('Stimulus in Current RF','Stimulus in Future RF');
+        legend boxoff;
+        hXLabel = xlabel('Time from saccade onset to stimulus off (s)');
+        hYLabel = ylabel({'Average response 0-300ms';'after saccade onset'});
+        set([hYLabel hXLabel hLenged], 'FontSize', 14);
+        ylim([-0.1 1.1]);
     end
     
     % Load CLayer Probe File
@@ -120,17 +126,19 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig] = ThesisSimulationPlot(exp
         CLayerProbe = load(CLayerProbeFile);
         CLabeProbe_Neurons_S = CLayerProbe.CLabeProbe_Neurons_S;
         CLabeProbe_Neurons_V = CLayerProbe.CLabeProbe_Neurons_V;
+        R_max = CLayerProbe.R_max;
+        S_max = CLayerProbe.S_max;
         
-        %{
-        f = figure;
+        CLayerProbeFigure = figure('Units','pixels','position', [1000 1000 420 300]);
         plot(CLabeProbe_Neurons_V, CLabeProbe_Neurons_S, 'or');
-        xlabel('Retinal Locaton');
-        ylabel('Saccade Location');
-
-        saveas(f,[netDir filesep 'CLayerProbe-summary.png']);
-
-        close(f);
-        %}
+        hXLabel = xlabel('Retinal Locaton (deg)');
+        hYLabel = ylabel('Saccade Location (deg)');
+        set([hYLabel hXLabel], 'FontSize', 14);
+        
+        xlim(1.1*[-R_max R_max]);
+        ylim(1.1*[-S_max S_max]);
+        pbaspect([2*R_max 2*S_max 1]);
+        
     end
     
     

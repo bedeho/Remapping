@@ -30,6 +30,11 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
     
     if nargin == 4 && exist(CLayerProbleFile), %% HACK
         CLayerProbleFileAnalysis = load(CLayerProbleFile);
+        
+        S = CLayerProbleFileAnalysis.CLabeProbe_Neurons_S;
+        V = CLayerProbleFileAnalysis.CLabeProbe_Neurons_V;
+        R_max = CLayerProbleFileAnalysis.R_max;
+        S_max = CLayerProbleFileAnalysis.S_max;
     end
     
     % Set parameters
@@ -88,6 +93,30 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
     imgR = [];
     imgS = [];
     imgC = [];
+    
+    % Fix R axes ticks
+    R_preferences = -stimuli.R_eccentricity:1:stimuli.R_eccentricity;
+    
+    rTicks = 1:length(R_preferences);
+    rdist = 15;
+    rTicks = rTicks(1:rdist:end);
+    rLabels = R_preferences(1:rdist:end);
+    rCellLabels = cell(1,length(rLabels));
+    for i=1:length(rLabels),
+      rCellLabels{i} = num2str(rLabels(i));
+    end
+    
+    % Fix S axes ticks
+    S_preferences = -stimuli.S_eccentricity:1:stimuli.S_eccentricity;
+    
+    sTicks = 1:length(S_preferences);
+    sdist = 5;
+    sTicks = sTicks(1:sdist:end);
+    sLabels = S_preferences(1:sdist:end);
+    sCellLabels = cell(1,length(sLabels));
+    for i=1:length(sLabels),
+      sCellLabels{i} = num2str(sLabels(i));
+    end
     
     % Do first plot
     display();
@@ -363,73 +392,119 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
                 
                 if(strcmp(region,'V')),
                     
-                    V_to_C_weights = network.V_to_C_weights;
-                    
-                    maxSynapseWeight = max(max(V_to_C_weights));
-                    
-                    S = CLayerProbleFileAnalysis.CLabeProbe_Neurons_S;
-                    V = CLayerProbleFileAnalysis.CLabeProbe_Neurons_V;
-                    
-                    min_S = min(S);
-                    max_S = max(S);
-                    
-                    min_V = min(V);
-                    max_V = max(V);
-                    
-                    min_ = min(min_S, min_V);
-                    max_ = max(max_S, max_V);
-                    
-                    numCSynapses = length(S);
-
-                    figure;
+                    figure('Units','pixels','position', [1000 1000 420 300]);
                     hold on;
+                    
+                    synapticEfferents = network.V_to_C_weights(:, neuron);
+                    maxWeight = max(synapticEfferents);
+                    num = length(synapticEfferents);
 
-                    for i=1:numCSynapses,
-                        synapticWeights = V_to_C_weights(i,neuron);
-                        plot(V(i),S(i),'o','Color',[1, 1 -  synapticWeights/maxSynapseWeight, 1 -  synapticWeights/maxSynapseWeight]);
+                    for i=1:num,
+                        weight = synapticEfferents(i);
+                        plot(V(i),S(i),'o','Color',[1, 1 -  weight/maxWeight, 1 -  weight/maxWeight]);
                     end
                     
-                    xlim([min_ max_]);
-                    ylim([min_ max_]);
+                    hXLabel = xlabel('Retinal Locaton (deg)');
+                    hYLabel = ylabel('Saccade Location (deg)');
+                    set([hYLabel hXLabel], 'FontSize', 14);
+
+                    box on;
                     
-                    hXLabel = xlabel('Retinal Location (deg)');
-                    hYLabel = ylabel('Saccade Target (deg)');
-                    set([hYLabel hXLabel], 'FontSize', 20);
-                    set([gca], 'FontSize', 18);
+                    xlim(1.1*[-R_max R_max]);
+                    ylim(1.1*[-S_max S_max]);
+                    pbaspect([2*R_max 2*S_max 1]);
                     
                 elseif(strcmp(region,'R')),
                     
-                    figure;
-                    R_weightvector = network.C_to_R_weights(neuron,:);
-                    plot(R_weightvector);
+                    figure('Units','pixels','position', [1000 1000 420 300]);
+                    hold on;
                     
+                    synapticAfferents = network.C_to_R_weights(neuron, :);
+                    maxWeight = max(synapticAfferents);
+                    num = length(synapticAfferents);
+                    
+                    for i=1:num,
+                        weight = synapticAfferents(i);
+                        plot(V(i),S(i),'o','Color',[1, 1 -  weight/maxWeight, 1 -  weight/maxWeight]);
+                    end
+                    
+                    hXLabel = xlabel('Retinal Locaton (deg)');
+                    hYLabel = ylabel('Saccade Location (deg)');
+                    set([hYLabel hXLabel], 'FontSize', 14);
+
+                    box on;
+                    
+                    xlim(1.1*[-R_max R_max]);
+                    ylim(1.1*[-S_max S_max]);
+                    pbaspect([2*R_max 2*S_max 1]);
+
                 elseif(strcmp(region,'S')),
-                    %responseTrace = activity.S_firing_history(neuron, :, period, epoch);
+                    
+                    figure('Units','pixels','position', [1000 1000 420 300]);
+                    hold on;
+                    
+                    synapticEfferents = network.S_to_C_weights(:, neuron);
+                    maxWeight = max(synapticEfferents);
+                    num = length(synapticEfferents);
+
+                    for i=1:num,
+                        weight = synapticEfferents(i);
+                        plot(V(i),S(i),'o','Color',[1, 1 -  weight/maxWeight, 1 -  weight/maxWeight]);
+                    end
+                    
+                    hXLabel = xlabel('Retinal Locaton (deg)');
+                    hYLabel = ylabel('Saccade Location (deg)');
+                    set([hYLabel hXLabel], 'FontSize', 14);
+
+                    box on;
+                    
+                    xlim(1.1*[-R_max R_max]);
+                    ylim(1.1*[-S_max S_max]);
+                    pbaspect([2*R_max 2*S_max 1]);
+                    
                 elseif(strcmp(region,'C')),
                     
                     C_to_R_weightvector = network.C_to_R_weights(:, neuron);
                     S_to_C_afferents =  network.S_to_C_weights(neuron, :);
                     V_to_C_afferents = network.V_to_C_weights(neuron, :);
-                    
-                    figure;
 
-                    subplot(1,3,1);
+                    % 'S->C'
+                    figure('Units','pixels','position', [1000 1000 420 240]);
                     plot(S_to_C_afferents);
                     axis tight;
-                    ylim([0 1]);
-                    title('S->C');
+                    ylim([0 max(S_to_C_afferents)]);
                     
-                    subplot(1,3,2);
+                    hXLabel = xlabel('Saccade Location (deg)');
+                    hYLabel = ylabel('Synaptic weight');
+                    set([hYLabel hXLabel], 'FontSize', 14);
+                    set(gca,'XTick', sTicks, 'XTickLabel', sCellLabels);
+                    pbaspect([1, 30/length(S_preferences), 1]);
+                    
+                    % 'V->C'
+                    figure('Units','pixels','position', [1000 1000 420 180]);
                     plot(V_to_C_afferents);
                     axis tight;
-                    ylim([0 1]);
-                    title('V->C');
+                    ylim([0 max(V_to_C_afferents)]);
                     
-                    subplot(1,3,3);
+                    hXLabel = xlabel('Retinal Location (deg)');
+                    hYLabel = ylabel('Synaptic weight');
+                    set([hYLabel hXLabel], 'FontSize', 14);
+                    set(gca,'XTick', rTicks, 'XTickLabel', rCellLabels);
+                    pbaspect([1, 30/length(R_preferences), 1]);
+                    
+                    
+                    % 'C->R'
+                    figure('Units','pixels','position', [1000 1000 420 180]);
                     plot(C_to_R_weightvector);
                     axis tight;
-                   % ylim([0 0.4]);
-                    title('C->R');
+                    ylim([0 max(C_to_R_weightvector)]);
+                    
+                    hXLabel = xlabel('Retinal Location (deg)');
+                    hYLabel = ylabel('Synaptic weight');
+                    set([hYLabel hXLabel], 'FontSize', 14);
+                    set(gca,'XTick', rTicks, 'XTickLabel', rCellLabels);
+                    pbaspect([1, 30/length(R_preferences), 1]);
+                    
                 end
 
             end

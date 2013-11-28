@@ -20,9 +20,12 @@ function ThesisSingleNeuronPlot()
     experiment  = 'test';
     stimuliName = 'STIM-basic-DuhamelRemapping';
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork/activity-basic-DuhamelRemapping.mat'];
+    colors{1}   = [67,82,163]/255;
+    legends{1}  = 'Untrained';
+    
     activityFiles{2} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/activity-basic-DuhamelRemapping.mat'];
-    colors      = {'-b'; '--k'};
-    legends     = {'Untrained'; 'Trained'};
+    colors{2}   = [44,180,44]/255;
+    legends{2}  = 'Trained';
     
     % =======================================
     
@@ -57,7 +60,7 @@ function ThesisSingleNeuronPlot()
         responseTrace = activity.R_firing_history(neuron, :, period, epoch);
         
         % Plot
-        plot(1:numTimeSteps, responseTrace, colors{i});
+        plot(1:numTimeSteps, responseTrace, 'Color', colors{i});
         
     end
     
@@ -67,7 +70,7 @@ function ThesisSingleNeuronPlot()
     ylim([-0.05 max(1, max(responseTrace))]);
     xlim([1 numTimeSteps]);
     legend(legends);
-    legend('boxoff');
+    legend boxoff;
 
     % Saccade times 
     if ~isempty(s), plot([s s],[-0.05 1],'r'); end 

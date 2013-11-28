@@ -119,4 +119,5 @@ function [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKus
         kusonokiSACCAlignedAnalysis(i).future_mean = mean(sacc_buffer{2,i});
         kusonokiSACCAlignedAnalysis(i).future_std  = std(sacc_buffer{2,i});
     end
+   
 end

@@ -14,7 +14,7 @@ function ThesisExperimentPlot()
     global EXPERIMENTS_FOLDER;
     
     % Basic
-    experiment  = 'test';
+    experiment  = 'test_plotting';
     
     simulationFolder{1} = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork/'];
     Legends{1}          = 'Untrained';
@@ -22,7 +22,7 @@ function ThesisExperimentPlot()
     
     simulationFolder{2} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/'];
     Legends{2}          = 'Trained';
-    FaceColors{2}       = '--k';
+    FaceColors{2}       = [238,48,44]/255;
     
     % Iterate Simulations
     for i=1:length(simulationFolder),

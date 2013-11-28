@@ -5,7 +5,7 @@
     global STIMULI_FOLDER;
     global EXPERIMENTS_FOLDER;
     
-    experimentName = 'test'; % baseline-multiRF3-tuneC-to-Rpsi
+    experimentName = 'test_plotting'; % baseline-multiRF3-tuneC-to-Rpsi
     
     experimentFolder = [EXPERIMENTS_FOLDER experimentName filesep];
     

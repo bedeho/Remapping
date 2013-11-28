@@ -27,10 +27,10 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
 
         % Fix latency plot limits
         minStimLat = min(X_Lat{i});
-        maxStimLat = max(Y_Lat{i});
+        maxStimLat = max(X_Lat{i});
 
-        minRemLat = min(remLat);
-        maxRemLat = max(remLat);
+        minRemLat = min(Y_Lat{i});
+        maxRemLat = max(Y_Lat{i});
 
         % Limits for this data set
         minLat = min(minStimLat, minRemLat);
@@ -41,7 +41,6 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
         lat_upper_limit = max(lat_upper_limit, maxLat);
 
     end
-
     
     % 1. scatter remap latency vs. stim control latency
     Lim = 1.1*[lat_lower_limit lat_upper_limit];
@@ -58,7 +57,11 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
     % 2. scatter stim index. vs sacc index.    
     Lim = [-1 1];
     
-    [remScatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X, Y, 'XTitle', 'Saccade Index', 'YTitle', 'Stimulus Index', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim);
+    if(length(remapping_results) > 1),
+        [remScatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Indx, Y_Indx, 'XTitle', 'Saccade Index', 'YTitle', 'Stimulus Index', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'Legends', Legends);
+    else
+        [remScatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Indx, Y_Indx, 'XTitle', 'Saccade Index', 'YTitle', 'Stimulus Index', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim);
+    end
     
     axes(scatterAxis);     
     hold on;
@@ -68,10 +71,20 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
     
     % 3. remapping index distibution
     indexFig = figure('Units','pixels','position', [1000 1000 620 300]);
+    hold on;
+    
+    for i=1:length(remapping_results),
+        
+        remapping_result = remapping_results{i};
+        index = fliplr(sort([remapping_result(:).remapping_index]));
+        plot(index, 'Color' , FaceColors{i});
 
-    index = fliplr(sort([remapping_result(:).remapping_index]));
-
-    plot(index);
+    end
+    
+    if(length(remapping_results) > 1),
+        legend(Legends);
+    end
+    
     xlim([1 length(index)]);
     ylim([-0.1 sqrt(2)]);
 
