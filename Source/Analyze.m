@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Analyze(netDir, stimulinames)
+function Analyze(experimentFolder, netDir, stimulinames)
 
     % Import global variables
     declareGlobalVars();
@@ -24,7 +24,13 @@ function Analyze(netDir, stimulinames)
         
         % Load stimuli
         disp(['Loading stimuli: ' stimulinames{i}]);
-        stimuliFile = [STIMULI_FOLDER stimulinames{i} filesep 'stim.mat'];
+        
+        % OLD GLOBAL
+        %stimuliFile = [STIMULI_FOLDER stimulinames{i} filesep 'stim.mat'];
+        
+        %LOCAL
+        stimuliFile = [experimentFolder 'STIM-' stimulinames{i} filesep 'stim.mat'];
+        
         stimuli  = load(stimuliFile);
         type = stimuli.stimulitype;
         

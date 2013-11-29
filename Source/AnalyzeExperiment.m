@@ -11,7 +11,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
 
     % Experiment name 
     if nargin < 1,
-        experiment = 'test_plotting';%'prewired';
+        experiment = 'test_plotting'; %test_plotting';%'prewired';
     end
     
     % Stimuli names
@@ -47,7 +47,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
 
         simulation = listing(d).name;
 
-        if listing(d).isdir && ~any(strcmp(simulation, {'Filtered', 'Images', '.', '..'})),
+        if listing(d).isdir && ~any(strcmp(simulation, {'Filtered', 'Images', '.', '..'})) && ~strcmp(simulation(1:5), 'STIM-'),
             [parameters, nrOfParams] = getParameters(simulation);
             break;
         end
@@ -111,11 +111,11 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
 
         if listing(d).isdir && ~any(strcmp(simulation, {'Filtered', 'Images', '.', '..'})) && ~strcmp(simulation(1:5), 'STIM-'),
             
-            disp(['******** Simulation ' num2str(counter) ' out of ' num2str((nnz([listing(:).isdir]) - 2)) '********']); 
+            disp(['******** Simulation ' num2str(counter) ' ********']); % ' out of ' num2str((nnz([listing(:).isdir]) - 2)) '
             counter = counter + 1;
             
             % Iterate simulations in this experiment folder
-            simulationFolder = [EXPERIMENTS_FOLDER experiment filesep simulation];
+            simulationFolder = [experimentFolder simulation];
             simulationListing = dir(simulationFolder); 
 
             for s=1:length(simulationListing),
@@ -125,12 +125,14 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                 if simulationListing(s).isdir && ~any(strcmp(network, {'Training', '.', '..'})),
                     
                     % color all these rows in same color
+                    
                     netDir = [simulationFolder filesep network];
-                    netDirRelative = [simulation filesep network];
-                    trDir = [experimentFolder simulation filesep 'Training'];
+                    
+                    %netDirRelative = [simulation filesep network];
+                    %trDir = [experimentFolder simulation filesep 'Training'];
                     
                     % Do analysis
-                    Analyze(netDir, stimulinames);
+                    Analyze(experimentFolder, netDir, stimulinames);
 
                     % Start row
                     fprintf(fileID, '<tr>');

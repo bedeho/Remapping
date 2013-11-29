@@ -1,13 +1,6 @@
     
-    %% Import global variables
-    declareGlobalVars();
+    experimentName = 'baseline-multiRF-epoch10'; % baseline-multiRF3-tuneC-to-Rpsi
     
-    global STIMULI_FOLDER;
-    global EXPERIMENTS_FOLDER;
-    
-    experimentName = 'test_plotting'; % baseline-multiRF3-tuneC-to-Rpsi
-    
-    experimentFolder = [EXPERIMENTS_FOLDER experimentName filesep];
     
     %% DO NOT CHANGE, basic2 has fixed dt
     %dt = 0.010; 
@@ -57,28 +50,6 @@
                     'basic-DuhamelRemappingTrace', ... 
                     'basic-DuhamelTruncation', ...
                     'basic-Kusonoki'}; % , ... 'basic-Kusonoki'
-
+    
     %% Run
     GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli);
-    
-    %% Backup 
-
-    % Compress source code folder
-    system(['tar -cjvf ' experimentFolder 'source.tbz .']);
-    
-    % Iterate stimuli and move to experiment
-    for s=1:length(stimulinames),
-        
-        % Get stimuli name
-        stimName = stimulinames{s};
-        
-        % Get stimuli folder
-        stimuliFolder = [STIMULI_FOLDER stimName];
-        
-        % Compress stimuli folder
-        %system(['tar -cjvPf ' experimentFolder stimName '.tbz ' stimuliFolder]);
-        
-        % Copy stimuli folder
-        copyfile(stimuliFolder,[experimentFolder 'STIM-' stimName]);
-    
-    end

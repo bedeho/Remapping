@@ -12,6 +12,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     % Import global variables
     declareGlobalVars();
     global EXPERIMENTS_FOLDER;
+    global STIMULI_FOLDER;
     
     % Experiment parameters
     %Name = 'prewired'; 
@@ -30,11 +31,33 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     
     mkdir(experimentFolderPath);
     
+    %% Stimuli Backup 
+
+    % Compress source code folder
+    system(['tar -cjvf ' experimentFolderPath filesep 'source.tbz .']);
+    
+    % Iterate stimuli and move to experiment
+    for s=1:length(stimulinames),
+        
+        % Get stimuli name
+        stimName = stimulinames{s};
+        
+        % Get stimuli folder
+        stimuliFolder = [STIMULI_FOLDER stimName];
+        
+        % Compress stimuli folder
+        %system(['tar -cjvPf ' experimentFolder stimName '.tbz ' stimuliFolder]);
+        
+        % Copy stimuli folder
+        copyfile(stimuliFolder,[experimentFolderPath filesep 'STIM-' stimName]);
+    
+    end
+    
     %% Specify main paramters
     parameterCombinations = containers.Map;
     
     % Simulations Paramters
-    numTrainingEpochs = 1;%10;
+    numTrainingEpochs = 10;%10;
     doTrain = (nargin == 4) && (numTrainingEpochs > 0);
     outputSavingRate = 1; % Period of time step saving during testing.
     assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
