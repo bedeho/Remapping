@@ -7,15 +7,13 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProbleFile)
+function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProbleFile)
 
     % Import global variables
     declareGlobalVars();
-    global STIMULI_FOLDER;
     
     if nargin == 0,
         activityFile    = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/Experiments/prewired/baseline/PrewiredNetwork/activity-basic-KusonokiTesting.mat';
-        stimuliName     = 'basic-KusonokiTesting';
     end
 
     % CLayerProbe
@@ -25,8 +23,9 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
     % Load input files
     disp('Loading input files...');
     activity = load(activityFile);
-    stimuli  = load([STIMULI_FOLDER stimuliName filesep 'stim.mat']);
+    stimuli  = load([stimuliFile filesep 'stim.mat']);
     network = load(networkFile);
+    stimuliType = stimuli.stimulitype;
     
     if nargin == 4 && exist(CLayerProbleFile), %% HACK
         CLayerProbleFileAnalysis = load(CLayerProbleFile);
@@ -43,7 +42,7 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
     dt = stimuli.dt;
     
     % Make figure
-    figure('name',stimuliName,'Position', [100, 100, 1049, 895]);
+    figure('name',stimuliType,'Position', [100, 100, 1049, 895]);
     
     % Adding controls
     if activity.numEpochs > 1
@@ -95,7 +94,12 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
     imgC = [];
     
     % Fix R axes ticks
-    R_preferences = -stimuli.R_eccentricity:1:stimuli.R_eccentricity;
+    if(isfield(stimuli,'R_eccentricity'))
+        R_eccentricity = stimuli.R_eccentricity;
+    else
+        R_eccentricity = 45;
+    end
+    R_preferences = -R_eccentricity:1:R_eccentricity;
     
     rTicks = 1:length(R_preferences);
     rdist = 15;
@@ -107,7 +111,13 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
     end
     
     % Fix S axes ticks
-    S_preferences = -stimuli.S_eccentricity:1:stimuli.S_eccentricity;
+    if(isfield(stimuli,'S_eccentricity'))
+        S_eccentricity = stimuli.S_eccentricity;
+    else
+        S_eccentricity = 30;
+    end
+    
+    S_preferences = -S_eccentricity:1:S_eccentricity;
     
     sTicks = 1:length(S_preferences);
     sdist = 5;
@@ -344,6 +354,10 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
             
             if(strcmp(clickType, 'normal')), % response trace
 
+                %
+                % response trace
+                %
+                
                 figure('Units','normalized','position',[.1 .1 .22 .1]);
                 hold on;
 
@@ -384,9 +398,40 @@ function viewNeuronDynamics(activityFile, stimuliName, networkFile, CLayerProble
                 set([hYLabel ], 'FontSize', 14);
                 set([hXLabel], 'FontSize', 16);
                 set([gca], 'FontSize', 14);
-                %daspect([40 1 1]);
-                
                 set( gca, 'TickDir', 'out' );
+                
+                %
+                % Stimuli trace
+                %
+                
+                figure('Units','normalized','position',[.1 .1 .22 .1]);
+                hold on;
+
+                eyePositionTrace = stimuli.stimuli{period}.eyePositionTrace;
+                retinalTargetTraces = stimuli.stimuli{period}.retinalTargetTraces';
+            
+                plot(1:numTimeSteps, eyePositionTrace, 'r');
+
+                hXLabel = xlabel('Time (s)');
+                hYLabel = ylabel('Location (deg)');
+                ylim([-45 45]);
+                xlim([1 numTimeSteps]);
+                
+                if(~isempty(retinalTargetTraces)),
+                    plot(1:numTimeSteps, retinalTargetTraces, 'b');
+                    legend({'Eye','Stimuli'});
+                else
+
+                    legend({'Eye'});            
+                end
+                
+                
+                legend('Location','NorthWest')
+                legend boxoff
+                set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
+                set(hYLabel, 'FontSize', 14);
+                set(hXLabel, 'FontSize', 14);
+                set(gca, 'FontSize', 10, 'TickDir', 'out' ,'YDir','reverse');
                 
             else % weight vectors!
                 

@@ -89,7 +89,7 @@ function ThesisSingleNeuronPlot()
     plot(1:numTimeSteps, eyePositionTrace, 'r');
 
     if(~isempty(retinalTargetTraces)),
-        plot(0:(numTimeSteps-1), retinalTargetTraces, 'b');       
+        plot(1:numTimeSteps, retinalTargetTraces, 'b');       
     end
     
     ylim([-45 45]); % we hard code limit since not all stimuli has stimuli.R_eccentricity

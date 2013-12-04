@@ -53,16 +53,19 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     
     end
     
+    % Copy training stimuli folder as well
+    copyfile([STIMULI_FOLDER trainingStimuli], [experimentFolderPath filesep 'STIM-' trainingStimuli]);
+    
     %% Specify main paramters
     parameterCombinations = containers.Map;
     
     % Simulations Paramters
-    numTrainingEpochs = 10;%10;
+    numTrainingEpochs = 1;%20;%10;
     doTrain = (nargin == 4) && (numTrainingEpochs > 0);
     outputSavingRate = 1; % Period of time step saving during testing.
     assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
     
-    saveActivityInTraining = true;
+    saveActivityInTraining = true;%false;
     saveNetworksAtEpochMultiples = 333; % Save network at this resolution
     seed = 13;
     
@@ -113,7 +116,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     parameterCombinations('C_threshold')            = [15]; % 15 WORKS.
     parameterCombinations('C_threshold_sigma')      = [0]; % dont change!
     parameterCombinations('C_slope')                = [100]; % prewired 100, classic= 500
-    parameterCombinations('C_to_R_psi')             = [8]; %10 8 6 4, NEW: 0.09 or? 0.19, CHANGE BACK: 30, 15, prewwired=0.05,0.1 works well, classic: 0.4
+    parameterCombinations('C_to_R_psi')             = [4]; %10 8 6 4, NEW: 0.09 or? 0.19, CHANGE BACK: 30, 15, prewwired=0.05,0.1 works well, classic: 0.4
     parameterCombinations('C_to_R_alpha')           = [0.1]; % WORKS (no covariance): 0.20 0.1 to small? learning rate
     parameterCombinations('C_to_R_connectivity')    = [1]; %0.5 [0 1]
     

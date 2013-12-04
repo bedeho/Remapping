@@ -87,16 +87,17 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
     
     fprintf(fileID, '<th>Summary</th>');
     
-    stimuli_files = cell(1,length(stimulinames));
     stimuli_types = cell(1,length(stimulinames))';
     for i = 1:length(stimulinames),
         
         fprintf(fileID, ['<th>' stimulinames{i} '</th>']);
-        stimuliFile         = [STIMULI_FOLDER stimulinames{i} filesep 'stim.mat'];
-        stimuli             = load(stimuliFile);
+        stimuli             = load([STIMULI_FOLDER stimulinames{i} filesep 'stim.mat']);
         stimuli_types{i}    = stimuli.stimulitype;
+        stimuli_file{i}     = [experimentFolder 'STIM-' stimulinames{i}];
         
     end
+    
+    trainingStimuliFile = [experimentFolder 'STIM-' trainingStimuli];
     
     counter = 1;
     
@@ -153,7 +154,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                     % Summary
                     fprintf(fileID, '<td>');
                     %fprintf(fileID, '<img src="%s" width="350px" height="350px"/>\n', [netDir filesep 'summary.png']);
-                    outputButton('Training', ['matlab:viewNeuronDynamics(\\''' simulationFolder filesep 'activity-' trainingStimuli '.mat\\'',\\''' trainingStimuli '\\'',\\''' [netDir filesep network '.mat'] '\\'',\\''' netDir filesep 'analysis-basic-CLayerProbe.mat\\'')']);
+                    outputButton('Training', ['matlab:viewNeuronDynamics(\\''' simulationFolder filesep 'activity-' trainingStimuli '.mat\\'',\\''' trainingStimuliFile '\\'',\\''' [netDir filesep network '.mat'] '\\'',\\''' netDir filesep 'analysis-basic-CLayerProbe.mat\\'')']);
                     fprintf(fileID, '</td>');
                     
                     % Stimuli
@@ -169,7 +170,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                         end
                         
                         % Button
-                        outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'',\\''' stimulinames{i} '\\'',\\''' [netDir filesep network '.mat'] '\\'',\\''' netDir filesep 'analysis-basic-CLayerProbe.mat\\'')']);
+                        outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'',\\''' stimuli_file{i} '\\'',\\''' [netDir filesep network '.mat'] '\\'',\\''' netDir filesep 'analysis-basic-CLayerProbe.mat\\'')']);
                         
                         fprintf(fileID, '</td>');
                     end

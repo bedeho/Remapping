@@ -1,5 +1,5 @@
     
-    experimentName = 'baseline-multiRF-epoch10'; % baseline-multiRF3-tuneC-to-Rpsi
+    experimentName = 'prewired'; % baseline-multiRF3-tuneC-to-Rpsi
     
     
     %% DO NOT CHANGE, basic2 has fixed dt
