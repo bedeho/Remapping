@@ -11,7 +11,7 @@ function CreatePrewiredNetwork(outputfile, R_preferences, S_preferences, C_N, C_
  
     R_N = length(R_preferences);
     S_N = length(S_preferences);
-    %C_N = S_N*R_N;
+    C_N = S_N*R_N; % override manual C_N
 
     % Prewired
     [X Y Z] = meshgrid(R_preferences, S_preferences, R_preferences);

@@ -9,6 +9,10 @@
 
 function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, FaceColors, Legends)
 
+
+    AxisFontSize = 12;
+    LabelFontSize  = 14;
+
     % Iterate data sets
     lat_lower_limit = inf;
     lat_upper_limit = -inf;
@@ -21,9 +25,9 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
         X_Indx{i} = [remapping_result(:).sacc_index];
         Y_Indx{i} = [remapping_result(:).stim_index];
 
-        % Latency data
-        X_Lat{i} = [remapping_result(:).stimLatency];
-        Y_Lat{i} = [remapping_result(:).remappingLatency];
+        % Latency data: turn into ms for plotting
+        X_Lat{i} = 1000*[remapping_result(:).stimLatency];
+        Y_Lat{i} = 1000*[remapping_result(:).remappingLatency];
 
         % Fix latency plot limits
         minStimLat = min(X_Lat{i});
@@ -46,9 +50,9 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
     Lim = 1.1*[lat_lower_limit lat_upper_limit];
     
     if(length(remapping_results) > 1),
-        [remLatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Lat, Y_Lat, 'XTitle', 'Stimulus Control Latency (s)', 'YTitle', 'Remapping Latency (s)', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'Legends', Legends);
+        [remLatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Lat, Y_Lat, 'XTitle', 'Stimulus Control Latency (ms)', 'YTitle', 'Remapping Latency (ms)', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'Legends', Legends, 'AxisFontSize', AxisFontSize, 'LabelFontSize', LabelFontSize);
     else
-        [remLatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Lat, Y_Lat, 'XTitle', 'Stimulus Control Latency (s)', 'YTitle', 'Remapping Latency (s)', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim);
+        [remLatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Lat, Y_Lat, 'XTitle', 'Stimulus Control Latency (ms)', 'YTitle', 'Remapping Latency (ms)', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'AxisFontSize', AxisFontSize, 'LabelFontSize', LabelFontSize);
     end
     axes(scatterAxis);     
     hold on;
@@ -58,9 +62,9 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
     Lim = [-1 1];
     
     if(length(remapping_results) > 1),
-        [remScatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Indx, Y_Indx, 'XTitle', 'Saccade Index', 'YTitle', 'Stimulus Index', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'Legends', Legends);
+        [remScatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Indx, Y_Indx, 'XTitle', 'Saccade Index', 'YTitle', 'Stimulus Index', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'Legends', Legends, 'AxisFontSize', AxisFontSize, 'LabelFontSize', LabelFontSize);
     else
-        [remScatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Indx, Y_Indx, 'XTitle', 'Saccade Index', 'YTitle', 'Stimulus Index', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim);
+        [remScatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Indx, Y_Indx, 'XTitle', 'Saccade Index', 'YTitle', 'Stimulus Index', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'AxisFontSize', AxisFontSize, 'LabelFontSize', LabelFontSize);
     end
     
     axes(scatterAxis);     
@@ -70,7 +74,8 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
     plot([-1 1],[0 0],'--g'); % y=0 bar
     
     % 3. remapping index distibution
-    indexFig = figure('Units','pixels','position', [1000 1000 620 300]);
+    %indexFig = figure('Units','pixels','position', [1000 1000 620 300]);
+    indexFig = figure('Units','pixels','position', [1000 1000 300 300]);
     hold on;
     
     for i=1:length(remapping_results),
@@ -93,6 +98,7 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
 
     set(gca, 'TickDir', 'out', 'FontSize', 14);
     set([hYLabel hXLabel], 'FontSize', 14);
-    pbaspect([1 0.5 1]);
+    %pbaspect([1 0.5 1]);
+    box on;
         
 end

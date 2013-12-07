@@ -35,7 +35,7 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
     Duration                        = dtRoundUpPeriod(saccadeOnset + (2*S_eccentricity/saccadeSpeed) + fixationPeriod, dt); % (s), the middle part of sum is to account for maximum saccade times
     saccades                        = -S_eccentricity:S_density:S_eccentricity;
     
-    %Training_RF_Locations           = (-R_eccentricity+minimum_Saccade_Amplitude):R_density:(R_eccentricity-minimum_Saccade_Amplitude);
+    Training_RF_Locations           = (-R_eccentricity+minimum_Saccade_Amplitude):R_density:(R_eccentricity-minimum_Saccade_Amplitude);
     
     %Training_RF_Locations           = [-20 -17 -15 -12 -10 -7 -5 -2 0 2 5 7 10 12 15 17 20];
     
@@ -43,7 +43,7 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
     
     %Training_RF_Locations           = [-20 -10 0 10 20];
     
-    Training_RF_Locations           = [-20 20];
+    %Training_RF_Locations           = [-20 20];
     
     %Training_RF_Locations           = [0];
     
@@ -116,14 +116,6 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
         
     end
     
-    
-    plot(Training_RF_Locations, Training_Saccades, 'or');
-    xlabel('RF Location (deg)');
-    xlim([-R_eccentricity R_eccentricity]);
-    ylabel('Saccade (deg)');
-    ylim([-S_eccentricity S_eccentricity]);
-    
-   
     % Save params
     stimuliFolder = [base 'Stimuli' filesep filename];
     
@@ -133,6 +125,7 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
     
     mkdir(stimuliFolder);
     
+    % Save stimuli
     save([stimuliFolder filesep 'stim.mat'] , ...
                                     'S_eccentricity', ...
                                     'S_density', ...
@@ -147,6 +140,19 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
                                     'dt', ...
                                     'seed');
                                 
-                                
+    % Make, save & close figure
+    f = figure('Units','pixels','position', [1000 1000 420 300]);
+    plot(Training_RF_Locations, Training_Saccades, 'or');
+
+    hXLabel = xlabel('Retinal Locaton (deg)');
+    hYLabel = ylabel('Saccade (deg)');
+    set([hYLabel hXLabel], 'FontSize', 14);
+    set(gca, 'FontSize', 12);
+    xlim(1.1*[-R_eccentricity R_eccentricity]);
+    ylim(1.1*[-S_eccentricity S_eccentricity]);
+    pbaspect([2*S_eccentricity 2*S_eccentricity 1]);
+
+    saveas(f, [stimuliFolder filesep 'trainingstimuli.eps']);
+    close(f);
 
 end

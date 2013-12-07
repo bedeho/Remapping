@@ -1,4 +1,6 @@
-    
+
+function quickrun()
+
     experimentName = 'prewired'; % baseline-multiRF3-tuneC-to-Rpsi
     
     
@@ -53,3 +55,5 @@
     
     %% Run
     GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli);
+
+end

@@ -29,35 +29,45 @@ function Testing_DuhamelRemapping(Name, dt, Training_RF_Locations, Training_Sacc
     saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!
     
     % Training_RF_Locations, Training_Saccades
+    saccadeDelayTime                = (2*S_eccentricity/saccadeSpeed) + 0.05; % round to nearest hundred above
     
     if nargin < 9,
         
         % Temporal
         stimulitype                     = 'DuhamelRemapping';
         saccadeOnset                    = 0.300; % (s) w.r.t start of task
-        stimuliDuration                 = 0.100; % 0.100; (s)
-        stimuliOnset                    = saccadeOnset - 2*stimuliDuration; % (s) w.r.t start of task
+        stimuliOnset                    = 0.100; % saccadeOnset - 2*stimuliDuration; % (s) w.r.t start of task
         postSaccadefixationPeriod       = 0.300; % (s) time from saccade COMPLETION ESTIMATE "saccadeDelayTime" below.
-            
+        
+        %{
         if nargin < 4,
             
             % Utilities - derived
             currentRF = 20%0%8; %[-10 -5 0 5 10];%-R_eccentricity:1:R_eccentricity; % 10; Remapping TARGET, i.e. postsaccadic (-R_eccentricity+R_edge_effect_buffer):1:(R_eccentricity+R_edge_effect_buffer)
             saccades  = -20%-S_eccentricity:1:S_eccentricity; % Pick among these saccades
         else
-            currentRF = Training_RF_Locations;
+            
         end
-
+        %}
+        
+        currentRF = Training_RF_Locations;
+        
+        Duration                        = dtRoundUpPeriod(saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod, dt); % (s), the middle part of sum is to account for maximum saccade times
+    
+        stimuliDuration = Duration - stimuliOnset;
+        
+        % classic
+        targetOffIntervals{1}           = [0 (stimuliOnset-dt)];
+    
     else
         currentRF = Training_RF_Locations;
+        
+        Duration                        = dtRoundUpPeriod(saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod, dt); % (s), the middle part of sum is to account for maximum saccade times
+    
+        % classic
+        targetOffIntervals{1}           = [0 (stimuliOnset-dt); (stimuliOnset+stimuliDuration) Duration];
+    
     end
-    
-    saccadeDelayTime                = (2*S_eccentricity/saccadeSpeed) + 0.05; % round to nearest hundred above
-    Duration                        = dtRoundUpPeriod(saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod, dt); % (s), the middle part of sum is to account for maximum saccade times
-    
-    % classic
-    targetOffIntervals{1}           = [0 (stimuliOnset-dt); (stimuliOnset+stimuliDuration) Duration];
-    %%targetOffIntervals{1}           = [0 stimuliOnset; (stimuliOnset+stimuliDuration) Duration];
     
     %% Generate stimuli
     for i = 1:length(currentRF);

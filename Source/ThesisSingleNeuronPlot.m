@@ -13,11 +13,16 @@ function ThesisSingleNeuronPlot()
     declareGlobalVars();
     global EXPERIMENTS_FOLDER;
     
+    R_BASE = 46;
+    
     % Basic
+    %{
+    experiment  = 'test';
+    
     period      = 1;
     epoch       = 1;
     neuron      = 46;
-    experiment  = 'test';
+    
     stimuliName = 'STIM-basic-DuhamelRemapping';
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork/activity-basic-DuhamelRemapping.mat'];
     colors{1}   = [67,82,163]/255;
@@ -26,7 +31,55 @@ function ThesisSingleNeuronPlot()
     activityFiles{2} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/activity-basic-DuhamelRemapping.mat'];
     colors{2}   = [44,180,44]/255;
     legends{2}  = 'Trained';
+    %}
     
+    %% prewired - stim onset
+    
+    experiment = 'prewired';
+    
+    period      = R_BASE + (-20);
+    epoch       = 1;
+    neuron      = period;
+    stimuliName = 'STIM-basic-StimuliControl';
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork/activity-basic-StimuliControl.mat'];
+
+    colors{1}   = [67,82,163]/255;
+    legends{1}  = '';
+    
+    %% prewired - remapping
+    
+    % h_0 = -5& s = 15, --> r = -20.
+    %experiment  = 'prewired';
+    
+    % Remapping
+    %{
+    period      = 1;
+    epoch       = 1;
+    neuron      = R_BASE + (-20);
+    stimuliName = 'STIM-basic-DuhamelRemapping';
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork/activity-basic-DuhamelRemapping.mat'];
+    %}
+    
+    % Stimuli control
+    %{
+    period      = R_BASE + (-5);
+    epoch       = 1;
+    neuron      = R_BASE + (-20);
+    stimuliName = 'STIM-basic-StimuliControl';
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork/activity-basic-StimuliControl.mat'];
+    %}
+    
+    % Saccade control
+    %{
+    period      = R_BASE + (15);
+    epoch       = 1;
+    neuron      = R_BASE + (-20);
+    stimuliName = 'STIM-basic-SaccadeControl';
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork/activity-basic-SaccadeControl.mat'];
+    
+    colors{1}   = [67,82,163]/255;
+    legends{1}  = '';
+    %}
     % =======================================
     
     % Load input files
@@ -69,8 +122,12 @@ function ThesisSingleNeuronPlot()
     hYLabel = ylabel('Firing Rate');
     ylim([-0.05 max(1, max(responseTrace))]);
     xlim([1 numTimeSteps]);
-    legend(legends);
-    legend boxoff;
+    
+    if(length(legends) > 1)
+        legend(legends);
+        legend boxoff;
+    end
+    
 
     % Saccade times 
     if ~isempty(s), plot([s s],[-0.05 1],'r'); end 

@@ -461,7 +461,7 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     
                 elseif(strcmp(region,'R')),
                     
-                    figure('Units','pixels','position', [1000 1000 420 300]);
+                    figure('Units','pixels','position', [1000 1000 420 230]);
                     hold on;
                     
                     synapticAfferents = network.C_to_R_weights(neuron, :);
@@ -474,7 +474,7 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     end
                     
                     hXLabel = xlabel('Retinal Locaton (deg)');
-                    hYLabel = ylabel('Saccade Location (deg)');
+                    hYLabel = ylabel('Saccade (deg)');
                     set([hYLabel hXLabel], 'FontSize', 14);
 
                     box on;
@@ -482,6 +482,12 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     xlim(1.1*[-R_max R_max]);
                     ylim(1.1*[-S_max S_max]);
                     pbaspect([2*R_max 2*S_max 1]);
+                    
+                    colorbar;
+                    caxis([0 maxWeight]);
+                    resolution = 100;
+                    map = [ones(101,1) (1:-1/resolution:0)' (1:-1/resolution:0)'];
+                    colormap(map);
 
                 elseif(strcmp(region,'S')),
                     
@@ -500,7 +506,8 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     hXLabel = xlabel('Retinal Locaton (deg)');
                     hYLabel = ylabel('Saccade Location (deg)');
                     set([hYLabel hXLabel], 'FontSize', 14);
-
+                    set(gca, 'FontSize', 12);
+                    
                     box on;
                     
                     xlim(1.1*[-R_max R_max]);

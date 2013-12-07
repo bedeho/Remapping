@@ -13,7 +13,8 @@ function ThesisExperimentPlot()
     declareGlobalVars();
     global EXPERIMENTS_FOLDER;
     
-    % Basic
+    %% Basic
+    %{
     experiment  = 'test_plotting';
     
     simulationFolder{1} = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork/'];
@@ -23,7 +24,16 @@ function ThesisExperimentPlot()
     simulationFolder{2} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/'];
     Legends{2}          = 'Trained';
     FaceColors{2}       = [238,48,44]/255;
+    %}
     
+    %% Basic
+    
+    experiment  = 'prewired';
+    
+    simulationFolder{1} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork/'];
+    Legends{1}          = 'Prewired';
+    FaceColors{1}       = [67,82,163]/255;
+
     % Iterate Simulations
     for i=1:length(simulationFolder),
         
@@ -39,7 +49,7 @@ function ThesisExperimentPlot()
     
     % Perform plots
     [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, FaceColors, Legends);
-    [remLatFig, remScatFig, indexFig] = remappingPlots(remappingtrace_results, FaceColors, Legends);
+    %[remLatFig, remScatFig, indexFig] = remappingPlots(remappingtrace_results, FaceColors, Legends);
     
 end
 
