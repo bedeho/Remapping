@@ -14,27 +14,9 @@ function ThesisSingleNeuronPlot()
     global EXPERIMENTS_FOLDER;
     
     R_BASE = 46;
-    
-    % Basic
-    %{
-    experiment  = 'test';
-    
-    period      = 1;
-    epoch       = 1;
-    neuron      = 46;
-    
-    stimuliName = 'STIM-basic-DuhamelRemapping';
-    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork/activity-basic-DuhamelRemapping.mat'];
-    colors{1}   = [67,82,163]/255;
-    legends{1}  = 'Untrained';
-    
-    activityFiles{2} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/activity-basic-DuhamelRemapping.mat'];
-    colors{2}   = [44,180,44]/255;
-    legends{2}  = 'Trained';
-    %}
-    
+        
     %% prewired - stim onset
-    
+    %{
     experiment = 'prewired';
     
     period      = R_BASE + (-20);
@@ -43,22 +25,46 @@ function ThesisSingleNeuronPlot()
     stimuliName = 'STIM-basic-StimuliControl';
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork/activity-basic-StimuliControl.mat'];
 
-    colors{1}   = [67,82,163]/255;
+    colors{1}   = [0,0,255]/255; % [67,82,163]/255;
     legends{1}  = '';
+    %}
+    
+    %% prewired - truncation
+    %{
+    experiment = 'prewired';
+    
+    period      = 1;
+    epoch       = 1;
+    neuron      = R_BASE + (-20);
+    stimuliName = 'STIM-basic-DuhamelTruncation';
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork/activity-basic-DuhamelTruncation.mat'];
+
+    colors{1}   = [0,0,255]/255; % [67,82,163]/255;
+    legends{1}  = '';
+    %}
     
     %% prewired - remapping
     
     % h_0 = -5& s = 15, --> r = -20.
-    %experiment  = 'prewired';
+    experiment  = 'prewired';
     
     % Remapping
     %{
     period      = 1;
     epoch       = 1;
     neuron      = R_BASE + (-20);
+    stimuliName = 'STIM-basic-DuhamelRemappingTrace';
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork/activity-basic-DuhamelRemappingTrace.mat'];
+    %}
+    
+    % Remapping 2
+    
+    period      = 1;
+    epoch       = 1;
+    neuron      = R_BASE + (-20);
     stimuliName = 'STIM-basic-DuhamelRemapping';
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork/activity-basic-DuhamelRemapping.mat'];
-    %}
+    
     
     % Stimuli control
     %{
@@ -76,10 +82,11 @@ function ThesisSingleNeuronPlot()
     neuron      = R_BASE + (-20);
     stimuliName = 'STIM-basic-SaccadeControl';
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork/activity-basic-SaccadeControl.mat'];
-    
-    colors{1}   = [67,82,163]/255;
-    legends{1}  = '';
     %}
+   
+    colors{1}   = [0,0,255]/255; % [67,82,163]/255;
+    legends{1}  = '';
+    %{%}
     % =======================================
     
     % Load input files

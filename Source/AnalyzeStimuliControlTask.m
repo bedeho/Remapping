@@ -35,8 +35,7 @@ function [StimuliControl_Result] = AnalyzeStimuliControlTask(activity, stimuli)
     
     latencyWindowSize   = 0.020; % (s), Colby
     latencyWindowLength = timeToTimeStep(latencyWindowSize, dt);
-    responseThreshold   = 0.5;
-    
+
     assert(numEpochs == 1, 'There is more than one epoch, hence this is not a testing stimuli');
     
     % Latency & Duration - nonvectorized form is more practical.
@@ -49,7 +48,7 @@ function [StimuliControl_Result] = AnalyzeStimuliControlTask(activity, stimuli)
         neuronActivity = R_firing_history(neuronIndex, :, p, 1);
         
         % Find latency and duration
-        [latencyTimeStep duration] = findNeuronalLatency(responseThreshold, neuronActivity, latencyWindowLength);
+        [latencyTimeStep duration] = findNeuronalLatency(neuronActivity, latencyWindowLength);
         
         % Baseline response
         baseline_response = normalizedIntegration(neuronActivity, dt, 0, stimuliOnset);

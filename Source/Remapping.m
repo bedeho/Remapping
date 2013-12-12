@@ -603,7 +603,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
         if mod(epoch, parameters.saveNetworksAtEpochMultiples) == 0,
             
             disp('Saving trained network to disk...');
-            save([simulationFolder filesep 'TrainedNetwork_e' num2str(epoch) '.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights', 'V_to_R_weights');
+            save([simulationFolder filesep 'TrainedNetwork_e' num2str(epoch) '.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights',  'C_to_R_weights_dilutionmap', 'S_to_C_weights_dilutionmap', 'V_to_C_weights_dilutionmap', 'R_N', 'S_N', 'C_N');
         end
     end
     
@@ -614,7 +614,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     if isTraining,
         disp('Saving trained network to disk...');
         % 'R_to_R_excitatory_weights', 'R_to_R_inhibitory_weights',
-        save([simulationFolder filesep 'TrainedNetwork.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights',  'C_to_R_weights_dilutionmap', 'S_to_C_weights_dilutionmap', 'V_to_C_weights_dilutionmap', 'R_N', 'S_N', 'C_N'); %'V_to_R_weights'
+        save([simulationFolder filesep 'TrainedNetwork.mat'] , 'C_to_R_weights', 'S_to_C_weights', 'V_to_C_weights',  'C_to_R_weights_dilutionmap', 'S_to_C_weights_dilutionmap', 'V_to_C_weights_dilutionmap', 'R_N', 'S_N', 'C_N');
     end
     
     if saveOutput && numel(C_firing_history) > 2000000/2, % dont save if bigger than 100MB

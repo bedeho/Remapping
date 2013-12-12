@@ -1,7 +1,10 @@
 
-function quickrun()
+function quickrun(DELAY)
 
-    experimentName = 'prewired'; % baseline-multiRF3-tuneC-to-Rpsi
+    experimentName = ['baseline-delay' num2str(DELAY) ];
+    %experimentName = 'prewired';
+    %experimentName = 'baseline';
+    %experimentName = 'baseline_denser';
     
     
     %% DO NOT CHANGE, basic2 has fixed dt
@@ -45,6 +48,7 @@ function quickrun()
     %'basic2-StimuliControl', ...
     %'basic2-SaccadeControl', ...
 
+    
     stimulinames = {'basic-StimuliControl', ...
                     'basic-SaccadeControl', ...
                     'basic-CLayerProbe', ...
@@ -52,8 +56,9 @@ function quickrun()
                     'basic-DuhamelRemappingTrace', ... 
                     'basic-DuhamelTruncation', ...
                     'basic-Kusonoki'}; % , ... 'basic-Kusonoki'
+   
     
     %% Run
-    GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli);
+    GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli, DELAY);
 
 end

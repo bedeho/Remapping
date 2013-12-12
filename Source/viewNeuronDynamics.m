@@ -450,7 +450,7 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     end
                     
                     hXLabel = xlabel('Retinal Locaton (deg)');
-                    hYLabel = ylabel('Saccade Location (deg)');
+                    hYLabel = ylabel('Saccade (deg)');
                     set([hYLabel hXLabel], 'FontSize', 14);
 
                     box on;
@@ -504,7 +504,7 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     end
                     
                     hXLabel = xlabel('Retinal Locaton (deg)');
-                    hYLabel = ylabel('Saccade Location (deg)');
+                    hYLabel = ylabel('Saccade (deg)');
                     set([hYLabel hXLabel], 'FontSize', 14);
                     set(gca, 'FontSize', 12);
                     
@@ -526,7 +526,7 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     axis tight;
                     ylim([0 max(S_to_C_afferents)]);
                     
-                    hXLabel = xlabel('Saccade Location (deg)');
+                    hXLabel = xlabel('Saccade (deg)');
                     hYLabel = ylabel('Synaptic weight');
                     set([hYLabel hXLabel], 'FontSize', 14);
                     set(gca,'XTick', sTicks, 'XTickLabel', sCellLabels);

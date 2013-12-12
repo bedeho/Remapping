@@ -15,4 +15,6 @@ function w = normalizeWeightVector(weightVector)
     norm = 1./sqrt(squeeze(sum(weightVector.^2, 2)));
     w = weightVector.*repmat(norm,1,num_presynaptic);
     
+    assert(nnz(isnan(w)) == 0, 'BEDEHO: Weight vector has NaN due to normalizaiton error.');
+    
 end

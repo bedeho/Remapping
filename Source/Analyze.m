@@ -116,6 +116,7 @@ function Analyze(experimentFolder, netDir, stimulinames)
     %saveas(f,[netDir filesep 'DuhamelTruncation-summary.png']);
     %
     
+    
     % Duhamel remapping trace
     saveas(remTraceScatFig,[netDir filesep 'DuhamelRemappingTrace-summary.png']);
     saveas(remTraceScatFig,[netDir filesep 'DuhamelRemappingTrace.eps']);
@@ -140,5 +141,6 @@ function Analyze(experimentFolder, netDir, stimulinames)
     saveas(CLayerProbeFigure,[netDir filesep 'CLayerProbe-summary.png']);
     saveas(CLayerProbeFigure,[netDir filesep 'CLayerProbe.eps']);
     close(CLayerProbeFigure);
+    
     
 end

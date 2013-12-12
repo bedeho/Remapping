@@ -16,6 +16,7 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
     % Iterate data sets
     lat_lower_limit = inf;
     lat_upper_limit = -inf;
+    foundNaN = false;
     
     for i=1:length(remapping_results),
 
@@ -43,21 +44,35 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
         % Limits for all data sets so far
         lat_lower_limit = min(lat_lower_limit, minLat);
         lat_upper_limit = max(lat_upper_limit, maxLat);
+        
+        % Did we have NaN in latency
+        foundNaN = foundNaN ||any(isnan(X_Lat{i})) || any(isnan(Y_Lat{i}));
 
     end
     
     % 1. scatter remap latency vs. stim control latency
-    Lim = 1.1*[lat_lower_limit lat_upper_limit];
+    Lim = [(lat_lower_limit - 5) (lat_upper_limit+5)]; %1.1*,  ticks on 10ms
+    Lim = roundn(Lim,1);
     
-    if(length(remapping_results) > 1),
-        [remLatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Lat, Y_Lat, 'XTitle', 'Stimulus Control Latency (ms)', 'YTitle', 'Remapping Latency (ms)', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'Legends', Legends, 'AxisFontSize', AxisFontSize, 'LabelFontSize', LabelFontSize);
-    else
-        [remLatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Lat, Y_Lat, 'XTitle', 'Stimulus Control Latency (ms)', 'YTitle', 'Remapping Latency (ms)', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'AxisFontSize', AxisFontSize, 'LabelFontSize', LabelFontSize);
-    end
-    axes(scatterAxis);     
-    hold on;
-    plot(Lim,Lim,'--k'); % Add x=y diagonal
-
+    %if(~foundNaN),
+    
+        if(length(remapping_results) > 1),
+            [remLatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Lat, Y_Lat, 'XTitle', 'Stimulus Control Latency (ms)', 'YTitle', 'Remapping Latency (ms)', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'Legends', Legends, 'AxisFontSize', AxisFontSize, 'LabelFontSize', LabelFontSize);
+        else
+            [remLatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Lat, Y_Lat, 'XTitle', 'Stimulus Control Latency (ms)', 'YTitle', 'Remapping Latency (ms)', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'AxisFontSize', AxisFontSize, 'LabelFontSize', LabelFontSize);
+        end
+        
+        axes(scatterAxis);     
+        hold on;
+        plot(Lim,Lim,'--k'); % Add x=y diagonal
+        ticks = Lim(1):20:Lim(2);
+        set(scatterAxis, 'YTick', ticks, 'XTick', ticks);
+    
+    %else
+    %    remLatFig = figure;
+    %    imagesc;
+    %end
+    
     % 2. scatter stim index. vs sacc index.    
     Lim = [-1 1];
     
@@ -88,6 +103,7 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
     
     if(length(remapping_results) > 1),
         legend(Legends);
+        legend('boxoff');
     end
     
     xlim([1 length(index)]);

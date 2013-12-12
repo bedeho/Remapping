@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
+function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DELAY)
 
     % Import global variables
     declareGlobalVars();
@@ -59,14 +59,14 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     %% Specify main paramters
     parameterCombinations = containers.Map;
     
-    % Simulations Paramters
-    numTrainingEpochs = 0;%20;%10;
+    % Simulations Parameters
+    numTrainingEpochs = 20;%20;%10;
     doTrain = (nargin == 4) && (numTrainingEpochs > 0);
     outputSavingRate = 1; % Period of time step saving during testing.
     assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
     
     saveActivityInTraining = false;%false;
-    saveNetworksAtEpochMultiples = 333; % Save network at this resolution
+    saveNetworksAtEpochMultiples = 5; % Save network at this resolution
     seed = 13;
     
     rng(seed);
@@ -89,13 +89,13 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     K_max_onset_delay = 0.080; % classic = 0.08, prewired = 
     
     % V
-    DELAY = 0.300; % classic = 0.3
+    %DELAY = 0.250; % classic = 0.3
     
     parameterCombinations('V_sigma')                = [3]; %  classic = 3, prewired =  receptive field size
     parameterCombinations('V_supression_delay')     = [DELAY];
     parameterCombinations('V_to_C_psi')             = [10]; % classic = 10, prewired = 
     parameterCombinations('V_to_C_alpha')           = [0.1]; % classic = 0.1, prewired = 
-    parameterCombinations('V_to_C_connectivity')    = [0.20]; % classic = 0.2, prewired = 
+    parameterCombinations('V_to_C_connectivity')    = [0.3]; % classic = 0.3, prewired = 0.2
 
     % S
     parameterCombinations('S_eccentricity')         = [30]; % classic = 30, prewired = 
@@ -106,7 +106,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     parameterCombinations('S_trace_length')         = [DELAY-0.020]; % classic = DELAY-0.02  ,stop saccade sooner so that you dont get FRF imprinted in V->C weights due to S and C delay and V speed
     parameterCombinations('S_to_C_psi')             = [8]; % classic = 8, prewired = 
     parameterCombinations('S_to_C_alpha')           = [0.1]; % classic = 0.1, prewired = 
-    parameterCombinations('S_to_C_connectivity')    = [0.20];  % classic = 0.2, prewired = 
+    parameterCombinations('S_to_C_connectivity')    = [0.3];  % classic = 0.3, prewired = 0.4
     
     % C
     parameterCombinations('C_N')                    = [1000]; % classic = 1000, prewired = 
@@ -115,7 +115,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
     parameterCombinations('C_threshold')            = [15]; % classic = 15, prewired = 
     parameterCombinations('C_threshold_sigma')      = [0]; % classic = 0, prewired = 
     parameterCombinations('C_slope')                = [100]; % classic = 100, prewired = 
-    parameterCombinations('C_to_R_psi')             = [7]; % classic = 4, prewired = 7
+    parameterCombinations('C_to_R_psi')             = [4]; % classic = 4, prewired = 7
     parameterCombinations('C_to_R_alpha')           = [0.1]; % classic = 0.1, prewired = 
     parameterCombinations('C_to_R_connectivity')    = [1]; % classic = 1, prewired = 
     
@@ -220,26 +220,26 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
             C_to_R_sigma = simulation('V_sigma');
             V_to_C_sigma = simulation('V_sigma');
             S_to_C_sigma = simulation('V_sigma');
+            
+            % no longer used: the next recurrent ones
             R_to_R_pos_sigma = simulation('V_sigma');
             R_to_R_neg_sigma = 10*simulation('V_sigma');
             R_to_R_sigma = simulation('V_sigma');
             
+            % Create simulation blank network
+            disp('Creating blank network...');
+            CreateBlankNetwork([simulationFolder filesep 'BlankNetwork.mat'], hardwired_pref_R, C_N, length(simulation('R_preferences')), length(simulation('S_preferences')), R_to_R_pos_sigma, R_to_R_neg_sigma, simulation('S_to_C_connectivity'), simulation('V_to_C_connectivity'), simulation('C_to_R_connectivity'));
+
             if(~doTrain),
                 
                 % Create prewired network
                 disp('Creating prewired network...');
                 CreatePrewiredNetwork([simulationFolder filesep 'PrewiredNetwork.mat'], hardwired_pref_R, hardwired_pref_S, C_N, C_to_R_sigma, V_to_C_sigma, S_to_C_sigma, R_to_R_sigma, simulation('S_to_C_connectivity'), simulation('V_to_C_connectivity'), simulation('C_to_R_connectivity'));
-           
             else
                 
-                % Create simulation blank network
-                disp('Creating blank network...');
-                CreateBlankNetwork([simulationFolder filesep 'BlankNetwork.mat'], hardwired_pref_R, C_N, length(simulation('R_preferences')), length(simulation('S_preferences')), R_to_R_pos_sigma, R_to_R_neg_sigma, simulation('S_to_C_connectivity'), simulation('V_to_C_connectivity'), simulation('C_to_R_connectivity'));
-
-                % Training
+                % Training blank network
                 disp('Training...');
-                Remapping(simulationFolder, trainingStimuli, true);            
-            
+                Remapping(simulationFolder, trainingStimuli, true);
             end
             
             % Move each network to new folder & test
@@ -254,18 +254,18 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli)
                     % Make dir name and dir
                     networkfile = [simulationFolder filesep subsim_name];
                     [pathstr, name, ext] = fileparts(networkfile);
-                    subsim_dir = [simulationFolder filesep name];
-                    mkdir(subsim_dir);
+                    network_dir = [simulationFolder filesep name];
+                    mkdir(network_dir);
                     
                     % Move files into dir
-                    movefile(networkfile, subsim_dir);
-                    copyfile(parameterfile, subsim_dir);
+                    movefile(networkfile, network_dir);
+                    copyfile(parameterfile, network_dir);
                     
                     % Testing network
-                    for s=1:length(stimulinames),
+                    for i=1:length(stimulinames),
                         
-                        disp(['Testing Stimuli: ' stimulinames{s}]);
-                        Remapping(subsim_dir, stimulinames{s}, false, [name ext]);                       
+                        disp(['Testing Stimuli: ' stimulinames{i}]);
+                        Remapping(network_dir, stimulinames{i}, false, [name ext]);                       
                     end
 
                 end

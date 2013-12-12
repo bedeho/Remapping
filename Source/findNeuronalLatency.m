@@ -1,13 +1,17 @@
 
 %
-%  findNeuronalLatency.m
+%  findNeuronalLatency_OLD.m
 %  Remapping
 %
 %  Created by Bedeho Mender on 09/07/13.
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [latencyTimeStep, duration] = findNeuronalLatency(responseThreshold, responseVector, latencyWindowLength)
+function [latencyTimeStep, duration] = findNeuronalLatency(responseVector, latencyWindowLength)
+
+    % analysis params, unifrom across all purposes
+    responseThreshold = 0.4;
+    minimumThreshold = 0.1;
 
     % Working vars
     responseLength      = length(responseVector);
@@ -17,7 +21,12 @@ function [latencyTimeStep, duration] = findNeuronalLatency(responseThreshold, re
     
     latencyTimeStep = nan;
     duration = nan;
-
+    
+    % Check for minimal discharge
+    if(all(responseVector < minimumThreshold))
+        return;
+    end
+    
     for t=1:(responseLength-latencyWindowLength+1),
 
         % Get time steps in question

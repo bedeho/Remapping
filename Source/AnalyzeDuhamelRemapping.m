@@ -37,7 +37,6 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
     latencyWindowSize   = 0.020; % (s), colby papers
     latencyWindowLength = timeToTimeStep(latencyWindowSize, dt);
     responseWindowDuration = 0.200;
-    responseThreshold   = 0.5;
     
     stim_responseWindowStart = 0.050; % Colby window control, [50ms,250ms] after stim onset.
     
@@ -65,7 +64,7 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         remap_responseVector  = R_firing_history(remappedInto_neuronIndex, :, p, 1);
 
         % Find latency and duration
-        [latencyTimeStep, duration] = findNeuronalLatency(responseThreshold, remap_responseVector, latencyWindowLength);
+        [latencyTimeStep, duration] = findNeuronalLatency(remap_responseVector, latencyWindowLength);
         
         % Saccade aligned response window
         saccadeonset_response = normalizedIntegration(remap_responseVector, dt, saccadeOnset, responseWindowDuration);
@@ -85,7 +84,7 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         
         % Find latency and duration
         stim2_responseVector = stim_control_activity(futureRF_neuronIndex, :, futureRF_neuronIndex);
-        [stim_latencyTimeStep stim_duration] = findNeuronalLatency(responseThreshold, stim2_responseVector, latencyWindowLength);
+        [stim_latencyTimeStep stim_duration] = findNeuronalLatency(stim2_responseVector, latencyWindowLength);
         
         %% SACC = CONTROL
         

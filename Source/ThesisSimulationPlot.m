@@ -14,7 +14,7 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusono
     global EXPERIMENTS_FOLDER;
     
     if(nargin<1)
-        experimentFolder = [EXPERIMENTS_FOLDER 'baseline-multiRF3-tuneC-to-Rpsi/C_to_R_psi=6/BlankNetwork/'];
+        experimentFolder = [EXPERIMENTS_FOLDER 'prewired/baseline/BlankNetwork/'];
     end
     
     color = [67,82,163]/255; % {[67,82,163]/255; [238,48,44]/255};
@@ -26,8 +26,8 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusono
         stmCtrl = load(stmCtrlFile);
         StimuliControl_Result = stmCtrl.StimuliControl_Result;
         
-        stmCtrlFigure = figure('Units','pixels','position', [1000 1000 620 300]);
-        latency = [StimuliControl_Result(:).latency];
+        stmCtrlFigure = figure('Units','pixels','position', [1000 1000 500 300]);
+        latency = 1000*[StimuliControl_Result(:).latency];
         maxLatency = max(latency);
         minLatency = min(latency);
         dh = (maxLatency - minLatency)/21;
@@ -47,16 +47,16 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusono
         % test in case experiment fails, analysis crashed
         if ~isnan(x),
             hBar = bar(x,hist(latency,x),1.0,'stacked','LineStyle','none');
-            set(hBar,'FaceColor', color);
+            %set(hBar,'FaceColor', color);
         end
         
         %xlim([0 maxLatency]);
-        pbaspect([1 0.3 1]);
-        box off;
+        pbaspect([1 0.6 1]);
+        axis tight
 
-        hXLabel = xlabel('Time (s)');
+        hXLabel = xlabel('Time (ms)');
         hYLabel = ylabel('Frequency');
-        set([hYLabel hXLabel], 'FontSize', 14);
+        set([hYLabel hXLabel], 'FontSize', 16);
         set(gca, 'FontSize', 14);
     
     end
@@ -68,7 +68,8 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusono
         rem = load(remFile);
         DuhamelRemapping_Result = rem.DuhamelRemapping_Result;
         [remLatFig, remScatFig, indexFig] = remappingPlots({DuhamelRemapping_Result}, {color});
-
+    else
+        remScatFig = 0; % set to garbage
     end
     
     % Load Duhamel Trace file
@@ -79,6 +80,8 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusono
         DuhamelRemappingTrace_Result = duhamelRemapping.DuhamelRemappingTrace_Result;
         
         [remTraceLatFig, remTraceScatFig, indexTraceFig] = remappingPlots({DuhamelRemappingTrace_Result}, {color});
+    else
+        remTraceScatFig = 0; % set to garbage
     end
     
     % Load Kusonoki File
@@ -117,6 +120,9 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusono
         hYLabel = ylabel({'Average response 0-300ms';'after saccade onset'});
         set([hYLabel hXLabel hLenged], 'FontSize', 14);
         ylim([-0.1 1.1]);
+    else
+        kusonokiSACCFigure = 0; % set to garbage
+        kusonokiSTIMFigure = 0;
     end
     
     % Load CLayer Probe File
@@ -132,13 +138,14 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusono
         CLayerProbeFigure = figure('Units','pixels','position', [1000 1000 420 300]);
         plot(CLabeProbe_Neurons_V, CLabeProbe_Neurons_S, 'or');
         hXLabel = xlabel('Retinal Locaton (deg)');
-        hYLabel = ylabel('Saccade Location (deg)');
+        hYLabel = ylabel('Saccade (deg)');
         set([hYLabel hXLabel], 'FontSize', 14);
         
         xlim(1.1*[-R_max R_max]);
         ylim(1.1*[-S_max S_max]);
         pbaspect([2*R_max 2*S_max 1]);
-        
+    else
+        CLayerProbeFigure = 0; % set to garbage
     end
     
     
