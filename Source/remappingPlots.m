@@ -106,7 +106,10 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
         legend('boxoff');
     end
     
-    xlim([1 length(index)]);
+    if(length(index) > 1);
+        xlim([1 length(index)]);
+    end
+    
     ylim([-0.1 sqrt(2)]);
 
     hXLabel = xlabel('Neuron Rank');

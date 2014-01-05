@@ -41,7 +41,7 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
     
     %Training_RF_Locations           = [-20 -15 -10 -5 0 5 10 15 20];
     
-    %Training_RF_Locations           = [-20 -10 0 10 20];
+    %Training_RF_Locations           = [-20 0 20];
     
     %Training_RF_Locations           = [-20 20];
     

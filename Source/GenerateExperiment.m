@@ -11,7 +11,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DELAY)
 
     % Import global variables
     declareGlobalVars();
-    global EXPERIMENTS_FOLDER;
+    global EXPERIMENTS_FOLDER;  
     global STIMULI_FOLDER;
     
     % Experiment parameters
@@ -60,64 +60,65 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DELAY)
     parameterCombinations = containers.Map;
     
     % Simulations Parameters
-    numTrainingEpochs = 20;%20;%10;
-    doTrain = (nargin == 4) && (numTrainingEpochs > 0);
+    numTrainingEpochs = 20;%10;
+    doTrain = (nargin >= 4) && (numTrainingEpochs > 0);
     outputSavingRate = 1; % Period of time step saving during testing.
     assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
     
-    saveActivityInTraining = false;%false;
-    saveNetworksAtEpochMultiples = 5; % Save network at this resolution
+    saveActivityInTraining = false;
+    saveNetworksAtEpochMultiples = 110; % Save network at this resolution
     seed = 13;
     
     rng(seed);
     
     % R
-    parameterCombinations('R_eccentricity')         = [45]; % classic = 45, prewired = 
-    parameterCombinations('R_tau')                  = [0.020]; % classic = 0.020, prewired = 
-    parameterCombinations('R_w_INHB')               = [0.6]; % classic = 0.6, prewired = 
-    parameterCombinations('R_slope')                = [0.5]; % classic = 0.5, prewired = 
-    parameterCombinations('R_threshold')            = [3]; % classic = 3, prewired = 
+    parameterCombinations('R_eccentricity')         = [45]; % self-org-classic = 45, prewired = 
+    parameterCombinations('R_tau')                  = [0.020]; % self-org-classic = 0.020, prewired = 
+    parameterCombinations('R_w_INHB')               = [0.6]; % self-org-classic = ?, prewired = 0.6
+    parameterCombinations('R_slope')                = [0.5]; % self-org-classic = 0.5, prewired = 
+    parameterCombinations('R_threshold')            = [3]; %self-org- classic = 3, prewired = 
     %parameterCombinations('R_covariance_threshold') = [0];
     
     % K
-    parameterCombinations('K_tau')                  = [0.020]; % classic = 0.02, prewired = 
-    parameterCombinations('K_onset_delay_sigma')    = [0.05]; % classic = 0.05, prewired = 
-    parameterCombinations('K_I_psi')                = [8]; % classic = 8, prewired = 
-    parameterCombinations('K_supression_delay')     = [0]; % classic = 0, prewired = 
-    parameterCombinations('P_tau')                  = [0.300]; % classic = 0.3, prewired = 
-    parameterCombinations('P_psi')                  = [0.8]; %  classic = 0.8, prewired = 
-    K_max_onset_delay = 0.080; % classic = 0.08, prewired = 
+    parameterCombinations('K_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
+    parameterCombinations('K_onset_delay_sigma')    = [0.05]; % self-org-classic = 0.05, prewired = 
+    parameterCombinations('K_I_psi')                = [8]; % self-org-classic = 8, prewired = 
+    parameterCombinations('K_supression_delay')     = [0]; % self-org-classic = 0, prewired = 
+    parameterCombinations('P_tau')                  = [0.300]; % self-org-classic = 0.3, prewired = 
+    parameterCombinations('P_psi')                  = [0.8]; %  self-org-classic = 0.8, prewired = 
+    K_max_onset_delay = 0.080; % self-org-classic = 0.08, prewired = 
     
     % V
-    %DELAY = 0.250; % classic = 0.3
+    DELAY = 0.3; % self-org-classic = 0.3
     
-    parameterCombinations('V_sigma')                = [3]; %  classic = 3, prewired =  receptive field size
+    % receptive field size
+    parameterCombinations('V_sigma')                = [3]; %  self-org-classic = 3, prewired = 
     parameterCombinations('V_supression_delay')     = [DELAY];
-    parameterCombinations('V_to_C_psi')             = [10]; % classic = 10, prewired = 
-    parameterCombinations('V_to_C_alpha')           = [0.1]; % classic = 0.1, prewired = 
-    parameterCombinations('V_to_C_connectivity')    = [0.3]; % classic = 0.3, prewired = 0.2
+    parameterCombinations('V_to_C_psi')             = [10]; % self-org-classic = 10, prewired = 
+    parameterCombinations('V_to_C_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('V_to_C_connectivity')    = [0.14]; % self-org-classic = 0.14 , prewired = 0.2
 
     % S
-    parameterCombinations('S_eccentricity')         = [30]; % classic = 30, prewired = 
-    parameterCombinations('S_delay_sigma')          = [0.100]; % classic = 0.1, prewired = 
-    parameterCombinations('S_tau')                  = [0.020]; % classic = 0.02, prewired = 
-    parameterCombinations('S_psi')                  = [1]; % classic = 1, prewired = 
-    parameterCombinations('S_presaccadic_onset')    = [0.100];  % classic = 0.050, prewired = 0.100
-    parameterCombinations('S_trace_length')         = [DELAY-0.020]; % classic = DELAY-0.02  ,stop saccade sooner so that you dont get FRF imprinted in V->C weights due to S and C delay and V speed
-    parameterCombinations('S_to_C_psi')             = [8]; % classic = 8, prewired = 
-    parameterCombinations('S_to_C_alpha')           = [0.1]; % classic = 0.1, prewired = 
-    parameterCombinations('S_to_C_connectivity')    = [0.3];  % classic = 0.3, prewired = 0.4
+    parameterCombinations('S_eccentricity')         = [30]; % self-org-classic = 30, prewired = 
+    parameterCombinations('S_delay_sigma')          = [0.100]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('S_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
+    parameterCombinations('S_psi')                  = [1]; % self-org-classic = 1, prewired = 
+    parameterCombinations('S_presaccadic_onset')    = [0.050];  % self-org-classic = 0.05 , prewired = 0.100
+    parameterCombinations('S_trace_length')         = [DELAY-0.020]; % self-org-classic = DELAY-0.02  ,stop saccade sooner so that you dont get FRF imprinted in V->C weights due to S and C delay and V speed
+    parameterCombinations('S_to_C_psi')             = [8]; % self-org-classic = 8, prewired = 
+    parameterCombinations('S_to_C_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('S_to_C_connectivity')    = [0.2];  % self-org-classic = 0.2, prewired = 0.4
     
     % C
-    parameterCombinations('C_N')                    = [1000]; % classic = 1000, prewired = 
-    parameterCombinations('C_tau')                  = [0.020]; % classic = 0.02, prewired = 
-    parameterCombinations('C_w_INHB')               = [0.1]; % classic = 0.1, prewired = 
-    parameterCombinations('C_threshold')            = [15]; % classic = 15, prewired = 
-    parameterCombinations('C_threshold_sigma')      = [0]; % classic = 0, prewired = 
-    parameterCombinations('C_slope')                = [100]; % classic = 100, prewired = 
-    parameterCombinations('C_to_R_psi')             = [4]; % classic = 4, prewired = 7
-    parameterCombinations('C_to_R_alpha')           = [0.1]; % classic = 0.1, prewired = 
-    parameterCombinations('C_to_R_connectivity')    = [1]; % classic = 1, prewired = 
+    parameterCombinations('C_N')                    = [2000]; % self-org-classic = ?, prewired = 1000
+    parameterCombinations('C_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
+    parameterCombinations('C_w_INHB')               = [0.1]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('C_threshold')            = [15]; % self-org-classic = 15, prewired = 
+    parameterCombinations('C_threshold_sigma')      = [0]; % self-org-classic = 0, prewired = 
+    parameterCombinations('C_slope')                = [100]; % self-org-classic = 100, prewired = 
+    parameterCombinations('C_to_R_psi')             = [4]; % self-org-classic = 4, prewired = 7
+    parameterCombinations('C_to_R_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('C_to_R_connectivity')    = [1]; % self-org-classic = 1, prewired = 
     
     % Save the experiment params
     save([experimentFolderPath filesep 'GenerateExperiment.mat'], 'parameterCombinations');

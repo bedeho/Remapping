@@ -1,7 +1,10 @@
 
 function quickrun(DELAY)
 
-    experimentName = ['baseline-delay' num2str(DELAY) ];
+    %experimentName = ['baseline-delay' num2str(DELAY) ];
+    
+    experimentName = 'baseline-largerC';
+    
     %experimentName = 'prewired';
     %experimentName = 'baseline';
     %experimentName = 'baseline_denser';
@@ -26,10 +29,10 @@ function quickrun(DELAY)
         Testing_StimuliControl('basic', dt);
         Testing_SaccadeControl('basic', dt);
         
-        %if length(Training_RF_Locations) == 1,
-        %    Testing_StimuliControl('basic2', dt, Training_RF_Locations+Training_Saccades);
-        %    Testing_SaccadeControl('basic2', dt, Training_Saccades);
-        %end
+        if length(Training_RF_Locations) == 1,
+            Testing_StimuliControl('basic2', dt, Training_RF_Locations+Training_Saccades);
+            Testing_SaccadeControl('basic2', dt, Training_Saccades);
+        end
 
         Testing_CLayerProbeTask('basic', dt);
 
@@ -51,6 +54,8 @@ function quickrun(DELAY)
     
     stimulinames = {'basic-StimuliControl', ...
                     'basic-SaccadeControl', ...
+                    'basic2-StimuliControl', ...
+                    'basic2-SaccadeControl', ...
                     'basic-CLayerProbe', ...
                     'basic-DuhamelRemapping', ...
                     'basic-DuhamelRemappingTrace', ... 
@@ -59,6 +64,7 @@ function quickrun(DELAY)
    
     
     %% Run
-    GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli, DELAY);
+    %GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli, DELAY);
+    GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli);
 
 end
