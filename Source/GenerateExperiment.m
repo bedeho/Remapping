@@ -67,14 +67,14 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DELAY)
     
     saveActivityInTraining = false;
     saveNetworksAtEpochMultiples = 110; % Save network at this resolution
-    seed = 13;
+    seed = 13; % CLASSIC = 13
     
     rng(seed);
     
     % R
     parameterCombinations('R_eccentricity')         = [45]; % self-org-classic = 45, prewired = 
     parameterCombinations('R_tau')                  = [0.020]; % self-org-classic = 0.020, prewired = 
-    parameterCombinations('R_w_INHB')               = [0.6]; % self-org-classic = ?, prewired = 0.6
+    parameterCombinations('R_w_INHB')               = [0.6]; % self-org-classic = 0.6, prewired =
     parameterCombinations('R_slope')                = [0.5]; % self-org-classic = 0.5, prewired = 
     parameterCombinations('R_threshold')            = [3]; %self-org- classic = 3, prewired = 
     %parameterCombinations('R_covariance_threshold') = [0];
@@ -89,34 +89,34 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DELAY)
     K_max_onset_delay = 0.080; % self-org-classic = 0.08, prewired = 
     
     % V
-    DELAY = 0.3; % self-org-classic = 0.3
+    %DELAY = 0.3; % self-org-classic = 0.3
     
     % receptive field size
     parameterCombinations('V_sigma')                = [3]; %  self-org-classic = 3, prewired = 
     parameterCombinations('V_supression_delay')     = [DELAY];
     parameterCombinations('V_to_C_psi')             = [10]; % self-org-classic = 10, prewired = 
     parameterCombinations('V_to_C_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
-    parameterCombinations('V_to_C_connectivity')    = [0.14]; % self-org-classic = 0.14 , prewired = 0.2
+    parameterCombinations('V_to_C_connectivity')    = [0.05]; % self-org-classic = 0.05 , prewired = 0.2
 
     % S
     parameterCombinations('S_eccentricity')         = [30]; % self-org-classic = 30, prewired = 
     parameterCombinations('S_delay_sigma')          = [0.100]; % self-org-classic = 0.1, prewired = 
     parameterCombinations('S_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
     parameterCombinations('S_psi')                  = [1]; % self-org-classic = 1, prewired = 
-    parameterCombinations('S_presaccadic_onset')    = [0.050];  % self-org-classic = 0.05 , prewired = 0.100
+    parameterCombinations('S_presaccadic_onset')    = [0.070];  % self-org-classic = 0.05 , prewired = 0.100
     parameterCombinations('S_trace_length')         = [DELAY-0.020]; % self-org-classic = DELAY-0.02  ,stop saccade sooner so that you dont get FRF imprinted in V->C weights due to S and C delay and V speed
     parameterCombinations('S_to_C_psi')             = [8]; % self-org-classic = 8, prewired = 
     parameterCombinations('S_to_C_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
     parameterCombinations('S_to_C_connectivity')    = [0.2];  % self-org-classic = 0.2, prewired = 0.4
     
     % C
-    parameterCombinations('C_N')                    = [2000]; % self-org-classic = ?, prewired = 1000
+    parameterCombinations('C_N')                    = [1000]; % self-org-classic = 1000, prewired = 1000
     parameterCombinations('C_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
     parameterCombinations('C_w_INHB')               = [0.1]; % self-org-classic = 0.1, prewired = 
     parameterCombinations('C_threshold')            = [15]; % self-org-classic = 15, prewired = 
     parameterCombinations('C_threshold_sigma')      = [0]; % self-org-classic = 0, prewired = 
     parameterCombinations('C_slope')                = [100]; % self-org-classic = 100, prewired = 
-    parameterCombinations('C_to_R_psi')             = [4]; % self-org-classic = 4, prewired = 7
+    parameterCombinations('C_to_R_psi')             = [3]; % self-org-classic = 3, prewired = 7
     parameterCombinations('C_to_R_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
     parameterCombinations('C_to_R_connectivity')    = [1]; % self-org-classic = 1, prewired = 
     

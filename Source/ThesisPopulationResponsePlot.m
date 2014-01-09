@@ -22,12 +22,32 @@ function ThesisPopulationResponsePlot()
     activityFile = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork/activity-basic-DuhamelRemapping.mat'];
     %}
     
+    %{
     % Basic
     period      = 1;
     epoch       = 1;
     experiment  = 'prewired';
     stimuliFile = [EXPERIMENTS_FOLDER experiment filesep 'STIM-basic-DuhamelRemapping' filesep 'stim.mat'];
     activityFile = [EXPERIMENTS_FOLDER experiment filesep 'baseline/PrewiredNetwork/activity-basic-DuhamelRemapping.mat'];
+    %}
+        
+    % Basic
+    period      = 1;
+    epoch       = 1;
+    experiment  = 'prewired';
+    stimuliFile = [EXPERIMENTS_FOLDER experiment filesep 'STIM-basic-DuhamelRemapping' filesep 'stim.mat'];
+    activityFile = [EXPERIMENTS_FOLDER experiment filesep 'baseline/PrewiredNetwork/activity-basic-DuhamelRemapping.mat'];
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     % Load input files
     disp('Loading input files...');

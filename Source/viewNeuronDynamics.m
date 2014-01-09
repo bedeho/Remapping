@@ -488,6 +488,10 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     resolution = 100;
                     map = [ones(101,1) (1:-1/resolution:0)' (1:-1/resolution:0)'];
                     colormap(map);
+                    
+                    % Diag
+                    disp('C afferents > 90% of max');
+                    find(synapticAfferents > maxWeight*0.9)
 
                 elseif(strcmp(region,'S')),
                     

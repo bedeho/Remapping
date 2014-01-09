@@ -11,7 +11,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
 
     % Experiment name 
     if nargin < 1,
-        experiment = 'baseline-1patterns'; %test_plotting';%'prewired';
+        experiment = 'baseline-Ctune'; %test_plotting';%'prewired';
     end
     
     % Stimuli names
