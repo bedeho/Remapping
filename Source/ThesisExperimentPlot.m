@@ -77,14 +77,15 @@ function ThesisExperimentPlot()
     end
     
     % Perform plots
+    data = remapping_results;
     
     % Remapping
     disp('Continous =======');
     [remLatFig, remScatFig, indexFig] = dump(remapping_results);
     
     % Trace
-    disp('Flashed ===========');
-    [remLatFig, remScatFig, indexFig] = dump(remappingtrace_results);
+    %disp('Flashed ===========');
+    %[remLatFig, remScatFig, indexFig] = dump(remappingtrace_results);
 
     function [f1, f2, f3] = dump(res)
         

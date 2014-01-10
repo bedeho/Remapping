@@ -58,13 +58,13 @@ function ThesisSingleNeuronPlot()
     %}
     
     % Remapping 2
-    
+    %{
     period      = 1;
     epoch       = 1;
     neuron      = R_BASE + (-20);
     stimuliName = 'STIM-basic-DuhamelRemapping';
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork/activity-basic-DuhamelRemapping.mat'];
-    
+    %}
     
     % Stimuli control
     %{
@@ -83,10 +83,47 @@ function ThesisSingleNeuronPlot()
     stimuliName = 'STIM-basic-SaccadeControl';
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork/activity-basic-SaccadeControl.mat'];
     %}
-   
+    
+    
+    %% prewired - remapping
+    
+    % h_0 = -5& s = 15, --> r = -20.
+    
+    h = -5;
+    s = 15;
+    r = h - s;
+    
+    experiment  = 'baseline-onsettune';
+    
+    %{
+    % Remapping
+    period      = 1;
+    epoch       = 1;
+    neuron      = R_BASE + r;
+    stimuliName = 'STIM-basic-DuhamelRemappingTrace';
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-DuhamelRemappingTrace.mat'];
+    %}
+    
+    %{
+    % Stimuli control
+    period      = R_BASE + h;
+    epoch       = 1;
+    neuron      = R_BASE + r;
+    stimuliName = 'STIM-basic-StimuliControl';
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-StimuliControl.mat'];
+    %}
+    
+    
+    % Saccade control
+    period      = R_BASE + s;
+    epoch       = 1;
+    neuron      = R_BASE + h;
+    stimuliName = 'STIM-basic-SaccadeControl';
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-SaccadeControl.mat'];
+    
+    
     colors{1}   = [0,0,255]/255; % [67,82,163]/255;
     legends{1}  = '';
-    %{%}
     % =======================================
     
     % Load input files
@@ -97,9 +134,12 @@ function ThesisSingleNeuronPlot()
 
     s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes, dt);
     numTimeSteps = length(stimuli.stimuli{period}.eyePositionTrace);
+    
+    width = 600; % classic = 600
+    panel_width = width - 100;
 
     % Plot
-    h = figure('Units','pixels','position', [1000 1000 600 250]);
+    h = figure('Units','pixels','position', [1000 1000 width 250]); % [1000 1000 600 250]
     
     % Setup axis ticks
     ticks = 1:(0.100/dt):numTimeSteps;
@@ -109,7 +149,7 @@ function ThesisSingleNeuronPlot()
     
     % Iterate activity files and plot
     responseAxis = subplot(2,1,1);
-    set(responseAxis, 'Units', 'Pixels', 'pos', [60 120 500 110]); % [left bottom width height]
+    set(responseAxis, 'Units', 'Pixels', 'pos', [60 120 panel_width 110]); % [left bottom width height] = classic [60 120 500 110]
     hold on;
     
     for i=1:length(activityFiles),
@@ -147,7 +187,7 @@ function ThesisSingleNeuronPlot()
     retinalTargetTraces = stimuli.stimuli{period}.retinalTargetTraces';
 
     traceAxis = subplot(2,1,2);
-    set(traceAxis, 'Units', 'Pixels', 'pos', [60 35 500 40]); % [left bottom width height]
+    set(traceAxis, 'Units', 'Pixels', 'pos', [60 35 panel_width 40]); % [left bottom width height] = [60 35 500 40]
     hold on;
     
     plot(1:numTimeSteps, eyePositionTrace, 'r');
