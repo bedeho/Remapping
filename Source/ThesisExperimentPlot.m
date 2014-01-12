@@ -12,22 +12,9 @@ function ThesisExperimentPlot()
     % Import global variables
     declareGlobalVars();
     global EXPERIMENTS_FOLDER;
-    
-    %% Basic
-    %{
-    experiment  = 'test_plotting';
-    
-    simulationFolder{1} = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork/'];
-    Legends{1}          = 'Untrained';
-    FaceColors{1}       = [67,82,163]/255;
-    
-    simulationFolder{2} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/'];
-    Legends{2}          = 'Trained';
-    FaceColors{2}       = [238,48,44]/255;
-    %}
-    
+        
     %% Prewired
-    %{
+    
     experiment  = 'prewired';
 
     simulationFolder{1} = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork/'];
@@ -50,9 +37,10 @@ function ThesisExperimentPlot()
         remappingtrace_results{i} = duhamelRemapping.DuhamelRemappingTrace_Result;
 
     end
-    %}
     
-    %% Prewired
+    
+    %% Selforganizing
+    %{
     experiment  = 'baseline-onsettune';
 
     simulationFolder{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/BlankNetwork'];
@@ -75,17 +63,15 @@ function ThesisExperimentPlot()
         remappingtrace_results{i} = duhamelRemapping.DuhamelRemappingTrace_Result;
 
     end
-    
-    % Perform plots
-    data = remapping_results;
+    %}
     
     % Remapping
     disp('Continous =======');
     [remLatFig, remScatFig, indexFig] = dump(remapping_results);
     
     % Trace
-    %disp('Flashed ===========');
-    %[remLatFig, remScatFig, indexFig] = dump(remappingtrace_results);
+    disp('Flashed ===========');
+    [remLatFig, remScatFig, indexFig] = dump(remappingtrace_results);
 
     function [f1, f2, f3] = dump(res)
         
@@ -93,17 +79,23 @@ function ThesisExperimentPlot()
 
         for j=1:length(simulationFolder),
             
-            M = length([res{j}.remappingLatency]);
+            latencies = [res{j}.remappingLatency];
+            NonNaNLatencies = latencies;
+            NonNaNLatencies(isnan(NonNaNLatencies)) = [];
+            
+            Num_NonNaNLatencies = length(NonNaNLatencies);
+            TOTAL = length(latencies);
             
             disp(Legends{j});
-            disp(['Average Remapping Latency: ' num2str(mean(1000*[res{j}.remappingLatency]))]);
+            disp(['Valid latencies: ' num2str(Num_NonNaNLatencies) '/' num2str(TOTAL) ]);
+            disp(['Average Remapping Latency: ' num2str(mean(1000*NonNaNLatencies))]);
             disp(['Average Remapping Index: ' num2str(mean([res{j}.remapping_index]))]);
             
             x=nnz([res{j}.stimLatency] > [res{j}.remappingLatency]);
-            disp(['Predictive: ' num2str(x) '=' num2str(100*x/M) '%']);
+            disp(['Predictive: ' num2str(x) '=' num2str(100*x/TOTAL) '%']);
             
             x = nnz([res{j}.remappingLatency] < 0);
-            disp(['Presaccadic: ' num2str(x) '=' num2str(100*x/M) '%']);
+            disp(['Presaccadic: ' num2str(x) '=' num2str(100*x/TOTAL) '%']);
             
             disp(['MAX Index: ' num2str(max([res{j}.remapping_index]))]);
             disp(['Stim Latency: ' num2str(mean([res{j}.stimLatency]))]);

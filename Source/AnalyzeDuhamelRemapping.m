@@ -34,8 +34,8 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
     sacc_saccadeOnset = sacc_stimuli.saccadeOnset;
     
     % Analysis params
-    latencyWindowSize   = 0.020; % (s), colby papers
-    latencyWindowLength = timeToTimeStep(latencyWindowSize, dt);
+    %latencyWindowSize   = 0.020; % (s), colby papers
+    %latencyWindowLength = timeToTimeStep(latencyWindowSize, dt);
     responseWindowDuration = 0.200;
     
     stim_responseWindowStart = 0.050; % Colby window control, [50ms,250ms] after stim onset.
@@ -64,7 +64,8 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         remap_responseVector  = R_firing_history(remappedInto_neuronIndex, :, p, 1);
 
         % Find latency and duration
-        [latencyTimeStep, duration] = findNeuronalLatency(remap_responseVector, latencyWindowLength);
+        %[latencyTimeStep, duration] = findNeuronalLatency(remap_responseVector, latencyWindowLength);
+        latencyTimeStep = findNeuronalLatency_NEW(remap_responseVector, dt);
         
         % Saccade aligned response window
         saccadeonset_response = normalizedIntegration(remap_responseVector, dt, saccadeOnset, responseWindowDuration);
@@ -84,7 +85,8 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         
         % Find latency and duration
         stim2_responseVector = stim_control_activity(futureRF_neuronIndex, :, futureRF_neuronIndex);
-        [stim_latencyTimeStep stim_duration] = findNeuronalLatency(stim2_responseVector, latencyWindowLength);
+        %[stim_latencyTimeStep stim_duration] = findNeuronalLatency(stim2_responseVector, latencyWindowLength);
+        stim_latencyTimeStep= findNeuronalLatency_NEW(stim2_responseVector, dt);
         
         %% SACC = CONTROL
         
@@ -188,7 +190,7 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         DuhamelRemappin_Result(p).remappingLatency        = (latencyTimeStep - timeToTimeStep(saccadeOnset,dt))*dt;
         DuhamelRemappin_Result(p).stimLatency             = (stim_latencyTimeStep - timeToTimeStep(stim_stimuliOnset, dt))*dt;
         
-        DuhamelRemappin_Result(p).Duration                = duration*dt;
+        %DuhamelRemappin_Result(p).Duration                = duration*dt;
         DuhamelRemappin_Result(p).saccadeonset_response   = saccadeonset_response;
         DuhamelRemappin_Result(p).stimulionset_response   = stimulionset_response;
         
