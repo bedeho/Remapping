@@ -129,11 +129,11 @@ function Analyze(experimentFolder, netDir, stimulinames)
     
     % Kusonoki
     saveas(kusonokiSACCFigure,[netDir filesep 'Kusonoki-sacc-summary.png']);
-    saveas(kusonokiSACCFigure,[netDir filesep 'Kusonoki-sacc.eps']);
+    saveas(kusonokiSACCFigure,[netDir filesep 'Kusonoki-sacc.eps'], 'epsc');
     close(kusonokiSACCFigure);
     
     saveas(kusonokiSTIMFigure,[netDir filesep 'Kusonoki-summary.png']);
-    saveas(kusonokiSTIMFigure,[netDir filesep 'Kusonoki.eps']);
+    saveas(kusonokiSTIMFigure,[netDir filesep 'Kusonoki.eps'], 'epsc');
     close(kusonokiSTIMFigure);
     
     % ClayerProbe

@@ -44,6 +44,7 @@ function ThesisSingleNeuronPlot()
     %}
     
     %% prewired - remapping
+    %{
     
     % h_0 = -5& s = 15, --> r = -20.
     experiment  = 'prewired';
@@ -84,9 +85,10 @@ function ThesisSingleNeuronPlot()
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork/activity-basic-SaccadeControl.mat'];
     %}
     
+    %}
     
     %% prewired - remapping
-    
+    %{
     % h_0 = -5& s = 15, --> r = -20.
     
     h = -5;
@@ -95,14 +97,12 @@ function ThesisSingleNeuronPlot()
     
     experiment  = 'baseline-onsettune';
     
-    %{
     % Remapping
     period      = 1;
     epoch       = 1;
     neuron      = R_BASE + r;
     stimuliName = 'STIM-basic-DuhamelRemappingTrace';
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-DuhamelRemappingTrace.mat'];
-    %}
     
     %{
     % Stimuli control
@@ -113,15 +113,34 @@ function ThesisSingleNeuronPlot()
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-StimuliControl.mat'];
     %}
     
-    
     % Saccade control
+    %{
     period      = R_BASE + s;
     epoch       = 1;
     neuron      = R_BASE + h;
     stimuliName = 'STIM-basic-SaccadeControl';
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-SaccadeControl.mat'];
+    %}
     
+    %}
     
+    %% prewired - KUSONKI
+
+    % h_0 = -5& s = 15, --> r = -20.
+    
+    h = -5;
+    s = 15;
+    r = h - s;
+    
+    experiment  = 'baseline-onsettune';
+    
+    % Remapping
+    period      = 13*1 + 13;
+    epoch       = 1;
+    neuron      = R_BASE + r;
+    stimuliName = 'STIM-basic-Kusonoki';
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-Kusonoki.mat'];
+
     colors{1}   = [0,0,255]/255; % [67,82,163]/255;
     legends{1}  = '';
     % =======================================
@@ -152,6 +171,36 @@ function ThesisSingleNeuronPlot()
     set(responseAxis, 'Units', 'Pixels', 'pos', [60 120 panel_width 110]); % [left bottom width height] = classic [60 120 500 110]
     hold on;
     
+    % plot rectangle
+    stimBegin = stimuli.stimuli{period}.stimOnsetTimes;
+        
+    if(~isempty(stimBegin)),
+
+        recordingWindow = 0.300;
+        
+        stimColor = 1.2*[0, 164, 103]/255;
+        stimWindowBegin = stimBegin + 0.050;
+        pos_box = [timeToTimeStep(stimWindowBegin, dt), 0.001, timeToTimeStep(recordingWindow, dt),  1];
+        rectangle('Position', pos_box,'FaceColor', stimColor,'EdgeColor', stimColor);
+        
+        %[x1, x2, x3, x4] = pos_box_to_X(pos_box);
+        %[y1, y2, y3, y4] = pos_box_to_Y(pos_box);
+        
+        %p = patch([x1, x2, x3, x4], [y1, y2, y3, y4], stimColor);
+        %set(p, 'FaceAlpha', 0.5, 'EdgeAlpha', 0.5, 'FaceColor', stimColor, 'EdgeColor', stimColor);
+        
+        saccColor = [242, 240, 94]/255;
+        saccBegin = stimuli.stimuli{period}.saccadeTimes;
+        pos_box = [timeToTimeStep(saccBegin, dt), 0.001, timeToTimeStep(recordingWindow, dt),  1];
+        rectangle('Position', pos_box,'FaceColor', saccColor,'EdgeColor', saccColor);
+        
+        %X = pos_box_to_X(pos_box);
+        %Y = pos_box_to_Y(pos_box);
+        
+        %p = patch(X, Y, stimColor);
+        %set(p,'FaceAlpha',0.5);
+    end
+    
     for i=1:length(activityFiles),
         
         activity = load(activityFiles{i});
@@ -174,7 +223,6 @@ function ThesisSingleNeuronPlot()
         legend(legends);
         legend boxoff;
     end
-    
 
     % Saccade times 
     if ~isempty(s), plot([s s],[-0.05 1],'r'); end 
@@ -202,4 +250,21 @@ function ThesisSingleNeuronPlot()
     set(gca,'XTick', ticks, 'XTickLabel', tickLabels);
     axis off
     
+    function [x1, x2, x3, x4] = pos_box_to_X(box),
+        
+        x1 = box(1);
+        x2 = x1;
+        x3 = x1 + box(3);
+        x4 = x3;
+       
+    end
+    
+    function [y1, y2, y3, y4] = pos_box_to_Y(box),
+       
+        y1 = box(2);
+        y2 = y1 + box(4);
+        y3 = y2;
+        y4 = y1;
+        
+    end
 end
