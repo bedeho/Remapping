@@ -93,8 +93,6 @@ function Analyze(experimentFolder, netDir, stimulinames)
             
             LHeiser_DuhamelRemappingTrace = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
             
-            disp('Doing LHeiser task analysis...');
-            
             LHeiser = AnalyzeLHeiser(LHeiser_DuhamelRemappingTrace, stimuli);
             
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'LHeiser_Result');

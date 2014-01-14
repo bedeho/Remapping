@@ -7,7 +7,7 @@
 %  Copyright 2014 OFTNAI. All rights reserved.
 %
 
-function [Training_RF_Locations, filename] = Training_LHeiser(Name, dt)
+function [Training_RF_Locations, Training_Saccades, filename] = Training_LHeiser(Name, dt)
 
     % Import global variables
     declareGlobalVars();
@@ -35,23 +35,19 @@ function [Training_RF_Locations, filename] = Training_LHeiser(Name, dt)
     Duration                        = dtRoundUpPeriod(saccadeOnset + (2*S_eccentricity/saccadeSpeed) + fixationPeriod, dt); % (s), the middle part of sum is to account for maximum saccade times
     saccades                        = -S_eccentricity:S_density:S_eccentricity;
     
-    %Training_RF_Locations           = (-R_eccentricity+minimum_Saccade_Amplitude):R_density:(R_eccentricity-minimum_Saccade_Amplitude);
+    %Unique_Training_RF_Locations           = (-R_eccentricity+minimum_Saccade_Amplitude):R_density:(R_eccentricity-minimum_Saccade_Amplitude);
     
-    Training_RF_Locations           = [-20 -17 -15 -12 -10 -7 -5 -2 0 2 5 7 10 12 15 17 20];
+    Unique_Training_RF_Locations           = [-20 -17 -15 -12 -10 -7 -5 -2 0 2 5 7 10 12 15 17 20];
     
-
-    
-    hardcoded = false;
-    
-
+    numberOfDirections              = 3;
 
     k = 1;
-    for i = 1:length(Training_RF_Locations);
+    for i = 1:length(Unique_Training_RF_Locations);
         
         % Receptive field of neuron to be trained
-        h = Training_RF_Locations(i);
+        h = Unique_Training_RF_Locations(i);
         
-        if(~hardcoded),
+        for d = 1:numberOfDirections,
         
             % Pick random saccade
             s = randi(length(saccades));
@@ -64,26 +60,28 @@ function [Training_RF_Locations, filename] = Training_LHeiser(Name, dt)
                 s = randi(length(saccades));
             end
 
-            % Save saccade
-            Training_Saccades(i) = saccades(s);
+            % Save saccade and rf
+            Training_Saccades(k)        = saccades(s);
+            Training_RF_Locations(k)    = h;
+
+            % FRF Trial
+            stimuli{k}.initialEyePosition           = 0;
+            stimuli{k}.headCenteredTargetLocations  = h+Training_Saccades(k);
+            stimuli{k}.saccadeTimes                 = saccadeOnset;
+            stimuli{k}.saccadeTargets               = Training_Saccades(k);
+            
+            stimuli{k}.numSaccades                  = length(stimuli{k}.saccadeTargets);
+            stimuli{k}.targetOffIntervals           = {[]};
+
+            [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, stimuli{k}.targetOffIntervals, stimuli{k}.initialEyePosition, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
+            stimuli{k}.eyePositionTrace             = eyePositionTrace;
+            stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
+            stimuli{k}.stimOnsetTimes               = 0;
+
+
+            k = k + 1;
+        
         end
-        
-        % FRF Trial
-        stimuli{k}.initialEyePosition           = 0;
-        stimuli{k}.headCenteredTargetLocations  = h+Training_Saccades(i);
-        stimuli{k}.saccadeTimes                 = saccadeOnset;
-        stimuli{k}.saccadeTargets               = Training_Saccades(i);
-        stimuli{k}.numSaccades                  = length(stimuli{k}.saccadeTargets);
-        stimuli{k}.targetOffIntervals           = {[]};
-
-        [eyePositionTrace, retinalTargetTraces] = GenerateTrace(Duration, dt, stimuli{k}.headCenteredTargetLocations, stimuli{k}.targetOffIntervals, stimuli{k}.initialEyePosition, stimuli{k}.saccadeTimes, stimuli{k}.saccadeTargets);
-        stimuli{k}.eyePositionTrace             = eyePositionTrace;
-        stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
-        stimuli{k}.stimOnsetTimes               = 0;
-        
-        %plot(stimuli{k}.headCenteredTargetLocations, stimuli{k}.saccadeTargets, 'or');
-
-        k = k + 1;
 
         
     end
@@ -109,6 +107,7 @@ function [Training_RF_Locations, filename] = Training_LHeiser(Name, dt)
                                     'stimuli', ...
                                     'Duration', ...
                                     'saccadeSpeed', ...
+                                    'numberOfDirections', ...
                                     'dt', ...
                                     'seed');
                                 

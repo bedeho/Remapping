@@ -25,28 +25,34 @@ function quickrun(DELAY)
         % Training
         %Training_Basic('basic', dt);
         [Training_RF_Locations, Training_Saccades, trainingStimuli] = Training_Coordinated('basic', dt);
+        [LHeiser_Training_RF_Locations, LHeiser_trainingStimuli] = Training_LHeiser('basic', dt);
 
         % Testing
         Testing_StimuliControl('basic', dt);
         Testing_SaccadeControl('basic', dt);
         
         %if length(Training_RF_Locations) == 1,
-            Testing_StimuliControl('basic2', dt, Training_RF_Locations+Training_Saccades);
-            Testing_SaccadeControl('basic2', dt, Training_Saccades);
+        %    Testing_StimuliControl('basic2', dt, Training_RF_Locations+Training_Saccades);
+        %    Testing_SaccadeControl('basic2', dt, Training_Saccades);
         %end
 
         Testing_CLayerProbeTask('basic', dt);
 
+        % Cont: Remapping
         Testing_DuhamelRemapping('basic', dt, Training_RF_Locations, Training_Saccades);
         
+        % LHeiser
+        Testing_DuhamelRemapping('basic', dt, LHeiser_Training_RF_Locations, LHeiser_trainingStimuli, 'LHeiser', 0.600, 0.100, 0.100, 0.300);
+        
+        % Truncation
         Testing_DuhamelTruncation('basic', dt, Training_RF_Locations, Training_Saccades);
         
+        % Trace
         Testing_DuhamelRemappingTrace('basic', dt, Training_RF_Locations, Training_Saccades);
         
+        % Kusonoki
         Testing_Kusonoki('basic', dt, Training_RF_Locations, Training_Saccades);
         
-        Testing_LHeiser('basic', dt, Training_RF_Locations);
-
     end
     
     %stimulinames = {'basic-StimuliControl','basic-CLayerProbe'};
@@ -66,7 +72,9 @@ function quickrun(DELAY)
    
     
     %% Run
-    GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli, DELAY);
+    %GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli, DELAY);
+    
     %GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli);
+    GenerateExperiment(experimentName, dt, stimulinames, LHeiser_trainingStimuli);
 
 end
