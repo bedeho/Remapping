@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusonokiSTIMFigure, CLayerProbeFigure] = ThesisSimulationPlot(experimentFolder)
+function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusonokiSTIMFigure, CLayerProbeFigure, LHeiserFigure] = ThesisSimulationPlot(experimentFolder)
 
     % Import global variables
     declareGlobalVars();
@@ -150,16 +150,25 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusono
     
     % LHEISER
     LHeiserFile = [experimentFolder filesep 'analysis-basic-LHeiser.mat'];
-    if(exist(CLayerProbeFile, 'file')),
+    if(exist(LHeiserFile, 'file')),
         
-        LHeiser = load(CLayerProbeFile);
+        LHeiser = load(LHeiserFile);
+         
+        numberOfDirections = LHeiser.LHeiserAnalysis.numberOfDirections;
+        uniqueResponseCount = LHeiser.LHeiserAnalysis.uniqueResponseCount;
         
-        LHeiserFigure = figure('Units','pixels','position', [1000 1000 420 300]);
+        LHeiserFigure = figure;%figure('Units','pixels','position', [1000 1000 420 300]);
+
+        hist(uniqueResponseCount,0:numberOfDirections);
         
+        hXLabel = xlabel('Number of saccade directions with remapping');
+        hYLabel = ylabel('Frequency');
+        set([hYLabel hXLabel], 'FontSize', 14);
+        set(gca, 'FontSize', 12);
+        
+        axis square;
     else
         LHeiserFigure = 0;
     end
     
-    
-
 end

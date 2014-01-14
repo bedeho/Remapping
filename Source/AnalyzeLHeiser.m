@@ -10,20 +10,22 @@
 function [LHeiserAnalysis] = AnalyzeLHeiser(activity, stimuli, stim_control_activity, stim_stimuli, sacc_control_activity, sacc_stimuli)
 
     % Do underlying analysis
-    LHeiser_DuhamelRemappingTrace = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
-
-    numPeriods           = activity.numPeriods;
+    LHeiser_DuhamelRemappingTrace = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity, stim_stimuli, sacc_control_activity, sacc_stimuli);
     
-
-    for p=1:numPeriods,
-        
-        stimuli.stimuli{p}.currentRF
-        
-        stimuli.stimuli{p}.futureRF
-        
-        stimuli.stimuli{p}.saccadeTargets
-        
-  
-    end
+    % Save indexes for all neurons and directions in 2d-array
+    Unique_Training_RF_Locations = unique(stimuli.currentRF);
+    numUnique = length(Unique_Training_RF_Locations);
+    numberOfDirections = activity.numPeriods/numUnique;
+    uniqueIndexes = reshape([LHeiser_DuhamelRemappingTrace.remapping_index], numberOfDirections, numUnique);
+    
+    % Count num directions per neuron
+    uniqueResponseCount = sum(uniqueIndexes > 0);
+    
+    % Save
+    LHeiserAnalysis.numUnique                    = numUnique;
+    LHeiserAnalysis.numberOfDirections           = numberOfDirections;
+    LHeiserAnalysis.uniqueIndexes                = uniqueIndexes;
+    LHeiserAnalysis.Unique_Training_RF_Locations = Unique_Training_RF_Locations;
+    LHeiserAnalysis.uniqueResponseCount          = uniqueResponseCount;
     
 end

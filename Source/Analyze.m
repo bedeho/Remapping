@@ -114,37 +114,53 @@ function Analyze(experimentFolder, netDir, stimulinames)
     end
     
     % Plots
-    [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusonokiSTIMFigure, CLayerProbeFigure] = ThesisSimulationPlot(netDir);
+    [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFig, kusonokiSTIMFig, CLayerProbeFigure, LHeiserFig] = ThesisSimulationPlot(netDir);
     
     % Stimuli Control
-    saveas(stmCtrlFigure,[netDir filesep 'StimuliControl-summary.png']);
-    saveas(stmCtrlFigure,[netDir filesep 'StimuliControl.eps']);
-    close(stmCtrlFigure);
+    if(remTraceScatFig),
+        saveas(stmCtrlFigure,[netDir filesep 'StimuliControl-summary.png']);
+        saveas(stmCtrlFigure,[netDir filesep 'StimuliControl.eps'], 'epsc');
+        close(stmCtrlFigure);
+    end
     
     % Duhamel remapping trace
-    saveas(remTraceScatFig,[netDir filesep 'DuhamelRemappingTrace-summary.png']);
-    saveas(remTraceScatFig,[netDir filesep 'DuhamelRemappingTrace.eps']);
-    close(remTraceScatFig);
+    if(remTraceScatFig),
+        saveas(remTraceScatFig,[netDir filesep 'DuhamelRemappingTrace-summary.png']);
+        saveas(remTraceScatFig,[netDir filesep 'DuhamelRemappingTrace.eps'], 'epsc');
+        close(remTraceScatFig);
+    end
     
     % Duhamel remaping
-    saveas(remScatFig,[netDir filesep 'DuhamelRemapping-summary.png']);
-    saveas(remScatFig,[netDir filesep 'DuhamelRemapping.eps']);
-    close(remScatFig);
+    if(remScatFig),
+        saveas(remScatFig,[netDir filesep 'DuhamelRemapping-summary.png']);
+        saveas(remScatFig,[netDir filesep 'DuhamelRemapping.eps'], 'epsc');
+        close(remScatFig);
+    end
+    
+    % LHeiser
+    if(LHeiserFig),
+        saveas(LHeiserFig,[netDir filesep 'LHeiser-summary.png']);
+        saveas(LHeiserFig,[netDir filesep 'LHeiser.eps'], 'epsc');
+        close(LHeiserFig);
+    end
     
     % Kusonoki
-    saveas(kusonokiSACCFigure,[netDir filesep 'Kusonoki-sacc-summary.png']);
-    saveas(kusonokiSACCFigure,[netDir filesep 'Kusonoki-sacc.eps'], 'epsc');
-    close(kusonokiSACCFigure);
+    if(kusonokiSACCFig),
+        saveas(kusonokiSACCFig,[netDir filesep 'Kusonoki-sacc-summary.png']);
+        saveas(kusonokiSACCFig,[netDir filesep 'Kusonoki-sacc.eps'], 'epsc');
+        close(kusonokiSACCFig);
+    end
     
-    saveas(kusonokiSTIMFigure,[netDir filesep 'Kusonoki-summary.png']);
-    saveas(kusonokiSTIMFigure,[netDir filesep 'Kusonoki.eps'], 'epsc');
-    close(kusonokiSTIMFigure);
+    if(kusonokiSTIMFig),
+        saveas(kusonokiSTIMFig,[netDir filesep 'Kusonoki-summary.png']);
+        saveas(kusonokiSTIMFig,[netDir filesep 'Kusonoki.eps'], 'epsc');
+        close(kusonokiSTIMFig);
+    end
     
     % ClayerProbe
-    
-    saveas(CLayerProbeFigure,[netDir filesep 'CLayerProbe-summary.png']);
-    saveas(CLayerProbeFigure,[netDir filesep 'CLayerProbe.eps']);
-    close(CLayerProbeFigure);
-    
-    
+    if(CLayerProbeFigure),
+        saveas(CLayerProbeFigure,[netDir filesep 'CLayerProbe-summary.png']);
+        saveas(CLayerProbeFigure,[netDir filesep 'CLayerProbe.eps']);
+        close(CLayerProbeFigure);
+    end
 end

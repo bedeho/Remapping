@@ -11,15 +11,19 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
 
     % Experiment name 
     if nargin < 1,
-        experiment = 'baseline-onsettune'; %test_plotting';%'prewired';
+        experiment = 'LHeiser'; %test_plotting';%'prewired';
     end
     
     % Stimuli names
     if(nargin < 3)
         
-        trainingStimuli = 'basic-Training';
+        %trainingStimuli = 'basic-Training';
+        
+        trainingStimuli = 'basic-Training_LHeiser';
         
         if(nargin < 2)
+            
+            %{
             stimulinames = {'basic-StimuliControl', ...
                             'basic-SaccadeControl', ...
                             'basic-CLayerProbe', ...
@@ -28,6 +32,9 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                             'basic-DuhamelTruncation', ...
                             'basic-Kusonoki', ...
                             'basic-LHeiser'};
+            %}
+            
+            stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-CLayerProbe', 'basic-LHeiser'};
         end
     end
     

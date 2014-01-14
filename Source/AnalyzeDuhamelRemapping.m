@@ -100,7 +100,11 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         sacc_index = saccadeonset_response - saccade_control_response;
         
         % Remapping Indexes
-        remapping_index = sqrt(stim_index^2 + sacc_index^2); 
+        if(stim_index > 0 && sacc_index > 0),
+            remapping_index = sqrt(stim_index^2 + sacc_index^2);
+        else
+            remapping_index = 0;
+        end
         
         %% FIGURE
         
