@@ -91,11 +91,9 @@ function Analyze(experimentFolder, netDir, stimulinames)
             
             disp('Doing LHeiser task analysis...');
             
-            LHeiser_DuhamelRemappingTrace = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
+            LHeiserAnalysis = AnalyzeLHeiser(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
             
-            LHeiser = AnalyzeLHeiser(LHeiser_DuhamelRemappingTrace, stimuli);
-            
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'LHeiser_Result');
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'LHeiserAnalysis');
             
         elseif strcmp(type,'CLayerProbe'),
             

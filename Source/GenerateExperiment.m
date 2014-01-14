@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DELAY)
+function GenerateExperiment(Name, dt, stimulinames, trainingStimuli) %, DELAY)
 
     % Import global variables
     declareGlobalVars();
@@ -89,7 +89,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DELAY)
     K_max_onset_delay = 0.080; % self-org-classic = 0.08, prewired = 
     
     % V
-    %DELAY = 0.3; % self-org-classic = 0.3
+    DELAY = 0.3; % self-org-classic = 0.3
     
     % receptive field size
     parameterCombinations('V_sigma')                = [3]; %  self-org-classic = 3, prewired = 

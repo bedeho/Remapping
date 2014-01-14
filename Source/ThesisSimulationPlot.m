@@ -148,6 +148,18 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusono
         CLayerProbeFigure = 0; % set to garbage
     end
     
+    % LHEISER
+    LHeiserFile = [experimentFolder filesep 'analysis-basic-LHeiser.mat'];
+    if(exist(CLayerProbeFile, 'file')),
+        
+        LHeiser = load(CLayerProbeFile);
+        
+        LHeiserFigure = figure('Units','pixels','position', [1000 1000 420 300]);
+        
+    else
+        LHeiserFigure = 0;
+    end
+    
     
 
 end

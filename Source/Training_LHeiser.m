@@ -37,7 +37,9 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_LHeiser
     
     %Unique_Training_RF_Locations           = (-R_eccentricity+minimum_Saccade_Amplitude):R_density:(R_eccentricity-minimum_Saccade_Amplitude);
     
-    Unique_Training_RF_Locations           = [-20 -17 -15 -12 -10 -7 -5 -2 0 2 5 7 10 12 15 17 20];
+    %Unique_Training_RF_Locations           = [-20 -17 -15 -12 -10 -7 -5 -2 0 2 5 7 10 12 15 17 20];
+    
+    Unique_Training_RF_Locations           = [-20 20];
     
     numberOfDirections              = 3;
 
