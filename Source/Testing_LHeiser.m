@@ -28,7 +28,7 @@ function Testing_LHeiser(Name, dt, Training_RF_Locations)
     saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!
     
     % Training_RF_Locations, Training_Saccades
-    saccadeDelayTime                = (2*S_eccentricity/saccadeSpeed) + 0.05; % round to nearest hundred above
+    saccadeDelayTime                = (2*S_eccentricity/saccadeSpeed) + 0.050; % round to nearest hundred above
      
     % Temporal
     stimulitype                     = 'LHeiser';
@@ -76,7 +76,8 @@ function Testing_LHeiser(Name, dt, Training_RF_Locations)
             stimuli{k}.eyePositionTrace             = eyePositionTrace;
             stimuli{k}.retinalTargetTraces          = retinalTargetTraces;
             stimuli{k}.stimOnsetTimes               = stimuliOnset;
-
+            stimuli{k}.directionNr                  = d;
+            
             % Add simple information
             stimuli{k}.futureRF  = futureRF;
             stimuli{k}.currentRF = r;

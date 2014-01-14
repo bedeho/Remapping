@@ -1,10 +1,10 @@
 
 function quickrun(DELAY)
 
-    experimentName = ['baseline-delay' num2str(DELAY) ];
+    %experimentName = ['baseline-delay' num2str(DELAY) ];
     %for d=[0.050 0.100 0.200 0.250], quickrun(d); end;
     
-    %experimentName = 'baseline-onsettune';
+    experimentName = 'LHeiser';
     
     %experimentName = 'prewired';
     %experimentName = 'baseline';
@@ -44,6 +44,8 @@ function quickrun(DELAY)
         Testing_DuhamelRemappingTrace('basic', dt, Training_RF_Locations, Training_Saccades);
         
         Testing_Kusonoki('basic', dt, Training_RF_Locations, Training_Saccades);
+        
+        Testing_LHeiser('basic', dt, Training_RF_Locations);
 
     end
     
@@ -59,7 +61,8 @@ function quickrun(DELAY)
                     'basic-DuhamelRemapping', ...
                     'basic-DuhamelRemappingTrace', ... 
                     'basic-DuhamelTruncation', ...
-                    'basic-Kusonoki'}; % , ... 'basic-Kusonoki'
+                    'basic-Kusonoki', ...
+                    'basic-LHeiser'}; % , ... 'basic-Kusonoki'
    
     
     %% Run

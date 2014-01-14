@@ -87,6 +87,18 @@ function Analyze(experimentFolder, netDir, stimulinames)
             
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'kusonokiSTIMAlignedAnalysis', 'kusonokiSACCAlignedAnalysis', 'ticks');
             
+        elseif strcmp(type,'LHeiser'),
+            
+            disp('Doing LHeiser task analysis...');
+            
+            LHeiser_DuhamelRemappingTrace = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
+            
+            disp('Doing LHeiser task analysis...');
+            
+            LHeiser = AnalyzeLHeiser(LHeiser_DuhamelRemappingTrace, stimuli);
+            
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'LHeiser_Result');
+            
         elseif strcmp(type,'CLayerProbe'),
             
             disp('Doing C Layer Probe analysis...');
@@ -112,10 +124,6 @@ function Analyze(experimentFolder, netDir, stimulinames)
     saveas(stmCtrlFigure,[netDir filesep 'StimuliControl-summary.png']);
     saveas(stmCtrlFigure,[netDir filesep 'StimuliControl.eps']);
     close(stmCtrlFigure);
-
-    %saveas(f,[netDir filesep 'DuhamelTruncation-summary.png']);
-    %
-    
     
     % Duhamel remapping trace
     saveas(remTraceScatFig,[netDir filesep 'DuhamelRemappingTrace-summary.png']);
