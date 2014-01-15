@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Testing_DuhamelRemapping(Name, dt, Training_RF_Locations, Training_Saccades, stimulitype, saccadeOnset, stimuliDuration, stimuliOnset, postSaccadefixationPeriod)
+function Testing_DuhamelRemapping(Name, dt, Training_RF_Locations, Training_Saccades, stimulitype, saccadeOnset, stimuliDuration, stimuliOnset, postSaccadeOnsetPeriod)
 
     % Import global variables
     declareGlobalVars();
@@ -29,15 +29,15 @@ function Testing_DuhamelRemapping(Name, dt, Training_RF_Locations, Training_Sacc
     saccadeSpeed                    = 300; % (deg/s) if changed, then change in GenerateEyeTrace.m as well!
     
     % Training_RF_Locations, Training_Saccades
-    saccadeDelayTime                = (2*S_eccentricity/saccadeSpeed) + 0.05; % round to nearest hundred above
+    %saccadeDelayTime                = (2*S_eccentricity/saccadeSpeed) + 0.05; % round to nearest hundred above
     
     if nargin < 9,
         
         % Temporal
         stimulitype                     = 'DuhamelRemapping';
-        saccadeOnset                    = 0.300; % (s) w.r.t start of task
-        stimuliOnset                    = 0.100; % saccadeOnset - 2*stimuliDuration; % (s) w.r.t start of task
-        postSaccadefixationPeriod       = 0.300; % (s) time from saccade COMPLETION ESTIMATE "saccadeDelayTime" below.
+        saccadeOnset                    = 0.600; % classic: 0.300 (s) w.r.t start of task
+        stimuliOnset                    = 0.100; % classic: 0.100, saccadeOnset - 2*stimuliDuration; % (s) w.r.t start of task
+        postSaccadeOnsetPeriod          = 0.300; % CLASSIC: saccadeDelayTime + postSaccadefixationPeriod, (s) time from saccade COMPLETION ESTIMATE "saccadeDelayTime" below.
         
         %{
         if nargin < 4,
@@ -52,7 +52,7 @@ function Testing_DuhamelRemapping(Name, dt, Training_RF_Locations, Training_Sacc
         
         currentRF = Training_RF_Locations;
         
-        Duration                        = dtRoundUpPeriod(saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod, dt); % (s), the middle part of sum is to account for maximum saccade times
+        Duration                        = dtRoundUpPeriod(saccadeOnset + postSaccadeOnsetPeriod, dt); % (s), the middle part of sum is to account for maximum saccade times
     
         stimuliDuration = Duration - stimuliOnset;
         
@@ -62,7 +62,7 @@ function Testing_DuhamelRemapping(Name, dt, Training_RF_Locations, Training_Sacc
     else
         currentRF = Training_RF_Locations;
         
-        Duration                        = dtRoundUpPeriod(saccadeOnset + saccadeDelayTime + postSaccadefixationPeriod, dt); % (s), the middle part of sum is to account for maximum saccade times
+        Duration                        = dtRoundUpPeriod(saccadeOnset + postSaccadeOnsetPeriod, dt); % (s), the middle part of sum is to account for maximum saccade times
     
         % classic
         targetOffIntervals{1}           = [0 (stimuliOnset-dt); (stimuliOnset+stimuliDuration) Duration];
@@ -124,7 +124,7 @@ function Testing_DuhamelRemapping(Name, dt, Training_RF_Locations, Training_Sacc
                                     'saccadeOnset', ...
                                     'stimuliDuration', ...
                                     'stimuliOnset', ...
-                                    'postSaccadefixationPeriod', ...
+                                    'postSaccadeOnsetPeriod', ...
                                     'stimulitype', ...
                                     'stimuli', ...
                                     'Duration', ...

@@ -19,7 +19,7 @@ function [LHeiserAnalysis] = AnalyzeLHeiser(activity, stimuli, stim_control_acti
     uniqueIndexes = reshape([LHeiser_DuhamelRemappingTrace.remapping_index], numberOfDirections, numUnique);
     
     % Count num directions per neuron
-    uniqueResponseCount = sum(uniqueIndexes > 0);
+    uniqueResponseCount = sum(uniqueIndexes > 0.1);
     
     % Save
     LHeiserAnalysis.numUnique                    = numUnique;

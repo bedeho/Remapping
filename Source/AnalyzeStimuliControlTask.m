@@ -51,13 +51,13 @@ function [StimuliControl_Result] = AnalyzeStimuliControlTask(activity, stimuli)
         [latencyTimeStep duration] = findNeuronalLatency(neuronActivity, latencyWindowLength);
         
         % Baseline response
-        baseline_response = normalizedIntegration(neuronActivity, dt, 0, stimuliOnset);
+        %baseline_response = normalizedIntegration(neuronActivity, dt, 0, stimuliOnset);
         
         % Stim response
-        stim_response   = normalizedIntegration(neuronActivity, dt, stimuliOnset + responseWindowStart, responseWindowDuration);
+        %stim_response   = normalizedIntegration(neuronActivity, dt, stimuliOnset + responseWindowStart, responseWindowDuration);
         
         % Offset response
-        offset_response = normalizedIntegration(neuronActivity, dt, stimuliOnset + stimuliDuration + responseWindowStart, responseWindowDuration);
+        %offset_response = normalizedIntegration(neuronActivity, dt, stimuliOnset + stimuliDuration + responseWindowStart, responseWindowDuration);
         
         % Plot
         %figure;plot(neuronActivity);hold on; plot([latencyTimeStep latencyTimeStep],[0 1], 'r');
@@ -66,9 +66,9 @@ function [StimuliControl_Result] = AnalyzeStimuliControlTask(activity, stimuli)
         StimuliControl_Result(p).index              = neuronIndex;
         StimuliControl_Result(p).receptiveField     = stimuli.stimuli{p}.headCenteredTargetLocations;
         StimuliControl_Result(p).latency            = stepToTime(latencyTimeStep, dt)-stimuliOnset;
-        StimuliControl_Result(p).duration           = duration*dt;
-        StimuliControl_Result(p).baseline_response  = baseline_response;
-        StimuliControl_Result(p).stimulus_response  = stim_response;
-        StimuliControl_Result(p).offset_response    = offset_response;
+        %StimuliControl_Result(p).duration           = duration*dt;
+        %StimuliControl_Result(p).baseline_response  = baseline_response;
+        %StimuliControl_Result(p).stimulus_response  = stim_response;
+        %StimuliControl_Result(p).offset_response    = offset_response;
     end
 end

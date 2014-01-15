@@ -34,19 +34,7 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
     sacc_saccadeOnset = sacc_stimuli.saccadeOnset;
     
     % Analysis params
-    %latencyWindowSize   = 0.020; % (s), colby papers
-    %latencyWindowLength = timeToTimeStep(latencyWindowSize, dt);
-    responseWindowDuration = 0.200;
-    
-    stim_responseWindowStart = 0.050; % Colby window control, [50ms,250ms] after stim onset.
-    
-    % For plots
-    stimuliOnsetTimeStep = timeToTimeStep(stimuliOnset, dt);
-    saccadeOnsetTimeStep = timeToTimeStep(saccadeOnset, dt);
-    stim_stimuliOnsetTimeStep = timeToTimeStep(stim_stimuliOnset, dt);
-    sacc_saccadeOnsetTimeStep = timeToTimeStep(sacc_saccadeOnset, dt);
-    
-    responseWindowSize = timeToTimeStep(responseWindowDuration, dt);
+    responseWindowDuration = 0.300; % CLASSIC:0.200, but LHeiser2005 uses 0.300
     
     % Check that we have done the right controls and that this is truly a
     % testing data set (epoch==1)
@@ -80,7 +68,8 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         
         % Stim response of remapped neuron when stim is in future RF
         stim_responseVector = stim_control_activity(remappedInto_neuronIndex, :, futureRF_neuronIndex);
-        stim_control_response = normalizedIntegration(stim_responseVector, dt, stim_stimuliOnset + stim_responseWindowStart, responseWindowDuration);
+        stim_responseWindowStart = stim_stimuliOnset + 0.200; % CLASIC: +0.050, but we use LHeiser2005: 0.200
+        stim_control_response = normalizedIntegration(stim_responseVector, dt, stim_responseWindowStart, responseWindowDuration);
         stim_index = saccadeonset_response - stim_control_response;
         
         % Find latency and duration
@@ -102,6 +91,7 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         % Remapping Indexes
         if(stim_index > 0 && sacc_index > 0),
             remapping_index = sqrt(stim_index^2 + sacc_index^2);
+            %remapping_index = (stim_index + sacc_index)/2;
         else
             remapping_index = 0;
         end
@@ -109,7 +99,16 @@ function [DuhamelRemappin_Result] = AnalyzeDuhamelRemapping(activity, stimuli, s
         %% FIGURE
         
         %{
+        
         figure;
+        
+        % For plots
+        stimuliOnsetTimeStep = timeToTimeStep(stimuliOnset, dt);
+        saccadeOnsetTimeStep = timeToTimeStep(saccadeOnset, dt);
+        stim_stimuliOnsetTimeStep = timeToTimeStep(stim_stimuliOnset, dt);
+        sacc_saccadeOnsetTimeStep = timeToTimeStep(sacc_saccadeOnset, dt);
+
+        responseWindowSize = timeToTimeStep(responseWindowDuration, dt);
        
         R_N = size(R_firing_history, 1);
         remapNumTimeSteps = size(R_firing_history, 2);

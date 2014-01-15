@@ -19,6 +19,11 @@ function Testing_SaccadeControl(Name, dt, saccadeTargets)
     S_eccentricity              = 30;
     S_density                   = 1; % should be 1, we test everyones response
     
+    filename       = [Name '-SaccadeControl'];
+    stimulitype    = 'SaccadeControl';
+    saccadeTargets = -S_eccentricity:S_density:S_eccentricity;
+    
+    %{    
     if nargin<3,
         filename       = [Name '-SaccadeControl'];
         stimulitype    = 'SaccadeControl';
@@ -27,15 +32,16 @@ function Testing_SaccadeControl(Name, dt, saccadeTargets)
         filename       = [Name '-SaccadeControl'];
         stimulitype    = 'SaccadeControl2';
     end
-    
+    %}
+        
     % Dynamical quantities
-    saccadeOnset                = 0.150; %(s) w.r.t start of task
-    postSaccadefixationPeriod   = 0.400; %(s)
-    saccadeSpeed                = 300; %(deg/s)
+    saccadeOnset                = 0.100; %(s) w.r.t start of task, CLASSIC 0.150, to make identical to stim control
+    postSaccadeOnsetPeriod      = 0.800; % CLASSIC: postSaccadefixationPeriod   = 0.400; %(s)
+    %saccadeSpeed                = 300; %(deg/s)
 
     % Generate stimuli
     rng(seed);
-    Duration                    = dtRoundUpPeriod(saccadeOnset + postSaccadefixationPeriod, dt); % (s)
+    Duration                    = dtRoundUpPeriod(saccadeOnset + postSaccadeOnsetPeriod, dt); % dtRoundUpPeriod(saccadeOnset + postSaccadefixationPeriod, dt); % (s)
     
     targetOffIntervals{1}       = [0 Duration]; % (s) [start_OFF end_OFF; start_OFF end_OFF]
     
@@ -72,8 +78,7 @@ function Testing_SaccadeControl(Name, dt, saccadeTargets)
                                     'stimuli', ...
                                     'saccadeOnset', ...
                                     'Duration', ...
-                                    'postSaccadefixationPeriod', ...
-                                    'saccadeSpeed', ...
+                                    'postSaccadeOnsetPeriod', ...
                                     'dt', ...
                                     'seed');
 end
