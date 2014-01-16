@@ -21,6 +21,10 @@ function [LHeiserAnalysis] = AnalyzeLHeiser(activity, stimuli, stim_control_acti
     % Count num directions per neuron
     uniqueResponseCount = sum(uniqueIndexes > 0.1);
     
+    %% Selectivity
+     
+    
+    
     % Save
     LHeiserAnalysis.numUnique                    = numUnique;
     LHeiserAnalysis.numberOfDirections           = numberOfDirections;

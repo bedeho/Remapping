@@ -13,7 +13,8 @@ function ThesisLHeiserPlot()
     declareGlobalVars();
     global EXPERIMENTS_FOLDER;
         
-    % Simulations 
+    % Simulations
+    %{
     simulationFolder{1} = [EXPERIMENTS_FOLDER 'LHeiser/baseline'];
     Legends{1} = 'value 1';
     
@@ -23,6 +24,34 @@ function ThesisLHeiserPlot()
     numberOfDirections = 3;
     numberOfUnique = 2;
     xTitle = 'The x tite';
+    %}
+    
+    %% LHeiser_C_to_R_connectivity
+    
+    simulationFolder{1} = [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=0.1'];
+    Legends{1}          = '0.1';
+    simulationFolder{2} = [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=0.2'];
+    Legends{2}          = '0.2';
+    simulationFolder{3} = [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=0.3'];
+    Legends{3}          = '0.3';
+    simulationFolder{4} = [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=0.4'];
+    Legends{4}          = '0.4';
+    simulationFolder{5} = [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=0.5'];
+    Legends{5}          = '0.5';
+    simulationFolder{6} = [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=0.6'];
+    Legends{6}          = '0.6';
+    simulationFolder{7} = [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=0.7'];
+    Legends{7}          = '0.7';
+    simulationFolder{8} = [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=0.8'];
+    Legends{8}          = '0.8';
+    simulationFolder{9} = [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=0.9'];
+    Legends{9}          = '0.9';
+    simulationFolder{10}= [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=1'];
+    Legends{10}         = '1.0';
+    
+    numberOfDirections = 4;
+    numberOfUnique = 17;
+    xTitle = '\phi^\text{C}';
     
     % Iterate simulations
     numSimulations = length(simulationFolder);
@@ -44,7 +73,7 @@ function ThesisLHeiserPlot()
         uniqueResponseCount = sum(diffUniqueIndexes > 0);
         
         % Show figure
-        figure;
+        figure('Units','pixels','position', [1000 1000 400 200]); % [1000 1000 400 400]
 
         h = hist(uniqueResponseCount,0:numberOfDirections)/numberOfUnique;
         bar(0:numberOfDirections, h, 0.7);
@@ -55,14 +84,15 @@ function ThesisLHeiserPlot()
         set([hYLabel hXLabel], 'FontSize', 14);
         set(gca, 'FontSize', 12);
         set(gca, 'YTick', [0 1]);
-        
-        axis square;
+        pbaspect([0.6 0.3 1])
+        %axis square;
         
         % Save plot for bar plot
         results(i,:) = h;
         
     end
     
+    %{
     % Plot population plot
     figure;
     plot(results');
@@ -74,5 +104,6 @@ function ThesisLHeiserPlot()
     set(gca, 'YTick', [0 1]);
     
     legend(Legends);
+    %}
     
 end

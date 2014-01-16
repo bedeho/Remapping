@@ -1,7 +1,7 @@
 
 function quickrun_LHeiser()
     
-    experimentName = 'LHeiser';
+    experimentName = 'LHeiser_C_to_R_connectivity';
 
     %% DO NOT CHANGE, basic2 has fixed dt
     %dt = 0.010; 
