@@ -155,7 +155,7 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusono
         LHeiser = load(LHeiserFile);
          
         numberOfDirections = LHeiser.LHeiserAnalysis.numberOfDirections;
-        uniqueResponseCount = LHeiser.LHeiserAnalysis.uniqueResponseCount;
+        uniqueResponseCount = sum(LHeiser.LHeiserAnalysis.uniqueIndexes > 0.1); %simple heuristic, not the same as analysis plots
         
         LHeiserFigure = figure;%figure('Units','pixels','position', [1000 1000 420 300]);
 
