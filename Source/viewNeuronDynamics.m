@@ -41,6 +41,18 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
     C_N = activity.C_N;
     dt = stimuli.dt;
     
+    %imagesc(network.S_to_C_weights);
+    %imagesc(network.V_to_C_weights);
+    
+    % HACK: analysis to identify trained C 
+    disp('S: ');
+    S_to_C = squeeze(max(network.S_to_C_weights, [], 2));
+    [C,I] = max(S_to_C)
+    
+    disp('V: ');
+    V_to_C = squeeze(max(network.V_to_C_weights, [], 2));
+    [C,I] = max(V_to_C)
+    
     % Make figure
     figure('name',stimuliType,'Position', [100, 100, 1049, 895]);
     

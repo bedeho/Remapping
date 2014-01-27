@@ -22,22 +22,50 @@ function ThesisPopulationResponsePlot()
     activityFile = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork/activity-basic-DuhamelRemapping.mat'];
     %}
     
-    %{
     % Basic: Prewired
+    %{
     period      = 1;
     epoch       = 1;
     experiment  = 'prewired';
-    stimuliFile = [EXPERIMENTS_FOLDER experiment filesep 'STIM-basic-DuhamelRemapping' filesep 'stim.mat'];
-    activityFile = [EXPERIMENTS_FOLDER experiment filesep 'baseline/PrewiredNetwork/activity-basic-DuhamelRemapping.mat'];
+    stimuliFile = [EXPERIMENTS_FOLDER experiment filesep 'STIM-basic-DuhamelRemappingTrace' filesep 'stim.mat'];
+    activityFile = [EXPERIMENTS_FOLDER experiment filesep 'baseline/PrewiredNetwork/activity-basic-DuhamelRemappingTrace.mat'];
     %}
         
     % Basic
+    %{
     period      = 1;
     epoch       = 1;
-    experiment  = 'baseline-onsettune';
+    experiment  = 'baseline';
     stimuliFile = [EXPERIMENTS_FOLDER experiment filesep 'STIM-basic-DuhamelRemappingTrace' filesep 'stim.mat'];
-    activityFile = [EXPERIMENTS_FOLDER experiment filesep 'S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-DuhamelRemappingTrace.mat'];
+    activityFile = [EXPERIMENTS_FOLDER experiment filesep 'baseline/TrainedNetwork/activity-basic-DuhamelRemappingTrace.mat'];
+    %}
     
+    % dilution-1: remappingtrace
+    %{
+    period      = 1;
+    epoch       = 1;
+    experiment  = 'dilution-1';
+    stimuliFile = [EXPERIMENTS_FOLDER experiment filesep 'STIM-basic-DuhamelRemappingTrace' filesep 'stim.mat'];
+    activityFile = [EXPERIMENTS_FOLDER experiment filesep 'baseline/TrainedNetwork/activity-basic-DuhamelRemappingTrace.mat'];
+    %}
+    
+    % dilution-1: stimuli control
+    %{
+    period      = 46 + 26;
+    epoch       = 1;
+    experiment  = 'dilution-1';
+    stimuliFile = [EXPERIMENTS_FOLDER experiment filesep 'STIM-basic-StimuliControl' filesep 'stim.mat'];
+    activityFile = [EXPERIMENTS_FOLDER experiment filesep 'baseline/TrainedNetwork/activity-basic-StimuliControl.mat'];
+    %}
+    
+    % saccade control
+    %{
+    period      = 31 + 26;
+    epoch       = 1;
+    experiment  = 'dilution-1';
+    stimuliFile = [EXPERIMENTS_FOLDER experiment filesep 'STIM-basic-SaccadeControl' filesep 'stim.mat'];
+    activityFile = [EXPERIMENTS_FOLDER experiment filesep 'baseline/TrainedNetwork/activity-basic-SaccadeControl.mat'];
+    %}
     
     %% ====================================================================================================================
     
@@ -55,8 +83,8 @@ function ThesisPopulationResponsePlot()
     
     stimuli  = load(stimuliFile);
     dt = stimuli.dt;
-    R_eccentricity = stimuli.R_eccentricity;
-    S_eccentricity = stimuli.S_eccentricity;
+    R_eccentricity = stimuli.R_eccentricity; % 45
+    S_eccentricity = stimuli.S_eccentricity; % 30
     
     s = timeToTimeStep(stimuli.stimuli{period}.saccadeTimes, dt);
     numTimeSteps = length(stimuli.stimuli{period}.eyePositionTrace);

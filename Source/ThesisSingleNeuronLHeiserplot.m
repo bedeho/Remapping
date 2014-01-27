@@ -31,6 +31,8 @@ function ThesisSingleNeuronLHeiserplot()
     % Plotting variable
     upperYlimit = sqrt(2);
     
+    %% Single neuron plots
+
     % Iterate each neuron
     for i=1:numUnique,
         
@@ -55,7 +57,7 @@ function ThesisSingleNeuronLHeiserplot()
             plot([pref pref], [-0.01 upperYlimit], '--k'); % preference
         end
         
-        text(-20, upperYlimit,['SI = ' num2str(sim_trained.LHeiserAnalysis.SI(i))], 'VerticalAlignment','bottom','HorizontalAlignment','right','FontSize',14)
+        text(-20, upperYlimit,['SI = ' num2str(sim_trained.LHeiserAnalysis.SI(i),'%.4f')], 'VerticalAlignment','bottom','HorizontalAlignment','right','FontSize',14)
         
         xlim([-45 45]);
         ylim([-0.01 upperYlimit]);

@@ -68,6 +68,10 @@ function ThesisLHeiserPlot()
         trained_network = load([simulationFolder{i} filesep 'TrainedNetwork/analysis-basic-LHeiser.mat']);
         trained_uniqueIndexes = trained_network.LHeiserAnalysis.uniqueIndexes
 
+        %% Number of locations responsiveness distribution
+        
+        %{
+        
         % Compute        
         diffUniqueIndexes = trained_uniqueIndexes - blank_uniqueIndexes;
         uniqueResponseCount = sum(diffUniqueIndexes > 0);
@@ -79,7 +83,7 @@ function ThesisLHeiserPlot()
         bar(0:numberOfDirections, h, 0.7);
         ylim([0 1.01]);
         
-        hXLabel = xlabel('Number of saccade directions with remapping');
+        hXLabel = xlabel('Number of locations with remapping');
         hYLabel = ylabel('Frequency');
         set([hYLabel hXLabel], 'FontSize', 14);
         set(gca, 'FontSize', 12);
@@ -90,6 +94,124 @@ function ThesisLHeiserPlot()
         % Save plot for bar plot
         results(i,:) = h;
         
+        
+        %}
+        
+        %% selectivity distribution
+        %{
+        % Make histograms
+        SI_untrained = [blank_network.LHeiserAnalysis.SI];
+        SI_trained = [trained_network.LHeiserAnalysis.SI];
+
+        X = 0:0.05:1;
+
+        %h_untrained = histc(SI_untrained, X);
+        h_trained = histc(SI_trained, X);
+
+        H = [ h_trained(1:end)']; % h_untrained(1:end)'
+
+        figure('Units','pixels','position', [1000 1000 400 200]);
+
+        hBar = bar(X,H,1.0);  %bar(X,H,1.0,'stacked','LineStyle','none'); 
+        set(hBar(1),'FaceColor', 'r');
+        %set(hBar(2),'FaceColor', 'r');
+
+        xlim([-0.1 1.1])
+
+        hXLabel = xlabel('Selectivity Index');
+        hYLabel = ylabel('Frequency');
+        set([hYLabel hXLabel], 'FontSize', 14);
+        set(gca, 'FontSize', 12);
+            %}
+        
+        %% preference distribution
+        %{
+        % Make histograms
+        pref_trained = [trained_network.LHeiserAnalysis.retinal_preference];
+
+        X = -45:5:45;
+
+        h_trained = histc(pref_trained, X);
+
+        figure('Units','pixels','position', [1000 1000 400 200]);
+
+        hBar = bar(X,h_trained,1.0); 
+
+        xlim([-50 50])
+
+        hXLabel = xlabel('Preferred Location (deg)');
+        hYLabel = ylabel('Frequency');
+        set([hYLabel hXLabel], 'FontSize', 14);
+        set(gca, 'FontSize', 12);
+        set(gca, 'XTick',-45:10:45);
+        %}
+        
+        %% Number of locations vs. max remapping index
+        %{
+        % Compute        
+        diffUniqueIndexes = trained_uniqueIndexes - blank_uniqueIndexes;
+        uniqueResponseCount = sum(diffUniqueIndexes > 0);
+        maxIndexPerNeuron = max(trained_uniqueIndexes);
+        
+        means = zeros(1,numberOfDirections);
+        err = zeros(1,numberOfDirections);
+        
+        for j=1:numberOfDirections,
+            
+            v = maxIndexPerNeuron(uniqueResponseCount == j);
+            means(j) = mean(v);
+            err(j) = std(v);
+        end
+        
+        % Show figure
+        figure('Units','pixels','position', [1000 1000 400 200]); % [1000 1000 400 400]
+        
+        errorbar(1:numberOfDirections, means, err);
+        
+        ylim([0 sqrt(2)]);
+        xlim([0 (numberOfDirections+1)]);
+        
+        hXLabel = xlabel('Number of locations with remapping');
+        hYLabel = ylabel('Maximum Remapping Index');
+        set([hYLabel hXLabel], 'FontSize', 14);
+        set(gca, 'FontSize', 12);
+        set(gca, 'YTick', [0 1], 'XTick', 1:numberOfDirections);
+        pbaspect([0.6 0.3 1])
+        %}
+        
+        %% RI,SI as function of RF
+        
+        meanRI = mean(trained_uniqueIndexes);
+        errorRI = std(trained_uniqueIndexes);
+        RF = trained_network.LHeiserAnalysis.Unique_Training_RF_Locations;
+        SI = trained_network.LHeiserAnalysis.SI;
+
+        % Show figure
+        figure('Units','pixels','position', [1000 1000 400 200]); % [1000 1000 400 400]
+        
+        errorbar(RF, meanRI, errorRI, 'o');
+        hold on;
+        plot(RF,SI,'*g');
+        
+        YLim = [0 sqrt(2)];
+        XLim = [-45 45];
+        
+        ylim(YLim);
+        xlim(XLim);
+        
+        hXLabel = xlabel('Retinal Location (deg)');
+        hYLabel = ylabel('');
+        
+        if(i==1),
+            legend('Mean Remapping Index','Selectivity Index');
+        end
+        
+        %legend('boxoff');
+        set([hYLabel hXLabel], 'FontSize', 14);
+        set(gca, 'FontSize', 12);
+        set(gca, 'YTick', [0 1], 'XTick', -45:10:45);
+        pbaspect([0.6 0.3 1])
+                
     end
     
     %{

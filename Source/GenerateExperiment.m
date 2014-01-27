@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function GenerateExperiment(Name, dt, stimulinames, trainingStimuli) %, DELAY)
+function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %, DELAY)
 
     % Import global variables
     declareGlobalVars();
@@ -60,7 +60,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli) %, DELAY)
     parameterCombinations = containers.Map;
     
     % Simulations Parameters
-    numTrainingEpochs = 20;%10;
+    numTrainingEpochs = 20;%20;
     doTrain = (nargin >= 4) && (numTrainingEpochs > 0);
     outputSavingRate = 1; % Period of time step saving during testing.
     assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
@@ -96,21 +96,21 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli) %, DELAY)
     parameterCombinations('V_supression_delay')     = [DELAY];
     parameterCombinations('V_to_C_psi')             = [10]; % self-org-classic = 10, prewired = 
     parameterCombinations('V_to_C_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
-    parameterCombinations('V_to_C_connectivity')    = [0.05]; % self-org-classic = 0.05 , prewired = 0.2
+    parameterCombinations('V_to_C_connectivity')    = [DILUTION]; % self-org-classic = 0.05 , prewired = 0.2 [tune 0.05 0.10 0.15 0.20 0.25] or 2 [0.05 0.5 0.1], 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
 
     % S
     parameterCombinations('S_eccentricity')         = [30]; % self-org-classic = 30, prewired = 
-    parameterCombinations('S_delay_sigma')          = [0.100]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('S_delay_sigma')          = [0.100]; % self-org-classic = 0.1, prewired = [tune 0.100 0.050 0.025]
     parameterCombinations('S_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
     parameterCombinations('S_psi')                  = [1]; % self-org-classic = 1, prewired = 
-    parameterCombinations('S_presaccadic_onset')    = [0.070];  % self-org-classic = 0.05 , prewired = 0.100
+    parameterCombinations('S_presaccadic_onset')    = [0.070];  % self-org-classic = 0.070 , prewired = 0.100
     parameterCombinations('S_trace_length')         = [DELAY-0.020]; % self-org-classic = DELAY-0.02  ,stop saccade sooner so that you dont get FRF imprinted in V->C weights due to S and C delay and V speed
     parameterCombinations('S_to_C_psi')             = [8]; % self-org-classic = 8, prewired = 
     parameterCombinations('S_to_C_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
-    parameterCombinations('S_to_C_connectivity')    = [0.2];  % self-org-classic = 0.2, prewired = 0.4
+    parameterCombinations('S_to_C_connectivity')    = [DILUTION];  % self-org-classic = 0.2, prewired = 0.4 [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
     
     % C
-    parameterCombinations('C_N')                    = [1000]; % self-org-classic = 1000, prewired = 1000
+    parameterCombinations('C_N')                    = [1000]; % self-org-classic = 1000, prewired =
     parameterCombinations('C_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
     parameterCombinations('C_w_INHB')               = [0.1]; % self-org-classic = 0.1, prewired = 
     parameterCombinations('C_threshold')            = [15]; % self-org-classic = 15, prewired = 
@@ -193,10 +193,15 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli) %, DELAY)
             S_N = length(simulation('S_preferences'));
             
             % S delays
+            
+            % NEW
             %S_delay = randn(1, S_N);
-            %S_delay = 0.06 + simulation('S_delay_sigma')*S_delay; % change mean and std
+            %S_delay = 0.050 + simulation('S_delay_sigma')*S_delay; % change mean and std
             %S_delay(S_delay < 0) = -S_delay(S_delay < 0); % flip negative delays to be positive
+            
+            %CLASSIC
             S_delay = simulation('S_delay_sigma')*ones(1, S_N);
+            
             simulation('S_presaccadicOffset') = S_delay;
             
             % K delays

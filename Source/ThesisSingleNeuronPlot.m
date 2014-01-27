@@ -15,7 +15,34 @@ function ThesisSingleNeuronPlot()
     
     R_BASE = 46;
         
-    %% prewired - stim onset
+    %% test
+    %{
+    experiment = 'test';
+    
+    period      = R_BASE + (-20);
+    epoch       = 5;
+    neuron      = period;
+    %stimuliName = 'STIM-basic-StimuliControl';
+    %activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/activity-basic-StimuliControl.mat'];
+    stimuliName = 'STIM-basic-Kusonoki';
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/activity-basic-Kusonoki.mat'];
+
+    colors{1}   = [0,0,255]/255; % [67,82,163]/255;
+    legends{1}  = '';
+    %}
+    
+    %{
+    experiment  = 'test';
+    
+    % Remapping
+    period      = 5;
+    epoch       = 1;
+    neuron      = 26;
+    stimuliName = 'STIM-basic-Kusonoki';
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/activity-basic-Kusonoki.mat'];
+    %}
+    
+    %% stim onset (prewired)
     %{
     experiment = 'prewired';
     
@@ -29,7 +56,7 @@ function ThesisSingleNeuronPlot()
     legends{1}  = '';
     %}
     
-    %% prewired - truncation
+    %% truncation (prewired)
     %{
     experiment = 'prewired';
     
@@ -43,9 +70,9 @@ function ThesisSingleNeuronPlot()
     legends{1}  = '';
     %}
     
-    %% prewired - remapping
+    %% remapping (prewired)
     %{
-    
+   
     % h_0 = -5& s = 15, --> r = -20.
     experiment  = 'prewired';
     
@@ -78,7 +105,7 @@ function ThesisSingleNeuronPlot()
     
     % Saccade control
     %{
-    period      = R_BASE + (15);
+    period      = 46; % not contigous due to minimal saccade restriction: R_BASE + (15);
     epoch       = 1;
     neuron      = R_BASE + (-20);
     stimuliName = 'STIM-basic-SaccadeControl';
@@ -87,22 +114,24 @@ function ThesisSingleNeuronPlot()
     
     %}
     
-    %% prewired - remapping
-    %{
+    %% remapping
+    
     % h_0 = -5& s = 15, --> r = -20.
     
     h = -5;
     s = 15;
     r = h - s;
     
-    experiment  = 'baseline-onsettune';
+    experiment  = 'baseline';
     
+    %{
     % Remapping
     period      = 1;
     epoch       = 1;
     neuron      = R_BASE + r;
     stimuliName = 'STIM-basic-DuhamelRemappingTrace';
-    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-DuhamelRemappingTrace.mat'];
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/activity-basic-DuhamelRemappingTrace.mat'];
+    %}
     
     %{
     % Stimuli control
@@ -110,22 +139,22 @@ function ThesisSingleNeuronPlot()
     epoch       = 1;
     neuron      = R_BASE + r;
     stimuliName = 'STIM-basic-StimuliControl';
-    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-StimuliControl.mat'];
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/activity-basic-StimuliControl.mat'];
     %}
     
     % Saccade control
-    %{
-    period      = R_BASE + s;
+    
+    period      = 46;
     epoch       = 1;
     neuron      = R_BASE + h;
     stimuliName = 'STIM-basic-SaccadeControl';
-    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-SaccadeControl.mat'];
-    %}
+    activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/activity-basic-SaccadeControl.mat'];
     
-    %}
     
-    %% prewired - KUSONKI
-
+    
+    
+    %% KUSONKI
+    %{
     % h_0 = -5& s = 15, --> r = -20.
     
     h = -5;
@@ -140,7 +169,8 @@ function ThesisSingleNeuronPlot()
     neuron      = R_BASE + r;
     stimuliName = 'STIM-basic-Kusonoki';
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-Kusonoki.mat'];
-
+    %}
+    
     colors{1}   = [0,0,255]/255; % [67,82,163]/255;
     legends{1}  = '';
     % =======================================
@@ -173,7 +203,8 @@ function ThesisSingleNeuronPlot()
     
     % plot rectangle
     stimBegin = stimuli.stimuli{period}.stimOnsetTimes;
-        
+    
+    %{
     if(~isempty(stimBegin)),
 
         recordingWindow = 0.300;
@@ -200,6 +231,7 @@ function ThesisSingleNeuronPlot()
         %p = patch(X, Y, stimColor);
         %set(p,'FaceAlpha',0.5);
     end
+    %}
     
     for i=1:length(activityFiles),
         

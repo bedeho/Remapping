@@ -129,15 +129,19 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     S_activation    = zeros(1,S_N);
     S_firingrate    = zeros(1,S_N);
     
-    S_presaccadicOffset = parameters.simulation('S_presaccadicOffset'); %
+    %S_presaccadicOffset = parameters.simulation('S_presaccadicOffset'); %
     S_tau           = parameters.simulation('S_tau'); % (s)
     S_to_C_psi      = parameters.simulation('S_to_C_psi');
     S_psi           = parameters.simulation('S_psi');
     S_to_C_alpha    = parameters.simulation('S_to_C_alpha'); % learning rate
     S_sigma         = V_sigma; % (deg) receptive field size
+    S_trace_length  = parameters.simulation('S_trace_length')*ones(1,S_N);
     
-    S_presaccadic_onset = parameters.simulation('S_presaccadic_onset')*ones(1,S_N);
-    S_trace_length      = parameters.simulation('S_trace_length')*ones(1,S_N);
+    % CLASSIC:
+    %S_presaccadic_onset = parameters.simulation('S_presaccadic_onset')*ones(1,S_N);
+    
+    % NEW:
+    S_presaccadic_onset = parameters.simulation('S_presaccadicOffset');
 
     % C  =======================================
     C_N             = size(S_to_C_weights, 1); % S_N*R_N;
@@ -188,6 +192,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     % Flat buffers
     C_firing_history_flat     = zeros(C_N, numPeriods, numEpochs);
     C_activation_history_flat = zeros(C_N, numPeriods, numEpochs);
+    C_Input_flat              = zeros(numPeriods, numEpochs); 
     
     %% Simulate
     totalTicID = tic;
@@ -257,7 +262,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             
             if(numSaccades > 0),
                 saccade_times = repmat(saccadeTimes,S_N,1); % Used to get F
-                saccade_time_offset = saccade_times - repmat(S_presaccadicOffset',1,numSaccades); % Used to get F
+                %saccade_time_offset = saccade_times - repmat(S_presaccadicOffset',1,numSaccades); % Used to get F
                 
                 % classic
                 %saccade_time_pos_offset = saccade_times + repmat(S_presaccadicOffset',1,numSaccades); % Used to get F
@@ -283,6 +288,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             R_activation        = R_activation*0;
             S_activation        = S_activation*0;
             C_activation        = C_activation*0;
+
     
             % Run period
             for t=2:numTimeSteps, % we cannot compute anything for t==1, since this is time=0, which are the initial conditions, we have not t=-dt input data to use for this
@@ -413,7 +419,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 C_inhibition = C_w_INHB*sum(C_firingrate);
                 V_to_C_excitation = V_to_C_psi*(V_to_C_weights*V_firingrate');
                 S_to_C_excitation = S_to_C_psi*(S_to_C_weights*S_firingrate');
-                C_activation = C_activation + (dt/C_tau)*(-C_activation + V_to_C_excitation' + S_to_C_excitation' - C_inhibition);
+                C_Input = V_to_C_excitation' + S_to_C_excitation';
+                C_activation = C_activation + (dt/C_tau)*(-C_activation + C_Input - C_inhibition);
 
                 % S =======================================
                 if(numSaccades > 0),
@@ -579,6 +586,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 end
                 %}
                 
+                C_Input_flat(period, epoch) = max(max(C_Input), C_Input_flat(period, epoch));
+                
             end
 
             % HACK to save C for C Probe Task, we dont have space to do
@@ -592,6 +601,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
 
                 C_firing_history_flat(:, period, epoch) = normalizedIntegration(C_firing_history(:, :, period, epoch), dt, firstSaccadeTime - window, window);
                 C_activation_history_flat(:, period, epoch) = normalizedIntegration(C_activation_history(:, :, period, epoch), dt, firstSaccadeTime - window, window);
+
             end
             
             periodFinishTime = toc(periodTicID);
@@ -621,6 +631,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
         disp('Could not save C_firing_history, TO BIG !!!!!!!!!!!!!');
         C_firing_history = [];
         C_activation_history = [];
+        extra_history = [];
     end
     
     % Output activity
@@ -645,6 +656,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                                                                             , 'C_activation_history' ...
                                                                             , 'C_firing_history_flat' ...
                                                                             , 'C_activation_history_flat' ...
+                                                                            , 'C_Input_flat' ...
                                                                             , 'extra_history');
                                                                         
     disp('Done...');

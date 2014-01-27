@@ -10,9 +10,9 @@
 function latencyTimeStep = findNeuronalLatency_NEW(responseVector, dt)
 
     % analysis variables
-    windowDuration = 0.02;
-    minResponse = 0.1; % do we even need this
-    minDiff = 0.01;
+    windowDuration = 0.030;
+    minResponse = 0.1; %classic: 0.1
+    minDiff = 0.002; % classic: 0.01 <------------ dependson dt !!!!!
 
     % working variables
     windowLength = timeToTimeStep(windowDuration, dt); % time over which to demand positive slop
@@ -24,18 +24,30 @@ function latencyTimeStep = findNeuronalLatency_NEW(responseVector, dt)
     
     % check that there is some response: we could be more sophisticated
     % here, but who cares.
-    if(all(responseLength < minResponse)),
+    if(all(responseVector < minResponse)),
         return;
     end
 
     % detect match: naive
     for t=1:(responseLength-windowLength),
         
+        % CLASSIC
+        activity = differential(t:(t+windowLength));
+        
         % are all slopes in window positive ? if so we are done
-        if(all(differential(t:(t+windowLength)) > minDiff))
+        if(all(activity > minDiff))
             latencyTimeStep = t;
             return;
         end
+        
+        
+        %{
+        % NEW
+        if(normalizedIntegration(responseVector, dt, (t-1)*dt, windowDuration) > 0.002)
+            latencyTimeStep = t;
+            return;            
+        end
+        %}
     end
 
 end
