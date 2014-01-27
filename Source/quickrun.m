@@ -2,7 +2,8 @@
 function quickrun()
 
     %for d=[0.050 0.100 0.150 0.200 0.250 0.300],
-    for d=0.2:0.1:1,
+    %for d=0.05:0.1:1,
+    d=0.05
         
         %experimentName = ['baseline-delay' num2str(d) ];
         %experimentName = ['prewired-delay' num2str(d) ];
@@ -69,6 +70,6 @@ function quickrun()
         %% Run
         GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli, d);
     
-    end
+    %end
    
 end
