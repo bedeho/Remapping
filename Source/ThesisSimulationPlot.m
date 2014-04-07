@@ -14,7 +14,7 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusono
     global EXPERIMENTS_FOLDER;
     
     if(nargin<1)
-        experimentFolder = [EXPERIMENTS_FOLDER 'prewired/baseline/BlankNetwork/'];
+        experimentFolder = [EXPERIMENTS_FOLDER 'prewired/baseline/PrewiredNetwork/'];
     end
     
     color = [67,82,163]/255; % {[67,82,163]/255; [238,48,44]/255};

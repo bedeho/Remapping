@@ -54,7 +54,7 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
     Lim = [(lat_lower_limit - 5) (lat_upper_limit+5)]; %1.1*,  ticks on 10ms
     Lim = roundn(Lim,1);
     
-    %if(~foundNaN),
+    if(~foundNaN),
     
         if(length(remapping_results) > 1),
             [remLatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Lat, Y_Lat, 'XTitle', 'Stimulus Control Latency (ms)', 'YTitle', 'Remapping Latency (ms)', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'Legends', Legends, 'AxisFontSize', AxisFontSize, 'LabelFontSize', LabelFontSize);
@@ -68,10 +68,11 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
         ticks = Lim(1):20:Lim(2);
         set(scatterAxis, 'YTick', ticks, 'XTick', ticks);
     
-    %else
-    %    remLatFig = figure;
-    %    imagesc;
-    %end
+    else
+        remLatFig = figure;
+        warning('missing latency');
+        imagesc;
+    end
     
     % 2. scatter stim index. vs sacc index.    
     Lim = [-1 1];

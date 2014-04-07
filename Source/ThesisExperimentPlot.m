@@ -16,7 +16,7 @@ function ThesisExperimentPlot()
     %% Prewired
     %{
     experiment  = 'prewired';
-
+    
     simulationFolder{1} = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork/'];
     Legends{1}          = 'Random';
     FaceColors{1}       = [67,82,163]/255;
@@ -40,7 +40,7 @@ function ThesisExperimentPlot()
     %}
     
     %% Selforganizing
-    %{
+    
     experiment  = 'baseline';
 
     simulationFolder{1} = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork'];
@@ -50,7 +50,7 @@ function ThesisExperimentPlot()
     simulationFolder{2} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork'];
     Legends{2}          = 'Trained';
     FaceColors{2}       = [238,48,44]/255;
-    %}
+    
     
     %% baseline-delay
     %{
