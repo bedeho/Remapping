@@ -174,7 +174,7 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
         R_activation = activity.R_activation_history(:, :, period, epoch);
         S_activation = activity.S_activation_history(:, :, period, epoch);
         
-        extra = activity.extra_history(:, :, period, epoch);
+        
         
         % If C is empty, just fill with blank
         if ~isempty(activity.C_firing_history),
@@ -189,6 +189,7 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
         else
             C_firingrate = zeros(C_N, activity.numPeriods);
             C_activation = zeros(C_N, activity.numPeriods);
+            
             
             includeC_layer = 0;
             %numRows = 5;
@@ -207,7 +208,16 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
         end
         
         subplot(numRows,2,1);
-        imgR = imagesc(extra);
+        
+        % check if extra info is empty
+        if(~isempty(activity.extra_history))
+            extra = activity.extra_history(:, :, period, epoch);
+            imgR = imagesc(extra);
+        else
+           imgR = zeros(size(R_firingrate));
+        end
+        
+        
         hold on;colorbar;
         if ~isempty(s), plot([s s],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
         title('Extra');
@@ -473,6 +483,10 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     
                 elseif(strcmp(region,'R')),
                     
+                    
+                    %% C-> R
+                    
+                    %{
                     figure('Units','pixels','position', [1000 1000 420 230]);
                     hold on;
                     
@@ -504,7 +518,24 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     % Diag
                     disp('C afferents > 90% of max');
                     find(synapticAfferents > maxWeight*0.9)
+                    %}
+                    
+                    
+                    %% V->R
 
+                    K_to_R_afferents = network.K_to_R_weights(neuron, :);
+                    
+                    figure('Units','pixels','position', [1000 1000 420 180]);
+                    plot(K_to_R_afferents);
+                    axis tight;
+                    ylim([0 max(K_to_R_afferents)]);
+                    
+                    hXLabel = xlabel('Retinal Location (deg)');
+                    hYLabel = ylabel('Synaptic weight');
+                    set([hYLabel hXLabel], 'FontSize', 14);
+                    set(gca,'XTick', rTicks, 'XTickLabel', rCellLabels);
+                    pbaspect([1, 30/length(R_preferences), 1]);
+                    
                 elseif(strcmp(region,'S')),
                     
                     figure('Units','pixels','position', [1000 1000 420 300]);

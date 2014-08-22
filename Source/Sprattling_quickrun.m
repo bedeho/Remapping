@@ -1,5 +1,5 @@
 
-function quickrun()
+function Sprattling_quickrun()
 
     %for d=[0.050 0.100 0.150 0.200 0.250 0.300],
     %for d=0.05:0.1:1,
@@ -18,7 +18,9 @@ function quickrun()
         
         %experimentName = 'prewired';
         
-        experimentName = 'new?';
+        % sprattlig
+        %experimentName = 'sprattling_nonplastic';
+        experimentName = 'sprattling_visual_learning';
         
         %% DO NOT CHANGE, basic2 has fixed dt
         %dt = 0.010;
@@ -45,33 +47,17 @@ function quickrun()
         Testing_CLayerProbeTask('basic', dt);
         
         % Cont: Remapping
-        Testing_DuhamelRemapping('basic', dt, Training_RF_Locations, Training_Saccades);
-        
-        % Truncation
-        Testing_DuhamelTruncation('basic', dt, Training_RF_Locations, Training_Saccades);
-        
-        % Trace
+        %Testing_DuhamelRemapping('basic', dt, Training_RF_Locations, Training_Saccades);
         Testing_DuhamelRemappingTrace('basic', dt, Training_RF_Locations, Training_Saccades);
         
-        % Kusonoki
-        Testing_Kusonoki('basic', dt, Training_RF_Locations, Training_Saccades);
         
         stimulinames = {'basic-StimuliControl', ...
             'basic-SaccadeControl', ...
-            'basic-CLayerProbe', ...
             'basic-DuhamelRemappingTrace'
-            };
-        
-        %'basic-Kusonoki'
-        
-        %'basic-CLayerProbe', ...
-        %'basic-DuhamelRemappingTrace', ...
-        %'basic-Kusonoki'
-        %'basic2-StimuliControl', ...
-        %'basic2-SaccadeControl', ...
+            };%'basic-CLayerProbe', ...
         
         %% Run
-        GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli, d);
+        Sprattling_GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli, d);
     %end
    
 end

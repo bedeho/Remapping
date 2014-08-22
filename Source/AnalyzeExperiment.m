@@ -11,7 +11,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
 
     % Experiment name 
     if nargin < 1,
-        experiment = 'baseline-delay0.3';%LHeiser_C_to_R_connectivity'; %'LHeiser';%'prewired';,'LHeiser_C_to_R_connectivity'
+        experiment = 'sprattling_visual_learning';
     end
     
     % Stimuli names
@@ -23,7 +23,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
         
         if(nargin < 2)
             
-            
+            %{
             stimulinames = {'basic-StimuliControl', ...
                             'basic-SaccadeControl', ...
                             'basic-CLayerProbe', ...
@@ -31,11 +31,12 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                             'basic-DuhamelRemappingTrace', ... 
                             'basic-DuhamelTruncation', ...
                             'basic-Kusonoki'};
+            %}
             
+            %, 'basic-CLayerProbe',
             
-            %stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-CLayerProbe', 'basic-LHeiser'};
+            stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemappingTrace'};
             
-            %stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-CLayerProbe', 'basic-DuhamelRemappingTrace', 'basic-Kusonoki'}; % 
         end
     end
     
@@ -142,8 +143,9 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                     %trDir = [experimentFolder simulation filesep 'Training'];
                     
                     % Do analysis
-                    Analyze(experimentFolder, netDir, stimulinames);
-
+                    %Analyze(experimentFolder, netDir, stimulinames);
+                    Sprattling_Analyze(experimentFolder, netDir, stimulinames, network);
+                    
                     % Start row
                     fprintf(fileID, '<tr>');
 

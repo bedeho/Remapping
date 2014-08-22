@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Analyze(experimentFolder, netDir, stimulinames)
+function Sprattling_Analyze(experimentFolder, netDir, stimulinames, network)
 
     % Import global variables
     declareGlobalVars();
@@ -18,6 +18,8 @@ function Analyze(experimentFolder, netDir, stimulinames)
     sacc_control_activity = [];
     stim_stimuli = [];
     sacc_stimuli = [];
+    
+    isUntrained = strcmp(network,'BlankNetwork');
     
     % Iterate stimuli
     for i = 1:length(stimulinames),
@@ -43,7 +45,7 @@ function Analyze(experimentFolder, netDir, stimulinames)
         if strcmp(type,'StimuliControl'),
             
             disp('Doing stimuli control task analysis...');
-            [StimuliControl_Result] = AnalyzeStimuliControlTask(activity, stimuli);
+            [StimuliControl_Result, Decoded_ReceptiveFieldsLocations] = Sprattling_AnalyzeStimuliControlTask(activity, stimuli);
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'StimuliControl_Result');
             
             stim_stimuli = stimuli;
@@ -59,47 +61,7 @@ function Analyze(experimentFolder, netDir, stimulinames)
             sacc_stimuli = stimuli;
             sacc_control_activity = activity;
             
-        elseif strcmp(type,'DuhamelRemapping'),
-            
-            disp('Doing duhamel remapping task analysis...');
-            DuhamelRemapping_Result = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemapping_Result');
-            
-        elseif strcmp(type,'DuhamelRemappingTrace'),
-            
-            disp('Doing duhamel remapping trace task analysis...');
-            
-            %DuhamelRemappingTrace_Result = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
-            
-            DuhamelRemappingTrace_Result = Sprattling_AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
-            
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemappingTrace_Result');
-            
-        elseif strcmp(type,'DuhamelTruncation'),
-            
-            DuhamelTruncation_Result = AnalyzeDuhamelTruncation(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli);
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelTruncation_Result');
-              
-        elseif strcmp(type,'Kusonoki'),
-            
-            disp('Doing Kusonoki analysis...');
-            [kusonokiSTIMAlignedAnalysis, kusonokiSACCAlignedAnalysis] = AnalyzeKusonoki(activity, stimuli);
-            
-            % We also save onset times in analysis file for convenicence
-            % uring plotting            
-            ticks = (stimuli.stimulusOnsetTimes + stimuli.stimulusDuration) - stimuli.saccadeOnset;
-            
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'kusonokiSTIMAlignedAnalysis', 'kusonokiSACCAlignedAnalysis', 'ticks');
-            
-        elseif strcmp(type,'LHeiser'),
-            
-            disp('Doing LHeiser task analysis...');
-            
-            LHeiserAnalysis = AnalyzeLHeiser(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
-            
-            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'LHeiserAnalysis');
-            
-        elseif strcmp(type,'CLayerProbe'),
+       elseif strcmp(type,'CLayerProbe'),
             
             disp('Doing C Layer Probe analysis...');
             [CLabeProbe_Neurons_S, CLabeProbe_Neurons_V] = AnalyzeCLayerProbe(activity,  stimuli);
@@ -111,15 +73,34 @@ function Analyze(experimentFolder, netDir, stimulinames)
             
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'CLabeProbe_Neurons_S', 'CLabeProbe_Neurons_V', 'R_max', 'S_max');
             
+        elseif strcmp(type,'DuhamelRemappingTrace') && ~isUntrained,
+            
+            disp('Doing duhamel remapping trace task analysis...');
+            
+            %[DuhamelRemappingTrace_Result] = Sprattling_AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli, Decoded_ReceptiveFieldsLocations);
+            
+            %save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemappingTrace_Result');
+            
         else
-            disp(['Unkonwn stimuli: ' num2str(stimulinames{i})]);
+            disp(['Unsupported stimuli: ' num2str(stimulinames{i})]);
         end
             
     end
     
-    % Plots
-    [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFig, kusonokiSTIMFig, CLayerProbeFigure, LHeiserFig] = ThesisSimulationPlot(netDir);
+   %% Plots
+   
+   % Stimuli Control
+   if(~isUntrained),
+        f = figure;   
+        %hist(Decoded_ReceptiveFieldsLocations, 40);
+        title('Receptive Field Location Distribution');
+        saveas(f,[netDir filesep 'StimuliControl-summary.png']);
+        saveas(f,[netDir filesep 'StimuliControl.eps'], 'epsc');
+        close(f);
+   end
+        
     
+    %{
     % Stimuli Control
     if(remTraceScatFig),
         saveas(stmCtrlFigure,[netDir filesep 'StimuliControl-summary.png']);
@@ -167,4 +148,5 @@ function Analyze(experimentFolder, netDir, stimulinames)
         saveas(CLayerProbeFigure,[netDir filesep 'CLayerProbe.eps']);
         close(CLayerProbeFigure);
     end
+    %}
 end

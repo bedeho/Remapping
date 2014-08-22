@@ -1,13 +1,13 @@
 
 %
-%  GenerateExperiment.m
+%  Sprattling_GenerateExperiment.m
 %  Remapping
 %
 %  Created by Bedeho Mender on 19/05/13.
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %, DELAY)
+function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %, DELAY)
 
     % Import global variables
     declareGlobalVars();
@@ -50,6 +50,11 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
         
         % Copy stimuli folder
         copyfile(stimuliFolder,[experimentFolderPath filesep 'STIM-' stimName]);
+        
+        % Delete folder, so that it has to be generate fresh by next
+        % experiment, got burned on this one since I was depending on
+        % stimuli without updating it
+        %system(['rm -R ' stimuliFolder]);
     
     end
     
@@ -60,7 +65,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
     parameterCombinations = containers.Map;
     
     % Simulations Parameters
-    numTrainingEpochs = 20;%20;
+    numTrainingEpochs = 20 %0 % CLASSIC = 20
     doTrain = (nargin >= 4) && (numTrainingEpochs > 0);
     outputSavingRate = 1; % Period of time step saving during testing.
     assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
@@ -74,19 +79,24 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
     % R
     parameterCombinations('R_eccentricity')         = [45]; % self-org-classic = 45, prewired = 
     parameterCombinations('R_tau')                  = [0.020]; % self-org-classic = 0.020, prewired = 
-    parameterCombinations('R_w_INHB')               = [0.6]; % self-org-classic = 0.6, prewired =
-    parameterCombinations('R_slope')                = [0.5]; % self-org-classic = 0.5, prewired = 
-    parameterCombinations('R_threshold')            = [3]; %self-org- classic = 3, prewired = 
+    parameterCombinations('R_w_INHB')               = [0.5]; % self-org-classic = 0.6, prewired =
+    parameterCombinations('R_slope')                = [2]; % self-org-classic = 0.5, prewired = 
+    parameterCombinations('R_threshold')            = [0.005]; %self-org- classic = 3, prewired = 
     %parameterCombinations('R_covariance_threshold') = [0];
     
     % K
     parameterCombinations('K_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
     parameterCombinations('K_onset_delay_sigma')    = [0.05]; % self-org-classic = 0.05, prewired = 
-    parameterCombinations('K_I_psi')                = [8]; % self-org-classic = 8, prewired = 
+    parameterCombinations('K_I_psi')                = [2 4 8]; % self-org-classic = 8, prewired = 
     parameterCombinations('K_supression_delay')     = [0]; % self-org-classic = 0, prewired = 
     parameterCombinations('P_tau')                  = [0.300]; % self-org-classic = 0.3, prewired = 
     parameterCombinations('P_psi')                  = [0.8]; %  self-org-classic = 0.8, prewired = 
-    K_max_onset_delay = 0.080; % self-org-classic = 0.08, prewired = 
+    
+    K_max_onset_delay = 0.080; % self-org-classic = 0.08, prewired =
+    
+    parameterCombinations('K_to_R_psi')             = [1]; %
+    parameterCombinations('K_to_R_alpha')           = [0.1]; % self-org-classic = 0.1
+    parameterCombinations('K_to_R_connectivity')    = [1]; % self-org-classic = 0.8, prewired = 
     
     % V
     DELAY = 0.3; % self-org-classic = 0.3
@@ -95,7 +105,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
     parameterCombinations('V_sigma')                = [3]; %  self-org-classic = 3, prewired = 
     parameterCombinations('V_supression_delay')     = [DELAY];
     parameterCombinations('V_to_C_psi')             = [10]; % self-org-classic = 10, prewired = 
-    parameterCombinations('V_to_C_alpha')           = [0 0.1]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('V_to_C_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
     parameterCombinations('V_to_C_connectivity')    = [DILUTION]; % self-org-classic = 0.05 , prewired = 0.2 [tune 0.05 0.10 0.15 0.20 0.25] or 2 [0.05 0.5 0.1], 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
 
     % S
@@ -106,7 +116,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
     parameterCombinations('S_presaccadic_onset')    = [0.070];  % self-org-classic = 0.070 , prewired = 0.100
     parameterCombinations('S_trace_length')         = [DELAY-0.020]; % self-org-classic = DELAY-0.02  ,stop saccade sooner so that you dont get FRF imprinted in V->C weights due to S and C delay and V speed
     parameterCombinations('S_to_C_psi')             = [8]; % self-org-classic = 8, prewired = 
-    parameterCombinations('S_to_C_alpha')           = [0 0.1]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('S_to_C_alpha')           = [0]; % self-org-classic = 0.1, prewired = 
     parameterCombinations('S_to_C_connectivity')    = [DILUTION];  % self-org-classic = 0.2, prewired = 0.4 [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
     
     % C
@@ -116,8 +126,8 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
     parameterCombinations('C_threshold')            = [15]; % self-org-classic = 15, prewired = 
     parameterCombinations('C_threshold_sigma')      = [0]; % self-org-classic = 0, prewired = 
     parameterCombinations('C_slope')                = [100]; % self-org-classic = 100, prewired = 
-    parameterCombinations('C_to_R_psi')             = [3]; % self-org-classic = 3, prewired = 7
-    parameterCombinations('C_to_R_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('C_to_R_psi')             = [15]; % self-org-classic = 3, prewired = 7
+    parameterCombinations('C_to_R_alpha')           = [0]; % self-org-classic = 0.1, prewired = 
     parameterCombinations('C_to_R_connectivity')    = [1]; % self-org-classic = 1, prewired = 
     
     % Save the experiment params
@@ -234,7 +244,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
             
             % Create simulation blank network
             disp('Creating blank network...');
-            CreateBlankNetwork([simulationFolder filesep 'BlankNetwork.mat'], hardwired_pref_R, C_N, length(simulation('R_preferences')), length(simulation('S_preferences')), R_to_R_pos_sigma, R_to_R_neg_sigma, simulation('S_to_C_connectivity'), simulation('V_to_C_connectivity'), simulation('C_to_R_connectivity'));
+            Sprattling_CreateBlankNetwork([simulationFolder filesep 'BlankNetwork.mat'], hardwired_pref_R, C_N, length(simulation('R_preferences')), length(simulation('S_preferences')), R_to_R_pos_sigma, R_to_R_neg_sigma, simulation('S_to_C_connectivity'), simulation('V_to_C_connectivity'), simulation('C_to_R_connectivity'), simulation('K_to_R_connectivity'));
 
             if(~doTrain),
                 
@@ -245,7 +255,8 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
                 
                 % Training blank network
                 disp('Training...');
-                Remapping(simulationFolder, trainingStimuli, true);
+
+                Sprattling_Remapping(simulationFolder, trainingStimuli, true);
             end
             
             % Move each network to new folder & test
@@ -271,7 +282,8 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
                     for i=1:length(stimulinames),
                         
                         disp(['Testing Stimuli: ' stimulinames{i}]);
-                        Remapping(network_dir, stimulinames{i}, false, [name ext]);                       
+
+                        Sprattling_Remapping(network_dir, stimulinames{i}, false, [name ext]);
                     end
 
                 end

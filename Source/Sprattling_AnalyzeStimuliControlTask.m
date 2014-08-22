@@ -1,13 +1,13 @@
 
 %
-%  AnalyzeStimuliControlTask.m
+%  Sprattling_AnalyzeStimuliControlTask.m
 %  Remapping
 %
 %  Created by Bedeho Mender on 30/06/13.
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [StimuliControl_Result] = AnalyzeStimuliControlTask(activity, stimuli)
+function [StimuliControl_Result, Decoded_ReceptiveFieldsLocations] = Sprattling_AnalyzeStimuliControlTask(activity, stimuli)
 
     % Check if this is manual run 
     if nargin == 0,
@@ -23,6 +23,7 @@ function [StimuliControl_Result] = AnalyzeStimuliControlTask(activity, stimuli)
 
     % Set parameters
     dt                  = activity.dt;
+    R_N                 = activity.R_N;
     R_eccentricity      = stimuli.R_eccentricity;
     numPeriods          = activity.numPeriods;
     numEpochs           = activity.numEpochs;
@@ -72,5 +73,26 @@ function [StimuliControl_Result] = AnalyzeStimuliControlTask(activity, stimuli)
         %StimuliControl_Result(p).stimulus_response  = stim_response;
         %StimuliControl_Result(p).offset_response    = offset_response;
     end
+    
+    %% Decode retinal location
+
+    R_Locations = -R_eccentricity:1:R_eccentricity;
+    Decoded_ReceptiveFieldsLocations = zeros(1,R_N);
+    
+    for i=1:R_N,
+        
+        % grab all activity for this neuron
+        cross_trial_neuronActivity = squeeze(R_firing_history(i, :, :, 1))'; % (R_N, numSavedTimeSteps, numPeriods, numEpochs)
+        
+        % integrat up activity in each trial
+        cross_trial_activity = normalizedIntegration(cross_trial_neuronActivity, dt, stimuliOnset + responseWindowStart, responseWindowDuration); % duration = 200ms , Colby window control, [50ms,250ms] after stim onset.
+        
+        % decode
+        decoded_location = dot(cross_trial_activity, R_Locations)/sum(cross_trial_activity);
+        
+        % save it
+        Decoded_ReceptiveFieldsLocations(i) = decoded_location;
+    end
+    
 
 end
