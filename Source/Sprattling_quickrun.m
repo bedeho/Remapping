@@ -20,7 +20,7 @@ function Sprattling_quickrun()
         
         % sprattlig
         %experimentName = 'sprattling_nonplastic';
-        experimentName = 'sprattling_visual_learning';
+        experimentName = 'sprattling_visual_learning_bigepoch20';
         
         %% DO NOT CHANGE, basic2 has fixed dt
         %dt = 0.010;
@@ -54,7 +54,9 @@ function Sprattling_quickrun()
         stimulinames = {'basic-StimuliControl', ...
             'basic-SaccadeControl', ...
             'basic-DuhamelRemappingTrace'
-            };%'basic-CLayerProbe', ...
+            };
+        
+        %'basic-CLayerProbe', ...
         
         %% Run
         Sprattling_GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli, d);

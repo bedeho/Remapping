@@ -42,7 +42,7 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
     
     %Training_RF_Locations           = (-R_eccentricity+minimum_Saccade_Amplitude):R_density:(R_eccentricity-minimum_Saccade_Amplitude);
     
-    %Training_RF_Locations           = [-20 -17 -15 -12 -10 -7 -5 -2 0 2 5 7 10 12 15 17 20];
+    Training_RF_Locations           = [-20 -17 -15 -12 -10 -7 -5 -2 0 2 5 7 10 12 15 17 20];
     
     %Training_RF_Locations           = [-20 -15 -10 -5 0 5 10 15 20];
     
@@ -50,7 +50,7 @@ function [Training_RF_Locations, Training_Saccades, filename] = Training_Coordin
     
     %Training_RF_Locations           = [-20 20];
     
-    Training_RF_Locations           = [-15];
+    %Training_RF_Locations           = [-15];
     
     hardcoded = false;
     

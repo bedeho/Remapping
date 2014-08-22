@@ -520,6 +520,13 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     find(synapticAfferents > maxWeight*0.9)
                     %}
                     
+                    figure('Units','pixels','position', [1000 1000 420 230]);
+                    hold on;
+                    
+                    synapticAfferents = network.C_to_R_weights(neuron, :);
+                    plot(synapticAfferents);
+                    
+                    
                     
                     %% V->R
 

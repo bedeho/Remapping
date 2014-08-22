@@ -79,23 +79,26 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli, 
     % R
     parameterCombinations('R_eccentricity')         = [45]; % self-org-classic = 45, prewired = 
     parameterCombinations('R_tau')                  = [0.020]; % self-org-classic = 0.020, prewired = 
-    parameterCombinations('R_w_INHB')               = [0.5]; % self-org-classic = 0.6, prewired =
-    parameterCombinations('R_slope')                = [2]; % self-org-classic = 0.5, prewired = 
-    parameterCombinations('R_threshold')            = [0.005]; %self-org- classic = 3, prewired = 
+    parameterCombinations('R_w_INHB')               = [1]; % self-org-classic = 0.6, prewired =
+    parameterCombinations('R_slope')                = [5]; % self-org-classic = 0.5, prewired = 
+    parameterCombinations('R_threshold')            = [0.01]; %self-org- classic = 3, prewired = 
     %parameterCombinations('R_covariance_threshold') = [0];
     
     % K
     parameterCombinations('K_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
     parameterCombinations('K_onset_delay_sigma')    = [0.05]; % self-org-classic = 0.05, prewired = 
-    parameterCombinations('K_I_psi')                = [2 4 8]; % self-org-classic = 8, prewired = 
+    
+    
+    parameterCombinations('K_I_psi')                = [1]; % <==== DON'T TOUCH, this sets LEVEL of K
+    
     parameterCombinations('K_supression_delay')     = [0]; % self-org-classic = 0, prewired = 
     parameterCombinations('P_tau')                  = [0.300]; % self-org-classic = 0.3, prewired = 
     parameterCombinations('P_psi')                  = [0.8]; %  self-org-classic = 0.8, prewired = 
     
     K_max_onset_delay = 0.080; % self-org-classic = 0.08, prewired =
     
-    parameterCombinations('K_to_R_psi')             = [1]; %
-    parameterCombinations('K_to_R_alpha')           = [0.1]; % self-org-classic = 0.1
+    parameterCombinations('K_to_R_psi')             = [2]; %
+    parameterCombinations('K_to_R_alpha')           = [0.01]; % 0.1
     parameterCombinations('K_to_R_connectivity')    = [1]; % self-org-classic = 0.8, prewired = 
     
     % V
@@ -127,7 +130,7 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli, 
     parameterCombinations('C_threshold_sigma')      = [0]; % self-org-classic = 0, prewired = 
     parameterCombinations('C_slope')                = [100]; % self-org-classic = 100, prewired = 
     parameterCombinations('C_to_R_psi')             = [15]; % self-org-classic = 3, prewired = 7
-    parameterCombinations('C_to_R_alpha')           = [0]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('C_to_R_alpha')           = [0.01]; % self-org-classic = 0.1, prewired = 
     parameterCombinations('C_to_R_connectivity')    = [1]; % self-org-classic = 1, prewired = 
     
     % Save the experiment params
@@ -144,6 +147,10 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli, 
     assert(min(parameterCombinations('R_tau')) >= dt_coeff*dt && ...
            min(parameterCombinations('S_tau')) >= dt_coeff*dt && ...
            min(parameterCombinations('C_tau')) >= dt_coeff*dt, 'One of the time constants are to small.');
+       
+    if(numTrainingEpochs ~= 20)
+        warning('YOU DO NOT HAVE CORRECT NUMBER OF EPOCHS!!!');
+    end
     
     %% Generate simulations
     function permute(paramnr)

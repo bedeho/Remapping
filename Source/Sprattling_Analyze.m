@@ -77,9 +77,9 @@ function Sprattling_Analyze(experimentFolder, netDir, stimulinames, network)
             
             disp('Doing duhamel remapping trace task analysis...');
             
-            %[DuhamelRemappingTrace_Result] = Sprattling_AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli, Decoded_ReceptiveFieldsLocations);
+            [DuhamelRemappingTrace_Result] = Sprattling_AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli, Decoded_ReceptiveFieldsLocations);
             
-            %save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemappingTrace_Result');
+            save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemappingTrace_Result');
             
         else
             disp(['Unsupported stimuli: ' num2str(stimulinames{i})]);
@@ -92,7 +92,7 @@ function Sprattling_Analyze(experimentFolder, netDir, stimulinames, network)
    % Stimuli Control
    if(~isUntrained),
         f = figure;   
-        %hist(Decoded_ReceptiveFieldsLocations, 40);
+        hist(Decoded_ReceptiveFieldsLocations, 40);
         title('Receptive Field Location Distribution');
         saveas(f,[netDir filesep 'StimuliControl-summary.png']);
         saveas(f,[netDir filesep 'StimuliControl.eps'], 'epsc');
