@@ -100,17 +100,22 @@ function Sprattling_Analyze(experimentFolder, netDir, stimulinames, network)
         
         f = figure;
         num_neurons = stim_control_activity.R_N;
+        desired_num_cols = 10;
+        num_rows = ceil(num_neurons / desired_num_cols);
 
         % Iterate neurons
         for ctr=1:num_neurons,
-            plot(cross_trial_activity(ctr, :));
-            hold on;
+
+
+            plot(cross_trial_activity(ctr, :) ,'r');
+
+
         end
         
-        ylim([0 1]);
-        xlim([1 num_neurons]);
-        set(gca,'YTickLabel',[]);
-        set(gca,'XTickLabel',[]);
+                    ylim([0 1]);
+            xlim([1 num_neurons]);
+            set(gca,'YTickLabel',[]);
+            set(gca,'XTickLabel',[]);
         
         saveas(f,[netDir filesep 'StimuliControl-summary.png']);
         saveas(f,[netDir filesep 'StimuliControl.eps'], 'epsc');

@@ -5,7 +5,7 @@ function Sprattling_quickrun()
     %for d=0.05:0.1:1,
     
     % DILUTION
-    d=0.05
+    % d=0.05
         
         %experimentName = ['baseline-delay' num2str(d) ];
         %experimentName = ['prewired-delay' num2str(d) ];
@@ -20,7 +20,7 @@ function Sprattling_quickrun()
         
         % sprattlig
         %experimentName = 'sprattling_nonplastic';
-        experimentName = 'sprattling_visual_learning_bigepoch20';
+        experimentName = 'sprattling_visual_learning_bigepoch20-connectivitfix';
         
         %% DO NOT CHANGE, basic2 has fixed dt
         %dt = 0.010;
@@ -37,6 +37,7 @@ function Sprattling_quickrun()
         
         % Testing
         Testing_StimuliControl('basic', dt);
+        Sprattling_Testing_StimuliControl('basic', dt);
         Testing_SaccadeControl('basic', dt);
         
         %if length(Training_RF_Locations) == 1,
@@ -53,13 +54,14 @@ function Sprattling_quickrun()
         
         stimulinames = {'basic-StimuliControl', ...
             'basic-SaccadeControl', ...
-            'basic-DuhamelRemappingTrace'
+            'basic-DuhamelRemappingTrace', ...
+            'basic-Sprattling_StimuliControl'
             };
         
         %'basic-CLayerProbe', ...
         
         %% Run
-        Sprattling_GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli, d);
+        Sprattling_GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli);
     %end
    
 end

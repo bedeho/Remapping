@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %, DELAY)
+function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli) %, DELAY)
 
     % Import global variables
     declareGlobalVars();
@@ -79,9 +79,9 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli, 
     % R
     parameterCombinations('R_eccentricity')         = [45]; % self-org-classic = 45, prewired = 
     parameterCombinations('R_tau')                  = [0.020]; % self-org-classic = 0.020, prewired = 
-    parameterCombinations('R_w_INHB')               = [1]; % self-org-classic = 0.6, prewired =
+    parameterCombinations('R_w_INHB')               = [0.2]; % baseline 1, 
     parameterCombinations('R_slope')                = [5]; % self-org-classic = 0.5, prewired = 
-    parameterCombinations('R_threshold')            = [0.01]; %self-org- classic = 3, prewired = 
+    parameterCombinations('R_threshold')            = [0.01]; %self-org- classic = 0.01 !!!!, prewired = 
     %parameterCombinations('R_covariance_threshold') = [0];
     
     % K
@@ -109,7 +109,7 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli, 
     parameterCombinations('V_supression_delay')     = [DELAY];
     parameterCombinations('V_to_C_psi')             = [10]; % self-org-classic = 10, prewired = 
     parameterCombinations('V_to_C_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
-    parameterCombinations('V_to_C_connectivity')    = [DILUTION]; % self-org-classic = 0.05 , prewired = 0.2 [tune 0.05 0.10 0.15 0.20 0.25] or 2 [0.05 0.5 0.1], 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+    parameterCombinations('V_to_C_connectivity')    = [0.05]; % self-org-classic = 0.05 , prewired = 0.2 [tune 0.05 0.10 0.15 0.20 0.25] or 2 [0.05 0.5 0.1], 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
 
     % S
     parameterCombinations('S_eccentricity')         = [30]; % self-org-classic = 30, prewired = 
@@ -119,8 +119,8 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli, 
     parameterCombinations('S_presaccadic_onset')    = [0.070];  % self-org-classic = 0.070 , prewired = 0.100
     parameterCombinations('S_trace_length')         = [DELAY-0.020]; % self-org-classic = DELAY-0.02  ,stop saccade sooner so that you dont get FRF imprinted in V->C weights due to S and C delay and V speed
     parameterCombinations('S_to_C_psi')             = [8]; % self-org-classic = 8, prewired = 
-    parameterCombinations('S_to_C_alpha')           = [0]; % self-org-classic = 0.1, prewired = 
-    parameterCombinations('S_to_C_connectivity')    = [DILUTION];  % self-org-classic = 0.2, prewired = 0.4 [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+    parameterCombinations('S_to_C_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('S_to_C_connectivity')    = [0.2];  % self-org-classic = 0.2, prewired = 0.4 [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
     
     % C
     parameterCombinations('C_N')                    = [1000]; % self-org-classic = 1000, prewired =
@@ -130,7 +130,7 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli, 
     parameterCombinations('C_threshold_sigma')      = [0]; % self-org-classic = 0, prewired = 
     parameterCombinations('C_slope')                = [100]; % self-org-classic = 100, prewired = 
     parameterCombinations('C_to_R_psi')             = [15]; % self-org-classic = 3, prewired = 7
-    parameterCombinations('C_to_R_alpha')           = [0.01]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('C_to_R_alpha')           = [0.001]; % self-org-classic = 0.01
     parameterCombinations('C_to_R_connectivity')    = [1]; % self-org-classic = 1, prewired = 
     
     % Save the experiment params

@@ -18,7 +18,7 @@ function quickrun()
         
         %experimentName = 'prewired';
         
-        experimentName = 'new?';
+        experimentName = 'classic';
         
         %% DO NOT CHANGE, basic2 has fixed dt
         %dt = 0.010;
@@ -36,6 +36,11 @@ function quickrun()
         % Testing
         Testing_StimuliControl('basic', dt);
         Testing_SaccadeControl('basic', dt);
+        
+        
+        %%%
+        Sprattling_Testing_StimuliControl('basic', dt);
+        %%%
         
         %if length(Training_RF_Locations) == 1,
         %    Testing_StimuliControl('basic2', dt, Training_RF_Locations+Training_Saccades);
@@ -59,7 +64,8 @@ function quickrun()
         stimulinames = {'basic-StimuliControl', ...
             'basic-SaccadeControl', ...
             'basic-CLayerProbe', ...
-            'basic-DuhamelRemappingTrace'
+            'basic-DuhamelRemappingTrace', ...
+            'basic-Sprattling_StimuliControl'
             };
         
         %'basic-Kusonoki'

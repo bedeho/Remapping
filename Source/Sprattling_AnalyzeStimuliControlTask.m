@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function [StimuliControl_Result, Decoded_ReceptiveFieldsLocations] = Sprattling_AnalyzeStimuliControlTask(activity, stimuli)
+function [StimuliControl_Result, Decoded_ReceptiveFieldsLocations, cross_trial_activity] = Sprattling_AnalyzeStimuliControlTask(activity, stimuli)
 
     % Check if this is manual run 
     if nargin == 0,
@@ -31,7 +31,7 @@ function [StimuliControl_Result, Decoded_ReceptiveFieldsLocations] = Sprattling_
     stimuliDuration     = stimuli.stimuliDuration;
     
     % Analysis params
-    responseWindowStart = 0.050; % Colby window control, [50ms,250ms] after stim onset.
+    responseWindowStart = 0; % Colby window control, [50ms,250ms] after stim onset.
     responseWindowDuration = 0.200; %(s), colby
     
     latencyWindowSize   = 0.020; % (s), Colby
@@ -77,7 +77,8 @@ function [StimuliControl_Result, Decoded_ReceptiveFieldsLocations] = Sprattling_
     %% Decode retinal location
 
     R_Locations = -R_eccentricity:1:R_eccentricity;
-    Decoded_ReceptiveFieldsLocations = zeros(1,R_N);
+    cross_trial_activity = zeros(R_N, numPeriods);
+    Decoded_ReceptiveFieldsLocations = zeros(1, R_N);
     
     for i=1:R_N,
         
@@ -85,14 +86,14 @@ function [StimuliControl_Result, Decoded_ReceptiveFieldsLocations] = Sprattling_
         cross_trial_neuronActivity = squeeze(R_firing_history(i, :, :, 1))'; % (R_N, numSavedTimeSteps, numPeriods, numEpochs)
         
         % integrat up activity in each trial
-        cross_trial_activity = normalizedIntegration(cross_trial_neuronActivity, dt, stimuliOnset + responseWindowStart, responseWindowDuration); % duration = 200ms , Colby window control, [50ms,250ms] after stim onset.
+        activity = normalizedIntegration(cross_trial_neuronActivity, dt, stimuliOnset + responseWindowStart, responseWindowDuration); % duration = 200ms , Colby window control, [50ms,250ms] after stim onset.
         
         % decode
-        decoded_location = dot(cross_trial_activity, R_Locations)/sum(cross_trial_activity);
+        decoded_location = dot(activity, R_Locations)/sum(activity);
         
         % save it
+        cross_trial_activity(i, :) = activity;
         Decoded_ReceptiveFieldsLocations(i) = decoded_location;
     end
     
-
 end

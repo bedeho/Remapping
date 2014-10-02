@@ -533,7 +533,7 @@ function Sprattling_Remapping(simulationFolder, stimuliName, isTraining, network
                     S_activation_history(:, periodSaveCounter, period, epoch) = S_activation;
                     C_activation_history(:, periodSaveCounter, period, epoch) = C_activation;
                     
-                    extra_history(:, periodSaveCounter, period, epoch) = K_to_R_excitation;%C_to_R_excitation,K
+                    extra_history(:, periodSaveCounter, period, epoch) = C_to_R_excitation;%C_to_R_excitation,K
                     
                     % Count one more dt
                     periodSaveCounter = periodSaveCounter + 1;

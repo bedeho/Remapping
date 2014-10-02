@@ -76,8 +76,20 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
         
         menu = '1';
         
+        if(strcmp(stimuliType,'DuhamelRemappingTrace')),
+            fprintf('Current \t Future\n');
+        end
+        
         for p=2:activity.numPeriods,
             menu = [menu '|' num2str(p)];
+            
+            if(strcmp(stimuliType,'DuhamelRemappingTrace')),
+                
+                sim = stimuli.stimuli{p};
+                
+                fprintf([ num2str(sim.currentRF + 46) '\t' num2str(sim.futureRF+46) '\n']);
+                
+            end
         end
         
         uicontrol('Style', 'text', 'String', 'Period', 'Position', [20 355 100 50]);

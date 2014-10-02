@@ -9,7 +9,7 @@
 function declareGlobalVars()
 
 	global base;
-	base = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Projects/Remapping/'; % must have trailing slash
+	base = ['C:' filesep 'Users' filesep 'bedeho' filesep 'Documents' filesep 'GitHub' filesep 'Remapping' filesep]; % must have trailing slash
 
 	global EXPERIMENTS_FOLDER;
 	EXPERIMENTS_FOLDER = [base 'Experiments' filesep];
@@ -18,6 +18,6 @@ function declareGlobalVars()
 	STIMULI_FOLDER = [base 'Stimuli' filesep];
     
     global THESIS_FIGURE_PATH;
-    THESIS_FIGURE_PATH = '/Network/Servers/mac0.cns.ox.ac.uk/Volumes/Data/Users/mender/Dphil/Thesis/figures/';
+    THESIS_FIGURE_PATH = ['C:' filesep 'Users' filesep 'bedeho' filesep 'Documents' filesep 'GitHub' filesep 'Remapping' filesep 'Thesisfigures' filesep ''];
     
     

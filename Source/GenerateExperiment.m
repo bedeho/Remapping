@@ -95,7 +95,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
     parameterCombinations('V_sigma')                = [3]; %  self-org-classic = 3, prewired = 
     parameterCombinations('V_supression_delay')     = [DELAY];
     parameterCombinations('V_to_C_psi')             = [10]; % self-org-classic = 10, prewired = 
-    parameterCombinations('V_to_C_alpha')           = [0 0.1]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('V_to_C_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
     parameterCombinations('V_to_C_connectivity')    = [DILUTION]; % self-org-classic = 0.05 , prewired = 0.2 [tune 0.05 0.10 0.15 0.20 0.25] or 2 [0.05 0.5 0.1], 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
 
     % S
@@ -106,7 +106,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
     parameterCombinations('S_presaccadic_onset')    = [0.070];  % self-org-classic = 0.070 , prewired = 0.100
     parameterCombinations('S_trace_length')         = [DELAY-0.020]; % self-org-classic = DELAY-0.02  ,stop saccade sooner so that you dont get FRF imprinted in V->C weights due to S and C delay and V speed
     parameterCombinations('S_to_C_psi')             = [8]; % self-org-classic = 8, prewired = 
-    parameterCombinations('S_to_C_alpha')           = [0 0.1]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('S_to_C_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
     parameterCombinations('S_to_C_connectivity')    = [DILUTION];  % self-org-classic = 0.2, prewired = 0.4 [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
     
     % C

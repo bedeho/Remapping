@@ -11,7 +11,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
 
     % Experiment name 
     if nargin < 1,
-        experiment = 'sprattling_visual_learning';
+        experiment = 'sprattling_visual_learning_bigepoch20';
     end
     
     % Stimuli names
@@ -71,11 +71,11 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
     fprintf(fileID, '<html><head>\n');
     fprintf(fileID, '<style type="text/css" title="currentStyle">\n');
                              
-    fprintf(fileID, ['@import "' base 'Source/DataTables-1.8.2/media/css/demo_page.css";\n']);
-	fprintf(fileID, ['@import "' base 'Source/DataTables-1.8.2/media/css/demo_table.css";\n']);
+    fprintf(fileID, ['@import "' escape([base 'Source' filesep 'DataTables-1.8.2' filesep 'media' filesep 'css' filesep 'demo_page.css"']) ';\n']);
+	fprintf(fileID, ['@import "'  escape([base 'Source' filesep 'DataTables-1.8.2' filesep 'media' filesep 'css' filesep 'demo_table.css"']) ';\n']);
 	fprintf(fileID, '</style>\n');
-	fprintf(fileID, ['<script type="text/javascript" language="javascript" src="' base 'Source/DataTables-1.8.2/media/js/jquery.js"></script>\n']);
-	fprintf(fileID, ['<script type="text/javascript" language="javascript" src="' base 'Source/DataTables-1.8.2/media/js/jquery.dataTables.js"></script>\n']);
+	fprintf(fileID, ['<script type="text/javascript" language="javascript" src="' escape([base 'Source' filesep 'DataTables-1.8.2' filesep 'media' filesep 'js' filesep 'jquery.js']) '"></script>\n']);
+	fprintf(fileID, ['<script type="text/javascript" language="javascript" src="' escape([base 'Source' filesep 'DataTables-1.8.2' filesep 'media' filesep 'js' filesep 'jquery.dataTables.js']) '"></script>\n']);
 	fprintf(fileID, '<script type="text/javascript" charset="utf-8">\n');
 	fprintf(fileID, '$(document).ready(function() { $("#example").dataTable();});\n');
 	fprintf(fileID, '</script>\n');
@@ -165,7 +165,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                     % Summary
                     fprintf(fileID, '<td>');
                     %fprintf(fileID, '<img src="%s" width="350px" height="350px"/>\n', [netDir filesep 'summary.png']);
-                    outputButton('Training', ['matlab:viewNeuronDynamics(\\''' simulationFolder filesep 'activity-' trainingStimuli '.mat\\'',\\''' trainingStimuliFile '\\'',\\''' [netDir filesep network '.mat'] '\\'',\\''' netDir filesep 'analysis-basic-CLayerProbe.mat\\'')']);
+                    outputButton('Training', ['matlab:viewNeuronDynamics(\\''' escape(escape([simulationFolder filesep 'activity-' trainingStimuli '.mat'])) '\\'',\\''' escape(escape(trainingStimuliFile)) '\\'',\\''' escape(escape([netDir filesep network '.mat'])) '\\'',\\''' escape(escape([netDir filesep 'analysis-basic-CLayerProbe.mat'])) '\\'')']);
                     fprintf(fileID, '</td>');
                     
                     % Stimuli
@@ -181,7 +181,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                         end
                         
                         % Button
-                        outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' netDir filesep 'activity-' stimulinames{i} '.mat\\'',\\''' stimuli_file{i} '\\'',\\''' [netDir filesep network '.mat'] '\\'',\\''' netDir filesep 'analysis-basic-CLayerProbe.mat\\'')']);
+                        outputButton('Activity', ['matlab:viewNeuronDynamics(\\''' escape(escape([netDir filesep 'activity-' stimulinames{i} '.mat'])) '\\'',\\''' escape(escape(stimuli_file{i})) '\\'',\\''' escape(escape([netDir filesep network '.mat'])) '\\'',\\''' escape(escape([netDir filesep 'analysis-basic-CLayerProbe.mat'])) '\\'')']);
                         
                         fprintf(fileID, '</td>');
                     end
