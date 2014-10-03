@@ -61,53 +61,8 @@ function [DuhamelRemappin_Result, Decoded_ReceptiveFieldsLocations] = Sprattling
         % Index of R neuron which will recieve remapping activity: currentRF
         [remappedInto_neuronIndex, loc] = get_neuron_from_RF(stimuli.stimuli{p}.currentRF); % R_eccentricity + stimuli.stimuli{p}.currentRF + 1;
         
-        % Get data for neuron
-        remap_responseVector = R_firing_history(remappedInto_neuronIndex, :, p, 1);
-
-        % Find latency and duration
-        %[latencyTimeStep, duration] = findNeuronalLatency(remap_responseVector, latencyWindowLength);
-        latencyTimeStep = findNeuronalLatency_NEW(remap_responseVector, dt);
+        [latencyTimeStep, stim_latencyTimeStep, saccadeonset_response, stimulionset_response, stim_index, sacc_index, remapping_index] = compute_all_for_neuron(remappedInto_neuronIndex);
         
-        % Saccade aligned response window
-        saccadeonset_response = normalizedIntegration(remap_responseVector, dt, saccadeOnset, responseWindowDuration);
-        
-        % Stimuli aligned response window
-        stimulionset_response = normalizedIntegration(remap_responseVector, dt, stimuliOnset, responseWindowDuration);
-        
-        %% STIM - CONTROL
-        
-        % Stimuli Control Trial number where stimuli is presented at stimuli.stimuli{p}.futureRF
-        futureRF_neuronIndex = R_eccentricity + stimuli.stimuli{p}.futureRF + 1;
-        
-        % Stim response of remapped neuron when stim is in future RF
-        stim_responseVector = stim_control_activity(remappedInto_neuronIndex, :, futureRF_neuronIndex);
-        stim_responseWindowStart = stim_stimuliOnset + 0.200; % CLASIC: +0.050, but we use LHeiser2005: 0.200
-        stim_control_response = normalizedIntegration(stim_responseVector, dt, stim_responseWindowStart, responseWindowDuration);
-        stim_index = saccadeonset_response - stim_control_response;
-        
-        % Find latency and duration
-        stim2_responseVector = stim_control_activity(futureRF_neuronIndex, :, futureRF_neuronIndex);
-        %[stim_latencyTimeStep stim_duration] = findNeuronalLatency(stim2_responseVector, latencyWindowLength);
-        stim_latencyTimeStep= findNeuronalLatency_NEW(stim2_responseVector, dt);
-        
-        %% SACC = CONTROL
-        
-        % Index of R neuron which has RF representing the saccade
-        % performed
-        sacc_neuronIndex = S_eccentricity + stimuli.stimuli{p}.saccadeTargets + 1;
-        
-        % Sacc response of remapped neuron when given saccade is performed
-        sacc_responseVector = sacc_control_activity(remappedInto_neuronIndex, :, sacc_neuronIndex);
-        saccade_control_response = normalizedIntegration(sacc_responseVector, dt, sacc_saccadeOnset, responseWindowDuration);
-        sacc_index = saccadeonset_response - saccade_control_response;
-        
-        % Remapping Indexes
-        if(stim_index > 0 && sacc_index > 0),
-            remapping_index = sqrt(stim_index^2 + sacc_index^2);
-            %remapping_index = (stim_index + sacc_index)/2;
-        else
-            remapping_index = 0;
-        end
         
         %% Save
         DuhamelRemappin_Result(p).index                   = remappedInto_neuronIndex;
@@ -125,6 +80,17 @@ function [DuhamelRemappin_Result, Decoded_ReceptiveFieldsLocations] = Sprattling
         DuhamelRemappin_Result(p).sacc_index              = sacc_index;
         DuhamelRemappin_Result(p).remapping_index         = remapping_index;
         
+        % itearte all neurons for this period and compute their remapping index
+        remapping_index_all = zeros(1, R_N);
+        remapping_response_all = zeros(1, R_N);
+        for i=1:R_N,
+            [latencyTimeStep, stim_latencyTimeStep, saccadeonset_response, stimulionset_response, stim_index, sacc_index, remapping_index] = compute_all_for_neuron(i);
+            remapping_index_all(i) = remapping_index;
+            remapping_response_all(i) = saccadeonset_response;
+        end
+        DuhamelRemappin_Result(p).remapping_index_all = remapping_index_all;
+        DuhamelRemappin_Result(p).remapping_response_all = remapping_response_all;
+        
     end
     
     function [idx, loc] = get_neuron_from_RF(location)
@@ -135,9 +101,64 @@ function [DuhamelRemappin_Result, Decoded_ReceptiveFieldsLocations] = Sprattling
         % get location
         loc = Decoded_ReceptiveFieldsLocations(idx);
         
-        assert(abs(location-loc) <= 5, 'Not possible to find neuron close enough');
+        if(abs(location-loc) > 5)
+            loc = 1;
+            warning('used BS loc in analysis');
+        end
+        %assert(abs(location-loc) <= 5, 'Not possible to find neuron close enough');
         %disp('Not possible to find neuron close enough');
         
     end
     
+    function [latencyTimeStep, stim_latencyTimeStep, saccadeonset_response, stimulionset_response, stim_index, sacc_index, remapping_index] = compute_all_for_neuron(index)
+    
+        
+        % Get data for neuron
+        remap_responseVector = R_firing_history(index, :, p, 1);
+
+        % Find latency and duration
+        %[latencyTimeStep, duration] = findNeuronalLatency(remap_responseVector, latencyWindowLength);
+        latencyTimeStep = findNeuronalLatency_NEW(remap_responseVector, dt);
+        
+        % Saccade aligned response window
+        saccadeonset_response = normalizedIntegration(remap_responseVector, dt, saccadeOnset, responseWindowDuration);
+        
+        % Stimuli aligned response window
+        stimulionset_response = normalizedIntegration(remap_responseVector, dt, stimuliOnset, responseWindowDuration);
+        
+        %% STIM - CONTROL
+        
+        % Stimuli Control Trial number where stimuli is presented at stimuli.stimuli{p}.futureRF
+        futureRF_neuronIndex = R_eccentricity + stimuli.stimuli{p}.futureRF + 1;
+        
+        % Stim response of remapped neuron when stim is in future RF
+        stim_responseVector = stim_control_activity(index, :, futureRF_neuronIndex);
+        stim_responseWindowStart = stim_stimuliOnset + 0.200; % CLASIC: +0.050, but we use LHeiser2005: 0.200
+        stim_control_response = normalizedIntegration(stim_responseVector, dt, stim_responseWindowStart, responseWindowDuration);
+        stim_index = saccadeonset_response - stim_control_response;
+        
+        % Find latency and duration
+        stim2_responseVector = stim_control_activity(futureRF_neuronIndex, :, futureRF_neuronIndex);
+        %[stim_latencyTimeStep stim_duration] = findNeuronalLatency(stim2_responseVector, latencyWindowLength);
+        stim_latencyTimeStep= findNeuronalLatency_NEW(stim2_responseVector, dt);
+        
+        %% SACC = CONTROL
+        
+        % Index of R neuron which has RF representing the saccade
+        % performed
+        sacc_neuronIndex = S_eccentricity + stimuli.stimuli{p}.saccadeTargets + 1;
+        
+        % Sacc response of remapped neuron when given saccade is performed
+        sacc_responseVector = sacc_control_activity(index, :, sacc_neuronIndex);
+        saccade_control_response = normalizedIntegration(sacc_responseVector, dt, sacc_saccadeOnset, responseWindowDuration);
+        sacc_index = saccadeonset_response - saccade_control_response;
+        
+        % Remapping Indexes
+        if(stim_index > 0 && sacc_index > 0),
+            remapping_index = sqrt(stim_index^2 + sacc_index^2);
+            %remapping_index = (stim_index + sacc_index)/2;
+        else
+            remapping_index = 0;
+        end
+    end
 end

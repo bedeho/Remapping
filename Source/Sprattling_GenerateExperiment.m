@@ -65,13 +65,13 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli) 
     parameterCombinations = containers.Map;
     
     % Simulations Parameters
-    numTrainingEpochs = 20 %0 % CLASSIC = 20
+    numTrainingEpochs = 10 %0 % CLASSIC = 20
     doTrain = (nargin >= 4) && (numTrainingEpochs > 0);
     outputSavingRate = 1; % Period of time step saving during testing.
     assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
     
     saveActivityInTraining = false;
-    saveNetworksAtEpochMultiples = 110; % Save network at this resolution
+    saveNetworksAtEpochMultiples = 100; % Save network at this resolution
     seed = 13; % CLASSIC = 13
     
     rng(seed);
@@ -79,26 +79,23 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli) 
     % R
     parameterCombinations('R_eccentricity')         = [45]; % self-org-classic = 45, prewired = 
     parameterCombinations('R_tau')                  = [0.020]; % self-org-classic = 0.020, prewired = 
-    parameterCombinations('R_w_INHB')               = [0.2]; % baseline 1, 
-    parameterCombinations('R_slope')                = [5]; % self-org-classic = 0.5, prewired = 
-    parameterCombinations('R_threshold')            = [0.01]; %self-org- classic = 0.01 !!!!, prewired = 
+    parameterCombinations('R_w_INHB')               = [0.2]; % 0.2 
+    parameterCombinations('R_slope')                = [5]; % 5 
+    parameterCombinations('R_threshold')            = [0.0100]; %
+    parameterCombinations('R_sigma')                = [1]; %
+    
     %parameterCombinations('R_covariance_threshold') = [0];
     
     % K
+    K_max_onset_delay = 0.080; % self-org-classic = 0.08, prewired =
     parameterCombinations('K_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
     parameterCombinations('K_onset_delay_sigma')    = [0.05]; % self-org-classic = 0.05, prewired = 
-    
-    
     parameterCombinations('K_I_psi')                = [1]; % <==== DON'T TOUCH, this sets LEVEL of K
-    
     parameterCombinations('K_supression_delay')     = [0]; % self-org-classic = 0, prewired = 
     parameterCombinations('P_tau')                  = [0.300]; % self-org-classic = 0.3, prewired = 
     parameterCombinations('P_psi')                  = [0.8]; %  self-org-classic = 0.8, prewired = 
-    
-    K_max_onset_delay = 0.080; % self-org-classic = 0.08, prewired =
-    
-    parameterCombinations('K_to_R_psi')             = [2]; %
-    parameterCombinations('K_to_R_alpha')           = [0.01]; % 0.1
+    parameterCombinations('K_to_R_psi')             = [3.5]; % 2.5 to low ,5 also works but still lower, 10 works, but a bit much
+    parameterCombinations('K_to_R_alpha')           = [0.1];
     parameterCombinations('K_to_R_connectivity')    = [1]; % self-org-classic = 0.8, prewired = 
     
     % V
@@ -129,8 +126,8 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli) 
     parameterCombinations('C_threshold')            = [15]; % self-org-classic = 15, prewired = 
     parameterCombinations('C_threshold_sigma')      = [0]; % self-org-classic = 0, prewired = 
     parameterCombinations('C_slope')                = [100]; % self-org-classic = 100, prewired = 
-    parameterCombinations('C_to_R_psi')             = [15]; % self-org-classic = 3, prewired = 7
-    parameterCombinations('C_to_R_alpha')           = [0.001]; % self-org-classic = 0.01
+    parameterCombinations('C_to_R_psi')             = [1]; % 10 works, but a bit overpowering still
+    parameterCombinations('C_to_R_alpha')           = [0.1]; % 0.01 and 0.001 is basically silent when psi=1
     parameterCombinations('C_to_R_connectivity')    = [1]; % self-org-classic = 1, prewired = 
     
     % Save the experiment params

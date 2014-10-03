@@ -20,7 +20,7 @@ function Sprattling_quickrun()
         
         % sprattlig
         %experimentName = 'sprattling_nonplastic';
-        experimentName = 'sprattling_visual_learning_bigepoch20-connectivitfix';
+        experimentName = 'sprattling_visual_learning_bigepoch20-connectivitfix-tune33';
         
         %% DO NOT CHANGE, basic2 has fixed dt
         %dt = 0.010;

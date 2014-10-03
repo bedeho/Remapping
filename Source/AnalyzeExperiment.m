@@ -11,7 +11,8 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
 
     % Experiment name 
     if nargin < 1,
-        experiment = 'sprattling_visual_learning_bigepoch20';
+        %experiment = 'classic'
+        experiment = 'sprattling_visual_learning_bigepoch20-connectivitfix-tune25'
     end
     
     % Stimuli names
@@ -35,7 +36,7 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
             
             %, 'basic-CLayerProbe',
             
-            stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemappingTrace'};
+            stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemappingTrace'}; % , 
             
         end
     end

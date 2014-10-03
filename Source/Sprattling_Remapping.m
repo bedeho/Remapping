@@ -89,7 +89,8 @@ function Sprattling_Remapping(simulationFolder, stimuliName, isTraining, network
     R_w_INHB        = parameters.simulation('R_w_INHB');
     R_slope         = parameters.simulation('R_slope');
     R_threshold     = parameters.simulation('R_threshold');
-
+    R_sigma     = parameters.simulation('R_sigma');
+    
     %R_covariance_threshold = parameters.simulation('R_covariance_threshold');
 
     % K  =======================================
@@ -322,7 +323,8 @@ function Sprattling_Remapping(simulationFolder, stimuliName, isTraining, network
                     
                     % retinal locations of stimuli in the precedng time step
                     retinalTargets = retinalTargetTraces(:,t-1);
-                    flat_gauss = visul_response(retinalTargets);
+                    flat_gauss_R = visul_response(retinalTargets, R_sigma);
+                    flat_gauss_V = visul_response(retinalTargets, V_sigma);
 
                     % clipping of retinal trace
                     indicator = zeros(1,R_N);
@@ -334,9 +336,9 @@ function Sprattling_Remapping(simulationFolder, stimuliName, isTraining, network
                         indicator(q) = any(in_interval);
                     end                  
 
-                    K_feed_forward = indicator.*flat_gauss;
+                    K_feed_forward = indicator.*flat_gauss_R;
                 else
-                    flat_gauss = 0;
+                    flat_gauss_R = 0;
                     K_feed_forward = 0;
                 end
                 
@@ -348,7 +350,7 @@ function Sprattling_Remapping(simulationFolder, stimuliName, isTraining, network
                     yes_delta_event = (delta_sum > 0);
                     
                     visual_onset = zeros(1, R_N);
-                    visual_onset(yes_delta_event) = flat_gauss(yes_delta_event);
+                    visual_onset(yes_delta_event) = flat_gauss_R(yes_delta_event);
                 else
                     visual_onset = 0;
                 end
@@ -402,7 +404,7 @@ function Sprattling_Remapping(simulationFolder, stimuliName, isTraining, network
                     % turn on stim if this is onset time, and if onset time
                     % is before saccade time!!!
                     if(any(precedingTimeStep==stimOnsetTimeSteps) && (isempty(saccOnsetTimeSteps) || any(precedingTimeStep < saccOnsetTimeSteps))) % V comes on if stimonst == sacc ons
-                        V_onset = flat_gauss;
+                        V_onset = flat_gauss_V;
                     else
                         V_onset = 0;
                     end
@@ -410,7 +412,7 @@ function Sprattling_Remapping(simulationFolder, stimuliName, isTraining, network
                     % sacc onset/supression
                     if(~isempty(saccOnsetTimeSteps) && any(precedingTimeStep==saccOnsetTimeSteps+V_supression_delayTimeSteps) && (stimOnsetTimeSteps < saccOnsetTimeSteps)),
                         V_sacc_supression = V_old;
-                        V_sacc_excitation = flat_gauss;
+                        V_sacc_excitation = flat_gauss_V;
                     else
                         V_sacc_supression = 0;
                         V_sacc_excitation = 0;
@@ -533,7 +535,7 @@ function Sprattling_Remapping(simulationFolder, stimuliName, isTraining, network
                     S_activation_history(:, periodSaveCounter, period, epoch) = S_activation;
                     C_activation_history(:, periodSaveCounter, period, epoch) = C_activation;
                     
-                    extra_history(:, periodSaveCounter, period, epoch) = C_to_R_excitation;%C_to_R_excitation,K
+                    extra_history(:, periodSaveCounter, period, epoch) = K_to_R_excitation;%C_to_R_excitation
                     
                     % Count one more dt
                     periodSaveCounter = periodSaveCounter + 1;
@@ -693,11 +695,11 @@ function Sprattling_Remapping(simulationFolder, stimuliName, isTraining, network
                                                                         
     disp('Done...');
               
-    function flat_gauss = visul_response(ret_target_locations)
+    function flat_gauss = visul_response(ret_target_locations, sigma)
 
         diff = R_preference_comparison_matrix - repmat(ret_target_locations,1,R_N);
         diff(isnan(diff)) = inf; % for nan values, make inf, so that exponantiation gives no contribution
-        gauss = exp((-(diff).^2)./(2*V_sigma^2)); % gauss has dimensions: maxNumberOfVisibleTargets X R_N
+        gauss = exp((-(diff).^2)./(2*sigma^2)); % gauss has dimensions: maxNumberOfVisibleTargets X R_N
         flat_gauss = sum(gauss,1); % collapse stimulus dimension, so that each neuron has one driving sum of exponentials, one exponential per stimulus
 
     end

@@ -115,23 +115,23 @@ function ThesisSingleNeuronPlot()
     %}
     
     %% remapping
-    %{
+    
     % h_0 = -5& s = 15, --> r = -20.
     
     h = -5;
     s = 15;
     r = h - s;
     
-    experiment  = 'baseline';
+    experiment  = 'sprattling_visual_learning_bigepoch20-connectivitfix';
     
-    %{
+     
     % Remapping
     period      = 1;
     epoch       = 1;
     neuron      = R_BASE + r;
     stimuliName = 'STIM-basic-DuhamelRemappingTrace';
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/activity-basic-DuhamelRemappingTrace.mat'];
-    %}
+    
     
     %{
     % Stimuli control
@@ -143,7 +143,7 @@ function ThesisSingleNeuronPlot()
     %}
     
     % Saccade control
-    
+    %{
     period      = 46;
     epoch       = 1;
     neuron      = R_BASE + h;
@@ -154,7 +154,7 @@ function ThesisSingleNeuronPlot()
     
     
     %% KUSONKI
-    
+    %{
     % h_0 = -5& s = 15, --> r = -20.
     
     h = -5;
@@ -175,8 +175,11 @@ function ThesisSingleNeuronPlot()
     %activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-Kusonoki.mat'];
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/activity-basic-Kusonoki.mat'];
     
+    %}
     colors{1}   = [0,0,255]/255; % [67,82,163]/255;
     legends{1}  = '';
+    
+    
     % =======================================
     
     % Load input files
