@@ -10,22 +10,11 @@
 % Population stim control response plot
 function Sprattling_StimPlot_Thesis()
 
-    declareGlobalVars();
-    global THESIS_FIGURE_PATH;
-
-    %untrained_analysis = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20\baseline\BlankNetwork\analysis-basic-StimuliControl.mat');
-    %trained_analysis = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20\baseline\TrainedNetwork\analysis-basic-StimuliControl.mat');
-    
-    untrained_analysis = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune31\baseline\BlankNetwork\analysis-basic-StimuliControl.mat');
-    trained_analysis = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune31\baseline\TrainedNetwork\analysis-basic-StimuliControl.mat');
-    trained_analysis_remapping = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune31\baseline\TrainedNetwork\analysis-basic-DuhamelRemappingTrace.mat');
-    
-    
-    
-    
+    untrained_analysis = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune44\baseline\BlankNetwork\analysis-basic-StimuliControl.mat');
+    trained_analysis = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune44\baseline\TrainedNetwork\analysis-basic-StimuliControl.mat');
+    trained_analysis_remapping = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune44\baseline\TrainedNetwork\analysis-basic-DuhamelRemappingTrace.mat');
+ 
     choosen_neurons = [trained_analysis_remapping.DuhamelRemappingTrace_Result.index];
-    
-    %stimuli = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix\STIM-basic-StimuliControl\stim.mat');
     
     num_neurons = 91; %stim_control_activity.R_N;
     desired_num_cols = 10;
@@ -42,6 +31,7 @@ function Sprattling_StimPlot_Thesis()
         hold on;
         plot(get_x(trained_analysis.Decoded_ReceptiveFieldsLocations(ctr)), [0 1],'b');
         
+        %{
         number_of_times_this_neuron_was_picked = nnz(choosen_neurons == ctr);
         
         if(number_of_times_this_neuron_was_picked == 1),
@@ -49,7 +39,8 @@ function Sprattling_StimPlot_Thesis()
         elseif(number_of_times_this_neuron_was_picked > 1),
             warning('one neuron picked more than ones, is that ok??');
         end 
-
+        %}
+        
         ylim([0 1]);
         xlim([1 num_neurons]);
         set(gca,'YTickLabel',[]);

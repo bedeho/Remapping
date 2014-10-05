@@ -65,7 +65,7 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli) 
     parameterCombinations = containers.Map;
     
     % Simulations Parameters
-    numTrainingEpochs = 10 %0 % CLASSIC = 20
+    numTrainingEpochs = 20 %0 % CLASSIC = 20
     doTrain = (nargin >= 4) && (numTrainingEpochs > 0);
     outputSavingRate = 1; % Period of time step saving during testing.
     assert(outputSavingRate == 1, 'outputSavingRate is not 1, all further analysis will fail');
@@ -89,12 +89,12 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli) 
     % K
     K_max_onset_delay = 0.080; % self-org-classic = 0.08, prewired =
     parameterCombinations('K_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
-    parameterCombinations('K_onset_delay_sigma')    = [0.05]; % self-org-classic = 0.05, prewired = 
+    parameterCombinations('K_onset_delay_sigma')    = [0.050]; % self-org-classic = 0.05, prewired = 
     parameterCombinations('K_I_psi')                = [1]; % <==== DON'T TOUCH, this sets LEVEL of K
     parameterCombinations('K_supression_delay')     = [0]; % self-org-classic = 0, prewired = 
     parameterCombinations('P_tau')                  = [0.300]; % self-org-classic = 0.3, prewired = 
     parameterCombinations('P_psi')                  = [0.8]; %  self-org-classic = 0.8, prewired = 
-    parameterCombinations('K_to_R_psi')             = [3.5]; % 2.5 to low ,5 also works but still lower, 10 works, but a bit much
+    parameterCombinations('K_to_R_psi')             = [3.5]; % 3.5
     parameterCombinations('K_to_R_alpha')           = [0.1];
     parameterCombinations('K_to_R_connectivity')    = [1]; % self-org-classic = 0.8, prewired = 
     
@@ -110,10 +110,10 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli) 
 
     % S
     parameterCombinations('S_eccentricity')         = [30]; % self-org-classic = 30, prewired = 
-    parameterCombinations('S_delay_sigma')          = [0.100]; % self-org-classic = 0.1, prewired = [tune 0.100 0.050 0.025]
+    parameterCombinations('S_delay_sigma')          = [0.1]; % self-org-classic = 0.1, prewired = [tune 0.100 0.050 0.025]
     parameterCombinations('S_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
     parameterCombinations('S_psi')                  = [1]; % self-org-classic = 1, prewired = 
-    parameterCombinations('S_presaccadic_onset')    = [0.070];  % self-org-classic = 0.070 , prewired = 0.100
+    parameterCombinations('S_presaccadic_onset')    = [0.070];  % 0.070
     parameterCombinations('S_trace_length')         = [DELAY-0.020]; % self-org-classic = DELAY-0.02  ,stop saccade sooner so that you dont get FRF imprinted in V->C weights due to S and C delay and V speed
     parameterCombinations('S_to_C_psi')             = [8]; % self-org-classic = 8, prewired = 
     parameterCombinations('S_to_C_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
@@ -127,8 +127,10 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli) 
     parameterCombinations('C_threshold_sigma')      = [0]; % self-org-classic = 0, prewired = 
     parameterCombinations('C_slope')                = [100]; % self-org-classic = 100, prewired = 
     parameterCombinations('C_to_R_psi')             = [1]; % 10 works, but a bit overpowering still
-    parameterCombinations('C_to_R_alpha')           = [0.1]; % 0.01 and 0.001 is basically silent when psi=1
+    parameterCombinations('C_to_R_alpha')           = [0.5]; % 0.01 and 0.001 is basically silent when psi=1
     parameterCombinations('C_to_R_connectivity')    = [1]; % self-org-classic = 1, prewired = 
+    
+    % C_to_R_alpha =0.1,  C_to_R_psi = 1
     
     % Save the experiment params
     save([experimentFolderPath filesep 'GenerateExperiment.mat'], 'parameterCombinations');

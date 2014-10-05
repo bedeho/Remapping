@@ -367,7 +367,6 @@ function Sprattling_Remapping(simulationFolder, stimuliName, isTraining, network
                 if(~isempty(saccOnsetTimeSteps) && any(precedingTimeStep==saccOnsetTimeSteps+K_supression_delayTimeSteps)),
                     P_sacc_supression = P_old; %* K_supress
                     K_sacc_supression = K_old;
-                    
                     %R_sacc_supression = R_activation;
                     
                     offset_decay = 0; %phenomenological trick in case both happen at the same time, could rewrite system, but why bother?
