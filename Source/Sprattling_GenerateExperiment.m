@@ -123,11 +123,11 @@ function Sprattling_GenerateExperiment(Name, dt, stimulinames, trainingStimuli) 
     parameterCombinations('C_N')                    = [1000]; % self-org-classic = 1000, prewired =
     parameterCombinations('C_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
     parameterCombinations('C_w_INHB')               = [0.1]; % self-org-classic = 0.1, prewired = 
-    parameterCombinations('C_threshold')            = [15]; % self-org-classic = 15, prewired = 
+    parameterCombinations('C_threshold')            = [14]; % 15
     parameterCombinations('C_threshold_sigma')      = [0]; % self-org-classic = 0, prewired = 
     parameterCombinations('C_slope')                = [100]; % self-org-classic = 100, prewired = 
     parameterCombinations('C_to_R_psi')             = [1]; % 10 works, but a bit overpowering still
-    parameterCombinations('C_to_R_alpha')           = [0.5]; % 0.01 and 0.001 is basically silent when psi=1
+    parameterCombinations('C_to_R_alpha')           = [0.1]; % 0.01 and 0.001 is basically silent when psi=1
     parameterCombinations('C_to_R_connectivity')    = [1]; % self-org-classic = 1, prewired = 
     
     % C_to_R_alpha =0.1,  C_to_R_psi = 1

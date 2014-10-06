@@ -10,9 +10,9 @@
 % Population stim control response plot
 function Sprattling_StimPlot_Thesis()
 
-    untrained_analysis = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune44\baseline\BlankNetwork\analysis-basic-StimuliControl.mat');
-    trained_analysis = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune44\baseline\TrainedNetwork\analysis-basic-StimuliControl.mat');
-    trained_analysis_remapping = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune44\baseline\TrainedNetwork\analysis-basic-DuhamelRemappingTrace.mat');
+    untrained_analysis = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune52\baseline\BlankNetwork\analysis-basic-StimuliControl.mat');
+    trained_analysis = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune52\baseline\TrainedNetwork\analysis-basic-StimuliControl.mat');
+    trained_analysis_remapping = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune52\baseline\TrainedNetwork\analysis-basic-DuhamelRemappingTrace.mat');
  
     choosen_neurons = [trained_analysis_remapping.DuhamelRemappingTrace_Result.index];
     

@@ -10,9 +10,9 @@
 % Population stim control response plot
 function Sprattling_RemappingPlot_Thesis()
 
-    trained_analysis_stim = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune44\baseline\TrainedNetwork\analysis-basic-StimuliControl.mat');
-    trained_analysis_remapping = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune44\baseline\TrainedNetwork\analysis-basic-DuhamelRemappingTrace.mat');
-    remapping_stimuli = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune44\STIM-basic-DuhamelRemappingTrace\stim.mat');
+    trained_analysis_stim = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune52\baseline\TrainedNetwork\analysis-basic-StimuliControl.mat');
+    trained_analysis_remapping = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune52\baseline\TrainedNetwork\analysis-basic-DuhamelRemappingTrace.mat');
+    remapping_stimuli = load('C:\Users\bedeho\Documents\GitHub\Remapping\Experiments\sprattling_visual_learning_bigepoch20-connectivitfix-tune52\STIM-basic-DuhamelRemappingTrace\stim.mat');
     
     % Iterate periods
     numPeriods = length(trained_analysis_remapping.DuhamelRemappingTrace_Result);
@@ -51,6 +51,7 @@ function Sprattling_RemappingPlot_Thesis()
  
 
         ylim([0 sqrt(2)]);
+        xlim([-45 45]);
         set(gca,'YTickLabel',[]);
         set(gca,'XTickLabel',[]);
     end
