@@ -12,7 +12,8 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
     % Experiment name 
     if nargin < 1,
         %experiment = 'classic'
-        experiment = 'sprattling_visual_learning_bigepoch20-connectivitfix-tune25'
+        experiment = 'sprattling_nonplastic'
+        % sprattling_visual_learning_bigepoch20-connectivitfix-tune25
     end
     
     % Stimuli names
@@ -34,9 +35,9 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                             'basic-Kusonoki'};
             %}
             
-            %, 'basic-CLayerProbe',
+            stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemappingTrace', 'basic-CLayerProbe'};
             
-            stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemappingTrace'}; % , 
+            %stimulinames = {'basic-StimuliControl', 'basic-SaccadeControl', 'basic-DuhamelRemappingTrace'}; % , 
             
         end
     end
@@ -144,8 +145,8 @@ function AnalyzeExperiment(experiment, stimulinames, trainingStimuli)
                     %trDir = [experimentFolder simulation filesep 'Training'];
                     
                     % Do analysis
-                    %Analyze(experimentFolder, netDir, stimulinames);
-                    Sprattling_Analyze(experimentFolder, netDir, stimulinames, network);
+                    Analyze(experimentFolder, netDir, stimulinames);
+                    %Sprattling_Analyze(experimentFolder, netDir, stimulinames, network);
                     
                     % Start row
                     fprintf(fileID, '<tr>');

@@ -40,6 +40,7 @@ function ThesisExperimentPlot()
     %}
     
     %% Selforganizing
+    %{
     
     experiment  = 'baseline';
 
@@ -51,20 +52,34 @@ function ThesisExperimentPlot()
     Legends{2}          = 'Trained';
     FaceColors{2}       = [238,48,44]/255;
     
+    %}
     
-    %% baseline-delay
+        %% Selforganizing
     %{
-    %experiment  = 'baseline-delay0.3';
-    experiment  = 'prewired-delay0.05';
+    
+    experiment  = 'baseline';
 
     simulationFolder{1} = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork'];
-    Legends{1}          = 'Random'; %'Untrained';
+    Legends{1}          = 'Untrained';
     FaceColors{1}       = [67,82,163]/255;
     
-    simulationFolder{2} = [EXPERIMENTS_FOLDER experiment '/baseline/PrewiredNetwork']; %TrainedNetwork
-    Legends{2}          = 'Manual'; %'Trained';
+    simulationFolder{2} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork'];
+    Legends{2}          = 'Trained';
     FaceColors{2}       = [238,48,44]/255;
+    
     %}
+    
+    %% sprattling_nonplastic
+    %experiment  = ['sprattling_nonplastic' filesep 'S_to_C_alpha=0.1-V_to_C_alpha=0'];
+    experiment  = ['sprattling_nonplastic' filesep 'S_to_C_alpha=0-V_to_C_alpha=0.1'];
+
+    simulationFolder{1} = [EXPERIMENTS_FOLDER experiment filesep 'BlankNetwork'];
+    Legends{1}          = 'Untrained';
+    FaceColors{1}       = [67,82,163]/255;
+    
+    simulationFolder{2} = [EXPERIMENTS_FOLDER experiment filesep 'TrainedNetwork']; %TrainedNetwork
+    Legends{2}          = 'Trained';
+    FaceColors{2}       = [238,48,44]/255;
         
     % Iterate Simulations
     for i=1:length(simulationFolder),

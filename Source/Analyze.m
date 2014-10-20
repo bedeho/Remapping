@@ -69,9 +69,9 @@ function Analyze(experimentFolder, netDir, stimulinames)
             
             disp('Doing duhamel remapping trace task analysis...');
             
-            %DuhamelRemappingTrace_Result = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
+            DuhamelRemappingTrace_Result = AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
             
-            DuhamelRemappingTrace_Result = Sprattling_AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
+            %DuhamelRemappingTrace_Result = Sprattling_AnalyzeDuhamelRemapping(activity, stimuli, stim_control_activity.R_firing_history, stim_stimuli, sacc_control_activity.R_firing_history, sacc_stimuli);
             
             save([netDir filesep 'analysis-' stimulinames{i} '.mat'] , 'DuhamelRemappingTrace_Result');
             
