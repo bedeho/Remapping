@@ -114,13 +114,15 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
     % C
     parameterCombinations('C_N')                    = [5551]; % self-org-classic = 1000, prewired =
     parameterCombinations('C_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
-    parameterCombinations('C_w_INHB')               = [0.5]; % self-org-classic = 0.1, prewired = 
+    parameterCombinations('C_w_INHB')               = [0]; % self-org-classic = 0.1, prewired = 
     parameterCombinations('C_threshold')            = [17]; % self-org-classic = 15, prewired = 
     parameterCombinations('C_threshold_sigma')      = [0]; % self-org-classic = 0, prewired = 
     parameterCombinations('C_slope')                = [100]; % self-org-classic = 100, prewired = 
     parameterCombinations('C_to_R_psi')             = [3]; % self-org-classic = 3, prewired = 7
     parameterCombinations('C_to_R_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
-    parameterCombinations('C_to_R_connectivity')    = [1]; % self-org-classic = 1, prewired = 
+    parameterCombinations('C_to_R_connectivity')    = [1.0]; % self-org-classic = 1, prewired = 
+    
+    % 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0
     
     % Save the experiment params
     save([experimentFolderPath filesep 'GenerateExperiment.mat'], 'parameterCombinations');

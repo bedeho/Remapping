@@ -14,20 +14,20 @@ function ThesisLHeiserPlot()
     global EXPERIMENTS_FOLDER;
         
     % Simulations
-    %{
-    simulationFolder{1} = [EXPERIMENTS_FOLDER 'LHeiser/baseline'];
+    
+    simulationFolder{1} = [EXPERIMENTS_FOLDER 'classic-lheiser/baseline'];
     Legends{1} = 'value 1';
     
-    %simulationFolder{2} = [EXPERIMENTS_FOLDER 'LHeiser/baseline'];
+    %simulationFolder{2} = [EXPERIMENTS_FOLDER 'classic-lheiser/baseline'];
     %Legends{2} = 'value 2';
     
-    numberOfDirections = 3;
-    numberOfUnique = 2;
+    numberOfDirections = 4;
+    numberOfUnique = 17;
     xTitle = 'The x tite';
-    %}
+    
     
     %% LHeiser_C_to_R_connectivity
-    
+    %{
     simulationFolder{1} = [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=0.1'];
     Legends{1}          = '0.1';
     simulationFolder{2} = [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=0.2'];
@@ -52,6 +52,13 @@ function ThesisLHeiserPlot()
     numberOfDirections = 4;
     numberOfUnique = 17;
     xTitle = '\phi^\text{C}';
+    %}
+    
+    
+    
+    
+    
+    
     
     % Iterate simulations
     numSimulations = length(simulationFolder);

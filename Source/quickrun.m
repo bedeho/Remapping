@@ -18,8 +18,7 @@ function quickrun()
         
         %experimentName = 'prewired';
         
-        experimentName = 'classic-lheiser';        
-        %experimentName = 'classic';
+        experimentName = 'classic';
         
         %% DO NOT CHANGE, basic2 has fixed dt
         %dt = 0.010;
@@ -31,9 +30,7 @@ function quickrun()
         %% Setup stimuli
         
         % Training
-        %[Training_RF_Locations, Training_Saccades, trainingStimuli] = Training_Coordinated('basic', dt);
-        
-        [Training_RF_Locations, Training_Saccades, trainingStimuli] = Training_LHeiser('basic', dt);
+        [Training_RF_Locations, Training_Saccades, trainingStimuli] = Training_Coordinated('basic', dt);
         
         % Testing
         Testing_StimuliControl('basic', dt);
@@ -75,12 +72,9 @@ function quickrun()
         stimulinames = {'basic-StimuliControl', ...
                         'basic-SaccadeControl', ...
                         'basic-CLayerProbe', ...
-                        'basic-DuhamelRemappingTrace'
+                        'basic-DuhamelRemappingTrace', ...
+                        'basic-Kusonoki'
                         };
-       
-                        %, ...
-                        %'basic-Kusonoki'
-
         
         %% Run
         GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli, d);
