@@ -18,7 +18,8 @@ function quickrun()
         
         %experimentName = 'prewired';
         
-        experimentName = 'classic';
+        experimentName = 'classic-lheiser';        
+        %experimentName = 'classic';
         
         %% DO NOT CHANGE, basic2 has fixed dt
         %dt = 0.010;
@@ -30,8 +31,9 @@ function quickrun()
         %% Setup stimuli
         
         % Training
-        %Training_Basic('basic', dt);
-        [Training_RF_Locations, Training_Saccades, trainingStimuli] = Training_Coordinated('basic', dt);
+        %[Training_RF_Locations, Training_Saccades, trainingStimuli] = Training_Coordinated('basic', dt);
+        
+        [Training_RF_Locations, Training_Saccades, trainingStimuli] = Training_LHeiser('basic', dt);
         
         % Testing
         Testing_StimuliControl('basic', dt);
@@ -39,7 +41,7 @@ function quickrun()
         
         
         %%%
-        Sprattling_Testing_StimuliControl('basic', dt);
+        %Sprattling_Testing_StimuliControl('basic', dt);
         %%%
         
         %if length(Training_RF_Locations) == 1,
@@ -60,21 +62,25 @@ function quickrun()
         
         % Kusonoki
         Testing_Kusonoki('basic', dt, Training_RF_Locations, Training_Saccades);
+
+        %% Debug C
+        %{
+        stimulinames = {'basic-StimuliControl', ...
+                        'basic-SaccadeControl'
+                        };
+        %}
+        
+        %% classic
         
         stimulinames = {'basic-StimuliControl', ...
-            'basic-SaccadeControl', ...
-            'basic-CLayerProbe', ...
-            'basic-DuhamelRemappingTrace', ...
-            'basic-Sprattling_StimuliControl'
-            };
-        
-        %'basic-Kusonoki'
-        
-        %'basic-CLayerProbe', ...
-        %'basic-DuhamelRemappingTrace', ...
-        %'basic-Kusonoki'
-        %'basic2-StimuliControl', ...
-        %'basic2-SaccadeControl', ...
+                        'basic-SaccadeControl', ...
+                        'basic-CLayerProbe', ...
+                        'basic-DuhamelRemappingTrace'
+                        };
+       
+                        %, ...
+                        %'basic-Kusonoki'
+
         
         %% Run
         GenerateExperiment(experimentName, dt, stimulinames, trainingStimuli, d);

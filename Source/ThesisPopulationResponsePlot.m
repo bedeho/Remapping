@@ -32,13 +32,13 @@ function ThesisPopulationResponsePlot()
     %}
         
     % Basic
-    %{
+    
     period      = 1;
     epoch       = 1;
-    experiment  = 'baseline';
+    experiment  = 'classic';
     stimuliFile = [EXPERIMENTS_FOLDER experiment filesep 'STIM-basic-DuhamelRemappingTrace' filesep 'stim.mat'];
     activityFile = [EXPERIMENTS_FOLDER experiment filesep 'baseline/TrainedNetwork/activity-basic-DuhamelRemappingTrace.mat'];
-    %}
+    
     
     % dilution-1: remappingtrace
     %{

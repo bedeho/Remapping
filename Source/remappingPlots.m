@@ -9,7 +9,6 @@
 
 function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, FaceColors, Legends)
 
-
     AxisFontSize = 12;
     LabelFontSize  = 14;
 

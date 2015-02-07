@@ -9,7 +9,8 @@
 function declareGlobalVars()
 
 	global base;
-	base = ['C:' filesep 'Users' filesep 'bedeho' filesep 'Documents' filesep 'GitHub' filesep 'Remapping' filesep]; % must have trailing slash
+	%base = ['C:' filesep 'Users' filesep 'bedeho' filesep 'Documents' filesep 'GitHub' filesep 'Remapping' filesep]; % must have trailing slash
+    base = ['C:' filesep 'RemappingWorkspace' filesep]; % must have trailing slash
 
 	global EXPERIMENTS_FOLDER;
 	EXPERIMENTS_FOLDER = [base 'Experiments' filesep];
@@ -18,6 +19,7 @@ function declareGlobalVars()
 	STIMULI_FOLDER = [base 'Stimuli' filesep];
     
     global THESIS_FIGURE_PATH;
-    THESIS_FIGURE_PATH = ['C:' filesep 'Users' filesep 'bedeho' filesep 'Documents' filesep 'GitHub' filesep 'Remapping' filesep 'Thesisfigures' filesep ''];
+    %THESIS_FIGURE_PATH = ['C:' filesep 'Users' filesep 'bedeho' filesep 'Documents' filesep 'GitHub' filesep 'Remapping' filesep 'Thesisfigures' filesep ''];
+    THESIS_FIGURE_PATH = [base 'Thesisfigures' filesep ''];
     
     

@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
+function Remapping_betterC(simulationFolder, stimuliName, isTraining, networkfilename)
 
     % Import global variables
     declareGlobalVars();
@@ -174,17 +174,27 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
     % Allocate buffer space
     saveOutput = (~isTraining) || (isTraining && parameters.saveActivityInTraining);
     
+    C_firing_history = [];
+    C_activation_history = [];
+    
     if(saveOutput),
         
         V_firing_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
         R_firing_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
         S_firing_history = zeros(S_N, numSavedTimeSteps, numPeriods, numEpochs);
-        C_firing_history = zeros(C_N, numSavedTimeSteps, numPeriods, numEpochs);
+        
+        %C_firing_history = zeros(C_N, numSavedTimeSteps, numPeriods, numEpochs);
+        
+        C_firing_history_lastperiode = zeros(C_N, numSavedTimeSteps);
 
         V_activation_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
         R_activation_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
         S_activation_history = zeros(S_N, numSavedTimeSteps, numPeriods, numEpochs);
-        C_activation_history = zeros(C_N, numSavedTimeSteps, numPeriods, numEpochs);
+        
+        %C_activation_history = zeros(C_N, numSavedTimeSteps, numPeriods, numEpochs);
+        
+        C_activation_history_lastperiode = zeros(C_N, numSavedTimeSteps);
+        
 
         extra_history = zeros(R_N, numSavedTimeSteps, numPeriods, numEpochs);
     end
@@ -276,7 +286,7 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
             end
             
             % Reset network variables
-            periodSaveCounter   = 2; % First dt is automatically saved
+            savedTimeStepCounter   = 2; % First dt is automatically saved
             V                   = V*0;
             K                   = K*0; % must be reallocated since teh number of visiible targets can in theory change, although it never does in practice.
             P                   = P*0;
@@ -474,96 +484,26 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 %% Save activity                
                 if (saveOutput),
                     
-                    V_firing_history(:, periodSaveCounter, period, epoch) = V_firingrate;
-                    R_firing_history(:, periodSaveCounter, period, epoch) = R_firingrate;
-                    S_firing_history(:, periodSaveCounter, period, epoch) = S_firingrate; % S_activation;
-                    C_firing_history(:, periodSaveCounter, period, epoch) = C_firingrate;
-
-                    V_activation_history(:, periodSaveCounter, period, epoch) = V;
-                    R_activation_history(:, periodSaveCounter, period, epoch) = R_activation;
-                    S_activation_history(:, periodSaveCounter, period, epoch) = S_activation;
-                    C_activation_history(:, periodSaveCounter, period, epoch) = C_activation;
+                    V_firing_history(:, savedTimeStepCounter, period, epoch) = V_firingrate;
+                    R_firing_history(:, savedTimeStepCounter, period, epoch) = R_firingrate;
+                    S_firing_history(:, savedTimeStepCounter, period, epoch) = S_firingrate; % S_activation;
                     
-                    extra_history(:, periodSaveCounter, period, epoch) = C_to_R_excitation;%C_to_R_excitation;%;ones(size(P))*C_dynamic_threshold;
+                    %C_firing_history(:, savedTimeStepCounter, period, epoch) = C_firingrate;
+                    C_firing_history_lastperiode(:, savedTimeStepCounter) = C_firingrate;
+
+                    V_activation_history(:, savedTimeStepCounter, period, epoch) = V;
+                    R_activation_history(:, savedTimeStepCounter, period, epoch) = R_activation;
+                    S_activation_history(:, savedTimeStepCounter, period, epoch) = S_activation;
+                    
+                    %C_activation_history(:, savedTimeStepCounter, period, epoch) = C_activation;
+                    C_activation_history_lastperiode(:, savedTimeStepCounter) = C_activation;
+                    
+                    extra_history(:, savedTimeStepCounter, period, epoch) = C_to_R_excitation;%C_to_R_excitation;%;ones(size(P))*C_dynamic_threshold;
                     
                     % Count one more dt
-                    periodSaveCounter = periodSaveCounter + 1;
+                    savedTimeStepCounter = savedTimeStepCounter + 1;
                 end 
-                
-                %{
-                % Visualize
-                if(strcmp(stimuliName,'basic-Training_Coordinated') && epoch >= 0 && t >= 40 ), % && t==141 period == 6, period == numPeriods, && 
 
-                    
-                    n=130;
-
-                    %figure;
-                    %plot(C_to_R_weights(40, :));
-                    %axis tight
-                    
-                    %figure;
-                    
-                    subplot(6,3,1);
-                    plot(S_to_C_weights(n,:));
-                    axis tight;
-                    ylim([0 0.5]);
-                    title('S->C');
-
-                    subplot(6,3,2);
-                    plot(V_to_C_weights(n,:));
-                    axis tight;
-                    ylim([0 0.5]);
-                    title('V->C');
-
-                    subplot(6,3,3);
-                    plot(C_to_R_weights(:, n));
-                    axis tight;
-                    %ylim([0 0.4]);
-                    title('C->R');
-
-                    subplot(6,3,[4 5 6]);
-                    imagesc(S_firing_history(:, :, period, epoch));
-                    hold on;
-                    if ~isempty(saccOnsetTimeSteps), plot([saccOnsetTimeSteps saccOnsetTimeSteps],[ones(S_N,1) S_N*ones(S_N,1)],'r'); end
-                    title('S');
-
-                    subplot(6,3,[7 8 9]);
-                    imagesc(V_firing_history(:, :, period, epoch));
-                    hold on;
-                    if ~isempty(saccOnsetTimeSteps), plot([saccOnsetTimeSteps saccOnsetTimeSteps],[ones(R_N,1) S_N*ones(R_N,1)],'r'); end
-                    title('V');
-
-                    subplot(6,3,[10 11 12]);
-                    imagesc(R_firing_history(:, :, period, epoch));
-                    hold on;
-                    if ~isempty(saccOnsetTimeSteps), plot([saccOnsetTimeSteps saccOnsetTimeSteps],[ones(R_N,1) R_N*ones(R_N,1)],'r'); end
-                    title('R');
-
-                    subplot(6,3,[13 14 15]);
-                    cla
-                    plot(C_firing_history(n, :, period, epoch));
-                    hold on;
-                    if ~isempty(saccOnsetTimeSteps), plot([saccOnsetTimeSteps saccOnsetTimeSteps],[0 1.1],'r'); end
-                    title('C Firing of neuron n');
-
-                    t_show = 50;%60;
-
-                    subplot(6,3,[16 17 18]);
-                    cla
-                    tmp = C_activation_history(:, t_show, period, epoch);
-                    [nelements, centers] =hist(tmp(:),100);
-                    bar(centers,nelements);
-                    hold on;
-                    n_activation = C_activation_history(n, t_show, period, epoch);
-                    plot([n_activation n_activation],[0 max(nelements)],'r','LineWidth',2);
-                    plot([C_threshold C_threshold],[0 max(nelements)],'g','LineWidth',2);
-                    
-                    axis tight;
-                    title('C activation');
-
-                end
-                %}
-                
                 C_Input_flat(period, epoch) = max(max(C_Input), C_Input_flat(period, epoch));
                 
             end
@@ -577,8 +517,8 @@ function Remapping(simulationFolder, stimuliName, isTraining, networkfilename)
                 firstSaccadeTime = saccadeTimes(1);
                 window = 0.050;
 
-                C_firing_history_flat(:, period, epoch) = normalizedIntegration(C_firing_history(:, :, period, epoch), dt, firstSaccadeTime - window, window);
-                C_activation_history_flat(:, period, epoch) = normalizedIntegration(C_activation_history(:, :, period, epoch), dt, firstSaccadeTime - window, window);
+                C_firing_history_flat(:, period, epoch) = normalizedIntegration(C_firing_history_lastperiode, dt, firstSaccadeTime - window, window);
+                C_activation_history_flat(:, period, epoch) = normalizedIntegration(C_activation_history_lastperiode, dt, firstSaccadeTime - window, window);
 
             end
             

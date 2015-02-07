@@ -129,6 +129,7 @@ function Analyze(experimentFolder, netDir, stimulinames)
     
     % Duhamel remapping trace
     if(remTraceScatFig),
+        
         saveas(remTraceScatFig,[netDir filesep 'DuhamelRemappingTrace-summary.png']);
         saveas(remTraceScatFig,[netDir filesep 'DuhamelRemappingTrace.eps'], 'epsc');
         close(remTraceScatFig);

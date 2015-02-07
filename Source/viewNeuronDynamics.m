@@ -497,18 +497,32 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     
                     
                     %% C-> R
+                    % Old style
                     
-                    %{
+                    
                     figure('Units','pixels','position', [1000 1000 420 230]);
                     hold on;
                     
                     synapticAfferents = network.C_to_R_weights(neuron, :);
                     maxWeight = max(synapticAfferents);
+                    minWeight = min(synapticAfferents);
+                    diff = maxWeight - minWeight;
                     num = length(synapticAfferents);
                     
-                    for i=1:num,
-                        weight = synapticAfferents(i);
-                        plot(V(i),S(i),'o','Color',[1, 1 -  weight/maxWeight, 1 -  weight/maxWeight]);
+                    % smallest first plotting
+                    [values, indexes] = sort(synapticAfferents);
+                    
+                    for j=1:num,
+                        
+                        neuron_index = indexes(j);
+                        
+                        weight = synapticAfferents(neuron_index);
+                        
+                        %plot(V(i),S(i),'o','Color',[1, 1 -  weight/maxWeight, 1 -  weight/maxWeight]);
+                        
+                        intensity = 1 - (weight - minWeight)/diff;
+                        plot(V(neuron_index),S(neuron_index),'o','Color',[1, intensity, intensity]);
+                        
                     end
                     
                     hXLabel = xlabel('Retinal Locaton (deg)');
@@ -523,25 +537,28 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     
                     colorbar;
                     caxis([0 maxWeight]);
-                    resolution = 100;
-                    map = [ones(101,1) (1:-1/resolution:0)' (1:-1/resolution:0)'];
+                    resolution = 100; % 100
+                    map = [ones(resolution + 1,1) (1:-1/resolution:0)' (1:-1/resolution:0)'];
                     colormap(map);
                     
                     % Diag
                     disp('C afferents > 90% of max');
                     find(synapticAfferents > maxWeight*0.9)
-                    %}
                     
+                    
+                    %% Primitive style
+                    %{
                     figure('Units','pixels','position', [1000 1000 420 230]);
                     hold on;
                     
                     synapticAfferents = network.C_to_R_weights(neuron, :);
                     plot(synapticAfferents);
-                    
-                    
+                    %}
                     
                     %% V->R
-
+                    %Sprattling visualization
+                    
+                    %{ 
                     K_to_R_afferents = network.K_to_R_weights(neuron, :);
                     
                     figure('Units','pixels','position', [1000 1000 420 180]);
@@ -554,7 +571,7 @@ function viewNeuronDynamics(activityFile, stimuliFile, networkFile, CLayerProble
                     set([hYLabel hXLabel], 'FontSize', 14);
                     set(gca,'XTick', rTicks, 'XTickLabel', rCellLabels);
                     pbaspect([1, 30/length(R_preferences), 1]);
-                    
+                    %}
                 elseif(strcmp(region,'S')),
                     
                     figure('Units','pixels','position', [1000 1000 420 300]);
