@@ -7,7 +7,7 @@
 %  Copyright 2013 OFTNAI. All rights reserved.
 %
 
-function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %, DELAY)
+function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DELAY)
 
     % Import global variables
     declareGlobalVars();
@@ -89,7 +89,7 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
     K_max_onset_delay = 0.080; % self-org-classic = 0.08, prewired = 
     
     % V
-    DELAY = 0.3; % self-org-classic = 0.3
+    %DELAY = 0.3; % self-org-classic = 0.3
     
     % receptive field size
     % V_tau, is not actually even used in simulator, since V_tau=1 means it
@@ -112,15 +112,15 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DILUTION) %
     parameterCombinations('S_to_C_connectivity')    = [0.02];  % self-org-classic = 0.2, prewired = 0.4 [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
     
     % C
-    parameterCombinations('C_N')                    = [5551]; % self-org-classic = 1000, prewired =
+    parameterCombinations('C_N')                    = [5551]; %5551, self-org-classic = 1000, prewired =
     parameterCombinations('C_tau')                  = [0.020]; % self-org-classic = 0.02, prewired = 
-    parameterCombinations('C_w_INHB')               = [0]; % self-org-classic = 0.1, prewired = 
-    parameterCombinations('C_threshold')            = [17]; % self-org-classic = 15, prewired = 
+    parameterCombinations('C_w_INHB')               = [0.1]; %0.3, self-org-classic = 0.1, prewired = 
+    parameterCombinations('C_threshold')            = [18]; % 16, self-org-classic = 15, prewired = 
     parameterCombinations('C_threshold_sigma')      = [0]; % self-org-classic = 0, prewired = 
     parameterCombinations('C_slope')                = [100]; % self-org-classic = 100, prewired = 
     parameterCombinations('C_to_R_psi')             = [3]; % self-org-classic = 3, prewired = 7
     parameterCombinations('C_to_R_alpha')           = [0.1]; % self-org-classic = 0.1, prewired = 
-    parameterCombinations('C_to_R_connectivity')    = [1.0]; % self-org-classic = 1, prewired = 
+    parameterCombinations('C_to_R_connectivity')    = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]; % self-org-classic = 1, prewired = 
     
     % 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0
     

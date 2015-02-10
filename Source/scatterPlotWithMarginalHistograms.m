@@ -44,9 +44,9 @@ function [maxPlot, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = 
     MarkerSize      = processOptionalArgument('MarkerSize', 3);
     Location        = processOptionalArgument('Location', 'NorthEast'); % SouthWest
     %YLabelOffset    = processOptionalArgument('YLabelOffset', 5);
-    LabelFontSize   = processOptionalArgument('LabelFontSize', 15);
-    AxisFontSize    = processOptionalArgument('AxisFontSize', 14);
-    LegendFontSize    = processOptionalArgument('LegendFontSize', 10);
+    LabelFontSize   = processOptionalArgument('LabelFontSize', 11);
+    AxisFontSize    = processOptionalArgument('AxisFontSize', 2);
+    LegendFontSize    = processOptionalArgument('LegendFontSize', 9);
     
     %% Main plot
 

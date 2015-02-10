@@ -53,7 +53,7 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
     Lim = [(lat_lower_limit - 5) (lat_upper_limit+5)]; %1.1*,  ticks on 10ms
     Lim = roundn(Lim,1);
     
-    if(~foundNaN),
+    if(true), % ~foundNaN
     
         if(length(remapping_results) > 1),
             [remLatFig, yProjectionAxis, scatterAxis, xProjectionAxis, XLim, YLim] = scatterPlotWithMarginalHistograms(X_Lat, Y_Lat, 'XTitle', 'Stimulus Control Latency (ms)', 'YTitle', 'Remapping Latency (ms)', 'FaceColors', FaceColors, 'XLim', Lim, 'YLim', Lim, 'Legends', Legends, 'AxisFontSize', AxisFontSize, 'LabelFontSize', LabelFontSize);

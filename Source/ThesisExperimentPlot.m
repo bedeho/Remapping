@@ -44,11 +44,11 @@ function ThesisExperimentPlot()
     
     experiment  = 'classic';
 
-    simulationFolder{1} = [EXPERIMENTS_FOLDER experiment '/C_w_INHB=0.05/BlankNetwork'];
+    simulationFolder{1} = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork'];
     Legends{1}          = 'Untrained';
     FaceColors{1}       = [67,82,163]/255;
     
-    simulationFolder{2} = [EXPERIMENTS_FOLDER experiment '/C_w_INHB=0.05/TrainedNetwork'];
+    simulationFolder{2} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork'];
     Legends{2}          = 'Trained';
     FaceColors{2}       = [238,48,44]/255;
     
