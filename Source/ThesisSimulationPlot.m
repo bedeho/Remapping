@@ -17,7 +17,8 @@ function [stmCtrlFigure, remScatFig, remTraceScatFig, kusonokiSACCFigure, kusono
         experimentFolder = [EXPERIMENTS_FOLDER 'classic\baseline\TrainedNetwork']; %'prewired/baseline/PrewiredNetwork/'];
     end
     
-    color = [67,82,163]/255; % {[67,82,163]/255; [238,48,44]/255};
+    %color = [67,82,163]/255; % {[67,82,163]/255; [238,48,44]/255};
+    color = [238,48,44]/255; % {[67,82,163]/255; [238,48,44]/255};
     
     %% Load stimuli control file
     stmCtrlFile = [experimentFolder filesep 'analysis-basic-StimuliControl.mat'];

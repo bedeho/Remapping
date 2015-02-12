@@ -115,8 +115,8 @@ function [remLatFig, remScatFig, indexFig] = remappingPlots(remapping_results, F
     hXLabel = xlabel('Neuron Rank');
     hYLabel = ylabel('Remapping Index');
 
-    set(gca, 'TickDir', 'out', 'FontSize', 14);
-    set([hYLabel hXLabel], 'FontSize', 14);
+    set(gca, 'TickDir', 'out', 'FontSize', 10); % 14 før
+    set([hYLabel hXLabel], 'FontSize', 10);
     %pbaspect([1 0.5 1]);
     box on;
         

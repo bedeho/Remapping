@@ -89,7 +89,10 @@ function GenerateExperiment(Name, dt, stimulinames, trainingStimuli, DELAY)
     K_max_onset_delay = 0.080; % self-org-classic = 0.08, prewired = 
     
     % V
-    %DELAY = 0.3; % self-org-classic = 0.3
+    if(nargin < 5),
+        DELAY = 0.300; % self-org-classic = 0.3
+    end
+    
     
     % receptive field size
     % V_tau, is not actually even used in simulator, since V_tau=1 means it

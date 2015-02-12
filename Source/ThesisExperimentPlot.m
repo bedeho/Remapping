@@ -42,7 +42,10 @@ function ThesisExperimentPlot()
     %% Selforganizing
     
     
-    experiment  = 'classic';
+    experiment  = 'classic-delay0.3';%
+    % classic-delay0.05, classic-delay0.1, classic-delay0.15,
+    % classic-delay0.2, classic-delay0.25, classic-delay0.3
+    
 
     simulationFolder{1} = [EXPERIMENTS_FOLDER experiment '/baseline/BlankNetwork'];
     Legends{1}          = 'Untrained';

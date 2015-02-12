@@ -115,7 +115,7 @@ function ThesisSingleNeuronPlot()
     %}
     
     %% remapping
-    
+    %{
     % h_0 = -5& s = 15, --> r = -20.
     
     h = -5;
@@ -123,6 +123,7 @@ function ThesisSingleNeuronPlot()
     r = h - s;
     
     experiment  = 'classic'; % sprattling_visual_learning_bigepoch20-connectivitfix
+    %}
     
     %{ 
     % Remapping
@@ -143,19 +144,15 @@ function ThesisSingleNeuronPlot()
     %}
     
     % Saccade control
-    
+    %{
     period      = 46;
     epoch       = 1;
     neuron      = R_BASE + h;
     stimuliName = 'STIM-basic-SaccadeControl';
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/activity-basic-SaccadeControl.mat'];
-    
-    
-    
+    %}
     
     %% KUSONKI
-    
-    %{
     
     % h_0 = -5& s = 15, --> r = -20.
     
@@ -163,7 +160,6 @@ function ThesisSingleNeuronPlot()
     s = 15;
     r = h - s;
     
-    %experiment  = 'baseline-onsettune';
     experiment  = 'classic';
     
     % CRF periods: [1,6,8,13]
@@ -177,11 +173,8 @@ function ThesisSingleNeuronPlot()
     %activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/S_presaccadic_onset=0.07/TrainedNetwork/activity-basic-Kusonoki.mat'];
     activityFiles{1} = [EXPERIMENTS_FOLDER experiment '/baseline/TrainedNetwork/activity-basic-Kusonoki.mat'];
     
-    %}
     colors{1}   = [0,0,255]/255; % [67,82,163]/255;
     legends{1}  = '';
-    
-    
     
     % =======================================
     
@@ -223,7 +216,7 @@ function ThesisSingleNeuronPlot()
         stimWindowBegin = stimBegin + 0.050;
         pos_box = [timeToTimeStep(stimWindowBegin, dt), 0.001, timeToTimeStep(recordingWindow, dt),  1];
         
-        %rectangle('Position', pos_box,'FaceColor', stimColor,'EdgeColor', stimColor);
+        rectangle('Position', pos_box,'FaceColor', stimColor,'EdgeColor', stimColor);
         
         %[x1, x2, x3, x4] = pos_box_to_X(pos_box);
         %[y1, y2, y3, y4] = pos_box_to_Y(pos_box);

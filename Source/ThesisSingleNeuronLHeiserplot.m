@@ -36,7 +36,7 @@ function ThesisSingleNeuronLHeiserplot()
     % Iterate each neuron
     for i=1:numUnique,
         
-        figure('Units','pixels','position', [1000 1000 400 200]); % [1000 1000 400 400]
+        figureHandle = figure('Units','pixels','position', [1000 1000 400 200]); % [1000 1000 400 400]
         
         pref = sim_trained.LHeiserAnalysis.retinal_preference(i);
         
@@ -70,6 +70,12 @@ function ThesisSingleNeuronLHeiserplot()
         
         set([hYLabel hXLabel], 'FontSize', 14);
         set(gca, 'FontSize', 12);
+        
+        %% Save
+        name = ['C:\Users\Sindre\Desktop\out\LHeiser_RI_' num2str(i)];
+        saveas(figureHandle,[name '.eps'], 'epsc');
+        saveas(figureHandle,[name '.png']);
+        close(figureHandle);
         
     end
 

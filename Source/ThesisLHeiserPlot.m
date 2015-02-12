@@ -14,7 +14,7 @@ function ThesisLHeiserPlot()
     global EXPERIMENTS_FOLDER;
         
     % Simulations
-    
+    %{
     simulationFolder{1} = [EXPERIMENTS_FOLDER 'classic-lheiser/baseline'];
     Legends{1} = 'value 1';
     
@@ -24,10 +24,10 @@ function ThesisLHeiserPlot()
     numberOfDirections = 4;
     numberOfUnique = 17;
     xTitle = 'The x tite';
-    
+    %}
     
     %% LHeiser_C_to_R_connectivity
-    %{
+    
     simulationFolder{1} = [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=0.1'];
     Legends{1}          = '0.1';
     simulationFolder{2} = [EXPERIMENTS_FOLDER 'LHeiser_C_to_R_connectivity/C_to_R_connectivity=0.2'];
@@ -52,7 +52,7 @@ function ThesisLHeiserPlot()
     numberOfDirections = 4;
     numberOfUnique = 17;
     xTitle = '\phi^\text{C}';
-    %}
+    
     
     
     
@@ -76,15 +76,15 @@ function ThesisLHeiserPlot()
         trained_uniqueIndexes = trained_network.LHeiserAnalysis.uniqueIndexes
 
         %% Number of locations responsiveness distribution
-        
         %{
+        
         
         % Compute        
         diffUniqueIndexes = trained_uniqueIndexes - blank_uniqueIndexes;
         uniqueResponseCount = sum(diffUniqueIndexes > 0);
         
         % Show figure
-        figure('Units','pixels','position', [1000 1000 400 200]); % [1000 1000 400 400]
+        figureHandle = figure('Units','pixels','position', [1000 1000 400 200]); % [1000 1000 400 400]
 
         h = hist(uniqueResponseCount,0:numberOfDirections)/numberOfUnique;
         bar(0:numberOfDirections, h, 0.7);
@@ -101,8 +101,8 @@ function ThesisLHeiserPlot()
         % Save plot for bar plot
         results(i,:) = h;
         
-        
         %}
+        
         
         %% selectivity distribution
         %{
@@ -117,7 +117,7 @@ function ThesisLHeiserPlot()
 
         H = [ h_trained(1:end)']; % h_untrained(1:end)'
 
-        figure('Units','pixels','position', [1000 1000 400 200]);
+        figureHandle = figure('Units','pixels','position', [1000 1000 400 200]);
 
         hBar = bar(X,H,1.0);  %bar(X,H,1.0,'stacked','LineStyle','none'); 
         set(hBar(1),'FaceColor', 'r');
@@ -129,10 +129,12 @@ function ThesisLHeiserPlot()
         hYLabel = ylabel('Frequency');
         set([hYLabel hXLabel], 'FontSize', 14);
         set(gca, 'FontSize', 12);
-            %}
+        %}
+        
         
         %% preference distribution
         %{
+        
         % Make histograms
         pref_trained = [trained_network.LHeiserAnalysis.retinal_preference];
 
@@ -140,7 +142,7 @@ function ThesisLHeiserPlot()
 
         h_trained = histc(pref_trained, X);
 
-        figure('Units','pixels','position', [1000 1000 400 200]);
+        figureHandle = figure('Units','pixels','position', [1000 1000 400 200]);
 
         hBar = bar(X,h_trained,1.0); 
 
@@ -171,7 +173,7 @@ function ThesisLHeiserPlot()
         end
         
         % Show figure
-        figure('Units','pixels','position', [1000 1000 400 200]); % [1000 1000 400 400]
+        figureHandle = figure('Units','pixels','position', [1000 1000 400 200]); % [1000 1000 400 400]
         
         errorbar(1:numberOfDirections, means, err);
         
@@ -194,7 +196,7 @@ function ThesisLHeiserPlot()
         SI = trained_network.LHeiserAnalysis.SI;
 
         % Show figure
-        figure('Units','pixels','position', [1000 1000 400 200]); % [1000 1000 400 400]
+        figureHandle = figure('Units','pixels','position', [1000 1000 400 200]); % [1000 1000 400 400]
         
         errorbar(RF, meanRI, errorRI, 'o');
         hold on;
@@ -218,6 +220,18 @@ function ThesisLHeiserPlot()
         set(gca, 'FontSize', 12);
         set(gca, 'YTick', [0 1], 'XTick', -45:10:45);
         pbaspect([0.6 0.3 1])
+        
+        
+        %% Save
+        %name = ['C:\Users\Sindre\Desktop\out\directiondistribution_' num2str(i)];
+        %name = ['C:\Users\Sindre\Desktop\out\selectivitydistribution_' num2str(i)];
+        %name = ['C:\Users\Sindre\Desktop\out\preferencedistribution_' num2str(i)];
+        %name = ['C:\Users\Sindre\Desktop\out\MAXRI_' num2str(i)];
+        name = ['C:\Users\Sindre\Desktop\out\RISI_' num2str(i)];
+        
+        saveas(figureHandle,[name '.eps'], 'epsc');
+        saveas(figureHandle,[name '.png']);
+        close(figureHandle);
                 
     end
     
