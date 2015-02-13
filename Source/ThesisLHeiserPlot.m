@@ -53,13 +53,6 @@ function ThesisLHeiserPlot()
     numberOfUnique = 17;
     xTitle = '\phi^\text{C}';
     
-    
-    
-    
-    
-    
-    
-    
     % Iterate simulations
     numSimulations = length(simulationFolder);
     results = zeros(numSimulations, numberOfDirections + 1);
@@ -78,7 +71,6 @@ function ThesisLHeiserPlot()
         %% Number of locations responsiveness distribution
         %{
         
-        
         % Compute        
         diffUniqueIndexes = trained_uniqueIndexes - blank_uniqueIndexes;
         uniqueResponseCount = sum(diffUniqueIndexes > 0);
@@ -92,20 +84,19 @@ function ThesisLHeiserPlot()
         
         hXLabel = xlabel('Number of locations with remapping');
         hYLabel = ylabel('Frequency');
-        set([hYLabel hXLabel], 'FontSize', 14);
-        set(gca, 'FontSize', 12);
+        set([hYLabel hXLabel], 'FontSize', 12);
+        set(gca, 'FontSize', 10);
         set(gca, 'YTick', [0 1]);
         pbaspect([0.6 0.3 1])
         %axis square;
         
         % Save plot for bar plot
         results(i,:) = h;
-        
+        name = ['C:\Users\Sindre\Desktop\out\directiondistribution_' num2str(i)];
         %}
         
-        
         %% selectivity distribution
-        %{
+        
         % Make histograms
         SI_untrained = [blank_network.LHeiserAnalysis.SI];
         SI_trained = [trained_network.LHeiserAnalysis.SI];
@@ -129,8 +120,8 @@ function ThesisLHeiserPlot()
         hYLabel = ylabel('Frequency');
         set([hYLabel hXLabel], 'FontSize', 14);
         set(gca, 'FontSize', 12);
-        %}
         
+        name = ['C:\Users\Sindre\Desktop\out\selectivitydistribution_' num2str(i)];
         
         %% preference distribution
         %{
@@ -153,6 +144,7 @@ function ThesisLHeiserPlot()
         set([hYLabel hXLabel], 'FontSize', 14);
         set(gca, 'FontSize', 12);
         set(gca, 'XTick',-45:10:45);
+        name = ['C:\Users\Sindre\Desktop\out\preferencedistribution_' num2str(i)];
         %}
         
         %% Number of locations vs. max remapping index
@@ -186,10 +178,13 @@ function ThesisLHeiserPlot()
         set(gca, 'FontSize', 12);
         set(gca, 'YTick', [0 1], 'XTick', 1:numberOfDirections);
         pbaspect([0.6 0.3 1])
+        
+        
+        name = ['C:\Users\Sindre\Desktop\out\MAXRI_' num2str(i)];
         %}
         
         %% RI,SI as function of RF
-        
+        %{
         meanRI = mean(trained_uniqueIndexes);
         errorRI = std(trained_uniqueIndexes);
         RF = trained_network.LHeiserAnalysis.Unique_Training_RF_Locations;
@@ -220,17 +215,14 @@ function ThesisLHeiserPlot()
         set(gca, 'FontSize', 12);
         set(gca, 'YTick', [0 1], 'XTick', -45:10:45);
         pbaspect([0.6 0.3 1])
-        
+        name = ['C:\Users\Sindre\Desktop\out\RISI_' num2str(i)];
+        %}
         
         %% Save
-        %name = ['C:\Users\Sindre\Desktop\out\directiondistribution_' num2str(i)];
-        %name = ['C:\Users\Sindre\Desktop\out\selectivitydistribution_' num2str(i)];
-        %name = ['C:\Users\Sindre\Desktop\out\preferencedistribution_' num2str(i)];
-        %name = ['C:\Users\Sindre\Desktop\out\MAXRI_' num2str(i)];
-        name = ['C:\Users\Sindre\Desktop\out\RISI_' num2str(i)];
-        
-        saveas(figureHandle,[name '.eps'], 'epsc');
-        saveas(figureHandle,[name '.png']);
+        %saveas(figureHandle,[name '.eps'], 'eps');
+        %saveas(figureHandle,[name '.png']);
+        hgexport(figureHandle, [name '.eps'], hgexport('factorystyle'), 'Format', 'eps');
+        hgexport(figureHandle, [name '.png'], hgexport('factorystyle'), 'Format', 'png');
         close(figureHandle);
                 
     end

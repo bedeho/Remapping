@@ -27,6 +27,7 @@ function ThesisSingleNeuronLHeiserplot()
     retinalSources = sim_trained.LHeiserAnalysis.retinalSources;
     uniqueIndexes_trained = sim_trained.LHeiserAnalysis.uniqueIndexes;
     uniqueIndexes_untrained = sim_untrained.LHeiserAnalysis.uniqueIndexes;
+    Unique_Training_RF_Locations = sim_untrained.LHeiserAnalysis.Unique_Training_RF_Locations;
     
     % Plotting variable
     upperYlimit = sqrt(2);
@@ -43,6 +44,7 @@ function ThesisSingleNeuronLHeiserplot()
         ret_src = retinalSources(:,i);
         RI_untrained = uniqueIndexes_untrained(:,i);
         RI_trained = uniqueIndexes_trained(:,i);
+        RF = Unique_Training_RF_Locations(i);
         
         % sort retinally
         [X,IX] = sort(ret_src);
@@ -51,13 +53,13 @@ function ThesisSingleNeuronLHeiserplot()
         
         hold on;
         plot(X, RI_untrained, '-*b'); % untrained
-        plot(X, RI_trained, '-or'); % trained
+        plot(X, RI_trained, '-or'); % trained1
 
         if(~isnan(pref)),
             plot([pref pref], [-0.01 upperYlimit], '--k'); % preference
         end
         
-        text(-20, upperYlimit,['SI = ' num2str(sim_trained.LHeiserAnalysis.SI(i),'%.4f')], 'VerticalAlignment','bottom','HorizontalAlignment','right','FontSize',14)
+        text(-20, upperYlimit,['SI = ' num2str(sim_trained.LHeiserAnalysis.SI(i),'%.4f')], 'VerticalAlignment','bottom','HorizontalAlignment','right','FontSize',10)
         
         xlim([-45 45]);
         ylim([-0.01 upperYlimit]);
@@ -68,13 +70,15 @@ function ThesisSingleNeuronLHeiserplot()
         legend('boxoff')
         box('on')
         
-        set([hYLabel hXLabel], 'FontSize', 14);
-        set(gca, 'FontSize', 12);
+        set([hYLabel hXLabel], 'FontSize', 10);
+        set(gca, 'FontSize', 8);
         
         %% Save
-        name = ['C:\Users\Sindre\Desktop\out\LHeiser_RI_' num2str(i)];
-        saveas(figureHandle,[name '.eps'], 'epsc');
-        saveas(figureHandle,[name '.png']);
+        name = ['C:\Users\Sindre\Desktop\out\LHeiser_RI_' num2str(RF)];
+        %saveas(figureHandle,[name '.eps'], 'epsc');
+        %saveas(figureHandle,[name '.png']);
+        hgexport(figureHandle, [name '.eps'], hgexport('factorystyle'), 'Format', 'eps');
+        hgexport(figureHandle, [name '.png'], hgexport('factorystyle'), 'Format', 'png');
         close(figureHandle);
         
     end
